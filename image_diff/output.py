@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-from image_diff.model import Box
+from image_diff.model import Box, Change, Kind, Side
 
 _RED = (255, 0, 0)
 _WHITE = (255, 255, 255)
@@ -64,27 +64,30 @@ def _draw_tag(draw: ImageDraw.ImageDraw, outline: Box, number: int, image_size: 
     draw.text((x + tag_width / 2, y + tag_height / 2), text, font=_FONT, fill=_WHITE, anchor="mm")
 
 
-def _annotate(image: np.ndarray, boxes: tuple[Box, ...]) -> np.ndarray:
+def _annotate(image: np.ndarray, numbered: list[tuple[int, Change]], side: Side) -> np.ndarray:
     canvas = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     draw = ImageDraw.Draw(canvas)
-    for number, box in enumerate(boxes, start=1):
-        outline = _draw_outline(draw, box, canvas.size)
-        _draw_tag(draw, outline, number, canvas.size)
+    for number, change in numbered:
+        box = change.before if side == Side.BEFORE else change.after
+        if box:
+            outline = _draw_outline(draw, box, canvas.size)
+            _draw_tag(draw, outline, number, canvas.size)
     return cv2.cvtColor(np.asarray(canvas), cv2.COLOR_RGB2BGR)
 
 
-def write(out: Path, before: np.ndarray, after: np.ndarray, boxes: tuple[Box, ...]):
+def _box_json(box: Box | None) -> dict[str, int] | None:
+    if box is None:
+        return None
+    return {"x": box.x1, "y": box.y1, "width": box.x2 - box.x1, "height": box.y2 - box.y1}
+
+
+def write(out: Path, before: np.ndarray, after: np.ndarray, changes: tuple[Change, ...]):
     out.mkdir(parents=True, exist_ok=True)
+    numbered = list(enumerate(changes, start=1))
 
     rows = []
-    for number, box in enumerate(boxes, start=1):
-        row = {
-            "id": number,
-            "x": box.x1,
-            "y": box.y1,
-            "width": box.x2 - box.x1,
-            "height": box.y2 - box.y1,
-        }
+    for number, change in numbered:
+        row = {"id": number, "type": change.kind, "before": _box_json(change.before), "after": _box_json(change.after)}
         rows.append(f"  {json.dumps(row)}")
 
     # One change per line for readability
@@ -92,5 +95,8 @@ def write(out: Path, before: np.ndarray, after: np.ndarray, boxes: tuple[Box, ..
     boxes_json = f"[\n{body}\n]\n"
     (out / "boxes.json").write_text(boxes_json)
 
-    cv2.imwrite(str(out / "before.png"), _annotate(before, boxes))
-    cv2.imwrite(str(out / "after.png"), _annotate(after, boxes))
+    # One pair of images per kind to avoid crowding
+    for kind in Kind:
+        kind_changes = [(number, change) for number, change in numbered if change.kind == kind]
+        cv2.imwrite(str(out / f"before_{kind}.png"), _annotate(before, kind_changes, Side.BEFORE))
+        cv2.imwrite(str(out / f"after_{kind}.png"), _annotate(after, kind_changes, Side.AFTER))
