@@ -1,4 +1,15 @@
 from dataclasses import dataclass
+from enum import StrEnum
+
+
+class Side(StrEnum):
+    BEFORE = "before"
+    AFTER = "after"
+
+
+class Kind(StrEnum):
+    COLOR = "color"
+    SHAPE = "shape"
 
 
 @dataclass(frozen=True)
@@ -17,3 +28,11 @@ class Box:
 
     def union(self, other: "Box") -> "Box":
         return Box(min(self.x1, other.x1), min(self.y1, other.y1), max(self.x2, other.x2), max(self.y2, other.y2))
+
+
+@dataclass(frozen=True)
+class Change:
+    # None on a side where nothing is drawn, such as an added or removed element
+    before: Box | None
+    after: Box | None
+    kind: Kind
