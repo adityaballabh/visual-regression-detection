@@ -12,3 +12,6 @@ test that fails on the regressed version.
 3. Image-diff to produce candidate bounding boxes
 4. Classify regression vs. intended change through a stateless LLM API call
 5. If a regression is detected, a CLI agent inspects the codebase and generates a failing test
+
+## Attribution
+The example pages in `image_diff/examples/` are re-rendered from [WUICC](https://huggingface.co/datasets/zhangsan11111122/WUICC), which is built on [WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight). Both are [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/).
