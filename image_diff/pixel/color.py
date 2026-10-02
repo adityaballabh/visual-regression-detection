@@ -2,10 +2,10 @@ import cv2
 import numpy as np
 from skimage.color import deltaE_ciede2000
 
+from image_diff.pixel.edges import TOLERANCE_PX
+
 # Roughly where color changes become noticeable
 _DELTA_E = 3.0
-# Anti-aliased edges shift by a pixel between renders
-_TOLERANCE_PX = 1
 
 
 def _to_lab(image: np.ndarray) -> np.ndarray:
@@ -20,8 +20,8 @@ def color_mask(before: np.ndarray, after: np.ndarray) -> np.ndarray:
     changed = np.ones(len(ys), dtype=bool)
 
     # Anti-aliasing fix
-    for dy in range(-_TOLERANCE_PX, _TOLERANCE_PX + 1):
-        for dx in range(-_TOLERANCE_PX, _TOLERANCE_PX + 1):
+    for dy in range(-TOLERANCE_PX, TOLERANCE_PX + 1):
+        for dx in range(-TOLERANCE_PX, TOLERANCE_PX + 1):
             neighbor_ys = np.clip(ys + dy, 0, height - 1)
             neighbor_xs = np.clip(xs + dx, 0, width - 1)
             neighbor_differs = deltaE_ciede2000(before_lab[neighbor_ys, neighbor_xs], after_lab[ys, xs]) > _DELTA_E
