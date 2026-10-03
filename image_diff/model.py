@@ -23,6 +23,18 @@ class Box:
     x2: int
     y2: int
 
+    @property
+    def width(self) -> int:
+        return self.x2 - self.x1
+
+    @property
+    def height(self) -> int:
+        return self.y2 - self.y1
+
+    @property
+    def area(self) -> int:
+        return self.width * self.height
+
     def is_near(self, other: "Box", distance: int) -> bool:
         # Negative when the boxes overlap on that axis
         horizontal_gap = max(self.x1 - other.x2, other.x1 - self.x2)
@@ -56,8 +68,7 @@ class Element:
 
     @property
     def visible(self) -> bool:
-        has_area = self.box.x2 > self.box.x1 and self.box.y2 > self.box.y1
-        return has_area and self.styles.get("visibility") != "hidden" and self.styles.get("opacity") != "0"
+        return self.box.area > 0 and self.styles.get("visibility") != "hidden" and self.styles.get("opacity") != "0"
 
 
 @dataclass(frozen=True)
