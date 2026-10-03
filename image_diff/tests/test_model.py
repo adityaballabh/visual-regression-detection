@@ -19,7 +19,7 @@ class SnapshotTests(unittest.TestCase):
             )
         )
         self.assertEqual(
-            [snapshot.label(element) for element in snapshot.elements],
+            [snapshot.label(item) for item in snapshot.elements],
             [
                 "<section> containing 'Join our team of dedicated volunteers an...'",
                 "<p> 'Join our team of dedicated volunteers an...'",
