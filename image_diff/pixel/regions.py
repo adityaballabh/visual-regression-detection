@@ -41,9 +41,13 @@ def find_boxes(mask: np.ndarray) -> list[Box]:
     return boxes
 
 
+def _touches_any(box: Box, others: list[Box]) -> bool:
+    return any(box.is_near(other, 0) for other in others)
+
+
 def categorize_boxes(shape_boxes: list[Box], color_boxes: list[Box]) -> list[Change]:
     # Color boxes touching a shape box belong to that change
-    absorbed = [box for box in color_boxes if any(box.is_near(shape, 0) for shape in shape_boxes)]
+    absorbed = [box for box in color_boxes if _touches_any(box, shape_boxes)]
     shape_boxes = merge_boxes(shape_boxes + absorbed)
     color_boxes = [box for box in color_boxes if box not in absorbed]
 
