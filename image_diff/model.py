@@ -13,6 +13,7 @@ class Side(StrEnum):
 class Kind(StrEnum):
     COLOR = "color"
     SHAPE = "shape"
+    COLOR_AND_SHAPE = "color_and_shape"
 
 
 @dataclass(frozen=True)
@@ -44,6 +45,13 @@ class Box:
     def union(self, other: "Box") -> "Box":
         return Box(min(self.x1, other.x1), min(self.y1, other.y1), max(self.x2, other.x2), max(self.y2, other.y2))
 
+    def intersection(self, other: "Box") -> "Box | None":
+        box = Box(max(self.x1, other.x1), max(self.y1, other.y1), min(self.x2, other.x2), min(self.y2, other.y2))
+        return box if box.width > 0 and box.height > 0 else None
+
+    def contains(self, inner: "Box") -> bool:
+        return self.intersection(inner) == inner
+
 
 @dataclass(frozen=True)
 class Change:
@@ -51,6 +59,11 @@ class Change:
     before: Box | None
     after: Box | None
     kind: Kind
+    # Which element changed and how, left as None when the DOM does not explain the change
+    element: str | None = None
+    selector: str | None = None
+    frames: tuple[str, ...] | None = None
+    detail: str | None = None
 
 
 @dataclass(frozen=True)
@@ -64,6 +77,8 @@ class Element:
     attributes: dict[str, str]
     own_text: str
     box: Box
+    # Chromium stacking layer, higher paints on top
+    paint_order: int
     styles: Mapping[str, str]
 
     @property
@@ -86,6 +101,14 @@ class Snapshot:
             return f"{tag} {_short_quote(image)}"
         return tag
 
+    def ancestors_of(self, element: Element) -> list[Element]:
+        ancestors = []
+        parent = element.parent
+        while parent is not None:
+            ancestors.append(self.elements[parent])
+            parent = self.elements[parent].parent
+        return ancestors
+
     def _first_text_inside(self, element: Element) -> str | None:
         for candidate in self.elements[element.id + 1 :]:
             if not self._is_inside(candidate, element):
@@ -95,12 +118,7 @@ class Snapshot:
         return None
 
     def _is_inside(self, element: Element, container: Element) -> bool:
-        parent = element.parent
-        while parent is not None:
-            if parent == container.id:
-                return True
-            parent = self.elements[parent].parent
-        return False
+        return any(ancestor.id == container.id for ancestor in self.ancestors_of(element))
 
 
 def _given_name(element: Element) -> str:

@@ -2,14 +2,13 @@ import unittest
 
 from image_diff.dom.match import Matching, match
 from image_diff.model import Box, Element, Snapshot
-from image_diff.tests.fixtures import element, snapshot
+from image_diff.tests.fixtures import PAGE, element, snapshot
 
-_PAGE = Box(0, 0, 960, 720)
 _HOME, _ABOUT, _BLOG = Box(16, 24, 72, 44), Box(88, 24, 152, 44), Box(168, 24, 224, 44)
 
 
 def _nav_page(*links: tuple[str, Box]) -> Snapshot:
-    body = element(0, None, "body", box=_PAGE)
+    body = element(0, None, "body", box=PAGE)
     nav = element(1, 0, "nav", box=Box(0, 0, 960, 64))
     anchors = []
     for element_id, (text, box) in enumerate(links, start=2):
@@ -39,20 +38,20 @@ class MatchTests(unittest.TestCase):
     def test_id_rename_paired(self):
         def page(button_id: str) -> Snapshot:
             button = element(1, 0, "button", attributes={"id": button_id}, box=Box(100, 100, 220, 140))
-            return snapshot(element(0, None, "body", box=_PAGE), button)
+            return snapshot(element(0, None, "body", box=PAGE), button)
 
         self.assertEqual(_pairs(match(page("save"), page("submit"))), [(0, 0), (1, 1)])
 
     def test_inserted_wrapper_added(self):
         heading, paragraph = Box(24, 24, 480, 64), Box(24, 88, 720, 152)
         before = snapshot(
-            element(0, None, "body", box=_PAGE),
+            element(0, None, "body", box=PAGE),
             element(1, 0, "section", box=Box(0, 0, 960, 320)),
             element(2, 1, "h2", "Our Services", box=heading),
             element(3, 1, "p", "We deliver food.", box=paragraph),
         )
         after = snapshot(
-            element(0, None, "body", box=_PAGE),
+            element(0, None, "body", box=PAGE),
             element(1, 0, "section", box=Box(0, 0, 960, 320)),
             element(2, 1, "div", box=Box(12, 12, 948, 308)),
             element(3, 2, "h2", "Our Services", box=heading),
@@ -96,7 +95,7 @@ class MatchTests(unittest.TestCase):
     def test_invisible_elements_ignored(self):
         def page(text: str, styles: dict[str, str]) -> Snapshot:
             span = element(1, 0, "span", text, box=Box(16, 16, 112, 40), styles=styles)
-            return snapshot(element(0, None, "body", box=_PAGE), span)
+            return snapshot(element(0, None, "body", box=PAGE), span)
 
         matching = match(page("Tooltip", {"visibility": "hidden"}), page("Toast", {"opacity": "0"}))
 
