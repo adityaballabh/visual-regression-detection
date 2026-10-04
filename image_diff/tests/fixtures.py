@@ -3,6 +3,9 @@ from dataclasses import replace
 
 from image_diff.model import Box, Element, Snapshot
 
+PAGE = Box(0, 0, 960, 720)
+BUTTON = Box(120, 96, 248, 136)
+
 _VISIBLE = {"visibility": "visible", "opacity": "1"}
 _BOX = Box(0, 0, 100, 40)
 
@@ -15,8 +18,9 @@ def element(
     attributes: dict[str, str] | None = None,
     box: Box = _BOX,
     styles: dict[str, str] | None = None,
+    paint_order: int = 1,
 ) -> Element:
-    return Element(id, parent, tag, "", (), attributes or {}, own_text, box, styles or _VISIBLE)
+    return Element(id, parent, tag, "", (), attributes or {}, own_text, box, paint_order, styles or _VISIBLE)
 
 
 def snapshot(*elements: Element) -> Snapshot:
