@@ -1,6 +1,9 @@
 import numpy as np
 
-from image_diff.dom.paint import explain_paint
+from image_diff.dom.box_changes import explain_boxes
+from image_diff.dom.diff import PageDiff
+from image_diff.dom.layout_changes import explain_layout
+from image_diff.dom.match import match
 from image_diff.model import Change, Snapshot
 from image_diff.pixel.color import color_mask
 from image_diff.pixel.edges import edge_mask, find_edges
@@ -34,7 +37,9 @@ def diff_images(
 
     explained = []
     if snapshots is not None:
-        explained, shape_boxes, color_boxes = explain_paint(shape_boxes, color_boxes, *snapshots)
+        page_diff = PageDiff(*snapshots, match(*snapshots))
+        causes = explain_layout(page_diff)
+        explained, shape_boxes, color_boxes = explain_boxes(shape_boxes, color_boxes, page_diff, causes)
 
     # Only boxes the DOM does not explain get merged
     changes = categorize_boxes(merge_boxes(shape_boxes), merge_boxes(color_boxes))

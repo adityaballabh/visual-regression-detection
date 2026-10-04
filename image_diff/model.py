@@ -52,6 +52,12 @@ class Box:
     def contains(self, inner: "Box") -> bool:
         return self.intersection(inner) == inner
 
+    def manhattan_distance(self, other: "Box") -> int:
+        # Empty space between the boxes along both axes, 0 when they touch or overlap
+        horizontal_gap = max(self.x1 - other.x2, other.x1 - self.x2, 0)
+        vertical_gap = max(self.y1 - other.y2, other.y1 - self.y2, 0)
+        return horizontal_gap + vertical_gap
+
 
 @dataclass(frozen=True)
 class Change:
@@ -111,14 +117,14 @@ class Snapshot:
 
     def _first_text_inside(self, element: Element) -> str | None:
         for candidate in self.elements[element.id + 1 :]:
-            if not self._is_inside(candidate, element):
+            if not self.is_inside(candidate, {element.id}):
                 return None
             if candidate.own_text and candidate.visible:
                 return candidate.own_text
         return None
 
-    def _is_inside(self, element: Element, container: Element) -> bool:
-        return any(ancestor.id == container.id for ancestor in self.ancestors_of(element))
+    def is_inside(self, element: Element, container_ids: set[int]) -> bool:
+        return any(ancestor.id in container_ids for ancestor in self.ancestors_of(element))
 
 
 def _given_name(element: Element) -> str:
