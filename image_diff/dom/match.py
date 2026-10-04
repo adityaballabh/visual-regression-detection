@@ -25,14 +25,14 @@ _ANCHOR_ATTRIBUTES = ("id", "data-testid")
 _WORD = re.compile(r"\w+")
 
 
-class Pair(NamedTuple):
+class ElementPair(NamedTuple):
     before: Element
     after: Element
 
 
 @dataclass(frozen=True)
 class Matching:
-    pairs: tuple[Pair, ...]
+    pairs: tuple[ElementPair, ...]
     removed: tuple[Element, ...]
     added: tuple[Element, ...]
 
@@ -181,13 +181,13 @@ def _scores(before: _Features, after: _Features) -> np.ndarray:
     return average.filled()
 
 
-def _best_pairs(before: _Features, after: _Features) -> list[Pair]:
+def _best_pairs(before: _Features, after: _Features) -> list[ElementPair]:
     scores = _scores(before, after)
     rows, columns = linear_sum_assignment(scores, maximize=True)
     pairs = []
     for row, column in zip(rows, columns):
         if scores[row, column] >= _MIN_SCORE:
-            pairs.append(Pair(before.elements[row], after.elements[column]))
+            pairs.append(ElementPair(before.elements[row], after.elements[column]))
     return pairs
 
 
@@ -202,7 +202,7 @@ def _anchor_keys(element: Element) -> list[tuple]:
     return keys
 
 
-def _anchors(befores: list[Element], afters: list[Element]) -> list[Pair]:
+def _anchors(befores: list[Element], afters: list[Element]) -> list[ElementPair]:
     before_counts: Counter[tuple] = Counter()
     for element in befores:
         before_counts.update(_anchor_keys(element))
@@ -224,7 +224,7 @@ def _anchors(befores: list[Element], afters: list[Element]) -> list[Pair]:
                 continue
             after = after_by_key[key]
             if after.id not in paired_after:
-                pairs.append(Pair(before, after))
+                pairs.append(ElementPair(before, after))
                 paired_after.add(after.id)
                 break
     return pairs

@@ -45,4 +45,5 @@ requires GitHub Copilot CLI with authentication configured, Node.js 24+, pnpm
 
 ## Attribution
 - Element matching is adapted from Similo (Nass et al., 2023).
+- Explaining changed pixels with the DOM is adapted from WebSee (Mahajan & Halfond, 2015).
 - The example pages in `image_diff/examples/` are re-rendered from [WUICC](https://huggingface.co/datasets/zhangsan11111122/WUICC), which is built on [WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight). Both are [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
