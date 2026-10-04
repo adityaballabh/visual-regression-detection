@@ -78,6 +78,9 @@ class _Document:
         x, y, width, height = self.layout["bounds"][self.layout_rows[node]]
         return self.origin[0] + x, self.origin[1] + y, width, height
 
+    def paint_order(self, node: int) -> int:
+        return self.layout["paintOrders"][self.layout_rows[node]]
+
 
 class _Loader:
     def __init__(self, capture: dict):
@@ -112,6 +115,7 @@ class _Loader:
             attributes=_attributes(document.nodes["attributes"][node], self.strings),
             own_text=document.own_texts.get(node, ""),
             box=self._box(*document.page_bounds(node)),
+            paint_order=document.paint_order(node),
             styles=self._styles(document.layout["styles"][row]),
         )
 
