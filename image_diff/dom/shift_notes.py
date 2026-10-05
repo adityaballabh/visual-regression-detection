@@ -1,8 +1,12 @@
 from statistics import mode
 
-from image_diff.dom.diff import PageDiff, resized, size_changes
+from image_diff.dom.diff import PageDiff, changed, size_changes
 from image_diff.dom.match import ElementPair
-from image_diff.model import Box, Cause, Edge, overlapping, px
+from image_diff.dom.spacing import swapped_sides
+from image_diff.model import Box, Cause, Edge, Element, overlapping, px
+
+# Cross axis alignments that move the other children when one grows
+_CENTER_OR_END = ("center", "flex-end", "end")
 
 
 def _margin_change(pair: ElementPair, side: str) -> float:
@@ -79,10 +83,11 @@ def _pushes_along(page_diff: PageDiff, cause: Cause, vertical: bool) -> bool:
 
     # A swap or reparent pushes along the axis it moved on, since the element keeps its size
     if cause.moved_itself:
+        # A transform moves the element without touching the flow
+        if changed(pair, "transform"):
+            return False
         dx, dy = _push(page_diff, pair)
         return dy != 0 if vertical else dx != 0
-    if not resized(pair):
-        return True
 
     # A resize pushes along the axis it or an ancestor grew on, like a nav that gets taller when its links wrap
     changed_sizes = set()
@@ -92,22 +97,74 @@ def _pushes_along(page_diff: PageDiff, cause: Cause, vertical: bool) -> bool:
     return ("height" if vertical else "width") in changed_sizes
 
 
+def _distributes(container: Element, child: Element, vertical: bool) -> bool:
+    display = container.styles.get("display", "")
+    if display.endswith("grid"):
+        return True
+
+    if display.endswith("flex"):
+        column = container.styles.get("flex-direction", "row").startswith("column")
+        # A flex container distributes its main axis, and its cross axis when it centers or end-aligns its children
+        return column == vertical or container.styles.get("align-items") in _CENTER_OR_END
+    # Cells aligned to the middle or bottom follow the tallest cell in the row
+    return vertical and display == "table-row" and child.styles.get("vertical-align") in ("middle", "bottom")
+
+
+def _distributing_container(page_diff: PageDiff, pair: ElementPair, vertical: bool) -> ElementPair | None:
+    child = pair.before
+    for ancestor in page_diff.before.ancestors_of(pair.before):
+        container = page_diff.by_before.get(ancestor.id)
+        if container and _distributes(ancestor, child, vertical):
+            return container
+        child = ancestor
+    return None
+
+
+def _cause_in_other_child(page_diff: PageDiff, container: ElementPair, pair: ElementPair, cause: Cause) -> bool:
+    mover_child = page_diff.before.child_containing(container.before, pair.before)
+    if cause.before is not None:
+        cause_child = page_diff.before.child_containing(container.before, cause.before)
+        return cause_child is not None and cause_child.id != mover_child.id
+
+    # An added cause has no before element, so find its child on the after page and match that back
+    cause_child = page_diff.after.child_containing(container.after, cause.after)
+    if cause_child is None:
+        return False
+    child_pair = page_diff.by_after.get(cause_child.id)
+    return child_pair is None or child_pair.before.id != mover_child.id
+
+
+def _placed_to_push(
+    page_diff: PageDiff, container: ElementPair | None, pair: ElementPair, cause: Cause, vertical: bool
+) -> bool:
+    origin, box = _origin_box(cause), pair.before.box
+    # In normal flow a push up or down comes from above, a push sideways from the same row
+    if vertical:
+        in_flow = origin.y1 < box.y1
+    else:
+        in_flow = overlapping(origin.y1, origin.y2, box.y1, box.y2)
+
+    cause_pair = page_diff.by_before.get(cause.before.id) if cause.before else None
+    reordered = cause.moved_itself and cause_pair and page_diff.parent_pair(cause_pair)
+    if reordered:
+        # A reorder displaces what it jumped over, and in normal flow also what follows it
+        return swapped_sides(pair, cause_pair) is not None or (in_flow and not container)
+
+    if container and not cause.moved_itself and _cause_in_other_child(page_diff, container, pair, cause):
+        # A cause in another child of a container that distributes its space pushes from any side
+        return True
+    return in_flow
+
+
 def _pusher(page_diff: PageDiff, causes: list[Cause], pair: ElementPair, vertical: bool) -> int | None:
     box = pair.before.box
+    container = _distributing_container(page_diff, pair, vertical)
     candidates = []
     for index, cause in enumerate(causes):
         itself = cause.before is not None and cause.before.id == pair.before.id
         if itself or not _pushes_along(page_diff, cause, vertical):
             continue
-
-        origin = _origin_box(cause)
-        # A push up or down comes from above, a push sideways comes from the same row
-        if vertical:
-            placed_to_push = origin.y1 < box.y1
-        else:
-            placed_to_push = overlapping(origin.y1, origin.y2, box.y1, box.y2)
-
-        if placed_to_push:
+        if _placed_to_push(page_diff, container, pair, cause, vertical):
             candidates.append(index)
     if not candidates:
         return None
@@ -115,9 +172,7 @@ def _pusher(page_diff: PageDiff, causes: list[Cause], pair: ElementPair, vertica
     # Credit the nearest cause along the axis of the push
     def distance(index: int) -> int:
         origin = _origin_box(causes[index])
-        if vertical:
-            return box.y1 - origin.y2
-        return origin.horizontal_gap(box)
+        return origin.vertical_gap(box) if vertical else origin.horizontal_gap(box)
 
     return min(candidates, key=distance)
 
