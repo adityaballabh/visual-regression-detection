@@ -1,8 +1,9 @@
+from collections.abc import Sequence
 from fnmatch import fnmatchcase
 from typing import NamedTuple
 
 from image_diff.dom.match import ElementPair, Matching
-from image_diff.model import Kind, Snapshot
+from image_diff.model import SIZE_TOLERANCE_PX, Kind, Snapshot
 
 # Chromium reports these as sizes and positions layout worked out, so they might change whenever something nearby resizes
 _LEFT_TO_LAYOUT = [
@@ -27,7 +28,7 @@ def _text_difference(pair: ElementPair) -> list[Difference]:
     return [Difference("text", f"'{before.own_text}'", f"'{after.own_text}'")]
 
 
-def matches_any(style: str, patterns: list[str]) -> bool:
+def matches_any(style: str, patterns: Sequence[str]) -> bool:
     return any(fnmatchcase(style, pattern) for pattern in patterns)
 
 
@@ -42,6 +43,31 @@ def changed_styles(pair: ElementPair) -> list[Difference]:
         if before.styles[name] != after.styles[name]:
             differences.append(Difference(name, before.styles[name], after.styles[name]))
     return differences
+
+
+def size_changes(pair: ElementPair) -> list[Difference]:
+    changes = []
+    for name in ("width", "height"):
+        was, now = getattr(pair.before.box, name), getattr(pair.after.box, name)
+        if abs(now - was) > SIZE_TOLERANCE_PX:
+            changes.append(Difference(name, f"{was}px", f"{now}px"))
+    return changes
+
+
+def resized(pair: ElementPair) -> bool:
+    return bool(size_changes(pair))
+
+
+def same_change(pair: ElementPair, other: ElementPair, style: str) -> bool:
+    # Inheritance changes a style from and to the same values on both elements
+    return (pair.before.styles.get(style), pair.after.styles.get(style)) == (
+        other.before.styles.get(style),
+        other.after.styles.get(style),
+    )
+
+
+def changed(pair: ElementPair, *patterns: str) -> bool:
+    return any(matches_any(difference.name, patterns) for difference in changed_styles(pair))
 
 
 def _style_differences(pair: ElementPair) -> list[Difference]:
@@ -78,6 +104,15 @@ class PageDiff:
             return parent
         return None
 
+    def matched_children(self, parent: ElementPair) -> list[ElementPair]:
+        children = []
+        for child in self.before.children_of(parent.before):
+            pair = self.by_before.get(child.id)
+            # Only children that stayed under this parent
+            if pair and pair.after.parent == parent.after.id:
+                children.append(pair)
+        return children
+
     def own_differences(self, pair: ElementPair) -> list[Difference]:
         inherited = set()
         if parent := self.parent_pair(pair):
@@ -89,8 +124,11 @@ class PageDiff:
                 own.append(difference)
         return own
 
-    def inherited_from(self, pair: ElementPair) -> ElementPair:
-        differences = set(self.differences[pair.after.id])
+    def inherited_from(self, pair: ElementPair, styles: tuple[str, ...] | None = None) -> ElementPair:
+        differences = {d for d in self.differences[pair.after.id] if styles is None or d.name in styles}
+        # With nothing to match every ancestor would qualify
+        if not differences:
+            return pair
         origin = pair
         for ancestor in self.after.ancestors_of(pair.after):
             candidate = self.by_after.get(ancestor.id)

@@ -8,11 +8,11 @@ import numpy as np
 
 from image_diff.model import Box, Change, Kind
 from image_diff.output import write
-from image_diff.tests.fixtures import BUTTON
 
+_BUTTON = Box(120, 96, 248, 136)
 _RESTYLED_BUTTON = Change(
-    BUTTON,
-    BUTTON,
+    _BUTTON,
+    _BUTTON,
     Kind.COLOR_AND_SHAPE,
     element="<button> 'Save'",
     selector="html:nth-child(1) > body:nth-child(2) > button:nth-child(1)",
