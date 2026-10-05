@@ -2,18 +2,12 @@ import unittest
 
 from image_diff.dom.match import Matching, match
 from image_diff.model import Box, Element, Snapshot
-from image_diff.tests.fixtures import PAGE, element, snapshot
-
-_HOME, _ABOUT, _BLOG = Box(16, 24, 72, 44), Box(88, 24, 152, 44), Box(168, 24, 224, 44)
+from image_diff.tests.fixtures import PAGE, Block, element, row, snapshot, stack
 
 
-def _nav_page(*links: tuple[str, Box]) -> Snapshot:
-    body = element(0, None, "body", box=PAGE)
-    nav = element(1, 0, "nav", box=Box(0, 0, 960, 64))
-    anchors = []
-    for element_id, (text, box) in enumerate(links, start=2):
-        anchors.append(element(element_id, 1, "a", text, {"href": "#"}, box))
-    return snapshot(body, nav, *anchors)
+def _nav(*texts: str) -> Snapshot:
+    links = [Block("a", text, 56, margin=16, attributes={"href": "#"}) for text in texts]
+    return row(*links, width=960, height=64)
 
 
 def _pairs(matching: Matching) -> list[tuple[int, int]]:
@@ -30,15 +24,14 @@ def _texts(elements: tuple[Element, ...]) -> list[str]:
 
 class MatchTests(unittest.TestCase):
     def test_link_removed(self):
-        matching = match(_nav_page(("Home", _HOME), ("About", _ABOUT)), _nav_page(("Home", _HOME)))
+        matching = match(_nav("Home", "About"), _nav("Home"))
 
         self.assertEqual(_texts(matching.removed), ["About"])
         self.assertEqual(matching.added, ())
 
     def test_id_rename_paired(self):
         def page(button_id: str) -> Snapshot:
-            button = element(1, 0, "button", attributes={"id": button_id}, box=Box(100, 100, 220, 140))
-            return snapshot(element(0, None, "body", box=PAGE), button)
+            return stack(Block("button", size=40, margin=100, attributes={"id": button_id}), x=100, width=120)
 
         self.assertEqual(_pairs(match(page("save"), page("submit"))), [(0, 0), (1, 1)])
 
@@ -64,8 +57,7 @@ class MatchTests(unittest.TestCase):
         self.assertEqual([item.id for item in matching.added], [2])
 
     def test_inserted_sibling_added(self):
-        before = _nav_page(("Home", _HOME), ("About", _ABOUT))
-        after = _nav_page(("News", _HOME), ("Home", _ABOUT), ("About", _BLOG))
+        before, after = _nav("Home", "About"), _nav("News", "Home", "About")
 
         matching = match(before, after)
 
@@ -94,8 +86,7 @@ class MatchTests(unittest.TestCase):
 
     def test_invisible_elements_ignored(self):
         def page(text: str, styles: dict[str, str]) -> Snapshot:
-            span = element(1, 0, "span", text, box=Box(16, 16, 112, 40), styles=styles)
-            return snapshot(element(0, None, "body", box=PAGE), span)
+            return stack(Block("span", text, 24, styles, margin=16), x=16, width=96)
 
         matching = match(page("Tooltip", {"visibility": "hidden"}), page("Toast", {"opacity": "0"}))
 
