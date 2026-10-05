@@ -22,6 +22,7 @@ class ParseTests(unittest.TestCase):
 
         self.assertEqual(snapshot.label(button), "<button> 'Join Now'")
         self.assertEqual(button.box, Box(16, 128, 99, 168))
+        self.assertEqual(button.text_box, Box(24, 139, 91, 157))
         self.assertEqual(
             button.selector, "html:nth-child(1) > body:nth-child(2) > section:nth-child(2) > button:nth-child(3)"
         )

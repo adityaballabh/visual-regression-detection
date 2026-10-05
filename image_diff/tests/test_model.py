@@ -9,9 +9,7 @@ class SnapshotTests(unittest.TestCase):
         snapshot = Snapshot(
             (
                 element(0, None, tag="section"),
-                element(
-                    1, 0, tag="p", own_text="Join our team of dedicated volunteers and make a difference in the world."
-                ),
+                element(1, 0, tag="p", own_text="Join our team of dedicated volunteers and make a difference."),
                 element(2, None, tag="button", own_text="Sign up", attributes={"id": "cta"}),
                 element(3, None, tag="nav", attributes={"aria-label": "Main"}),
                 element(4, None, tag="img", attributes={"src": "/static/logo.png"}),

@@ -1,69 +1,49 @@
 # Adapted from X-PERT (Choudhary, Prasad & Orso, 2013)
 
-from statistics import mode
-from typing import NamedTuple
+from collections import defaultdict
 
-from image_diff.dom.diff import Difference, PageDiff, change_kind, changed_styles, matches_any
+from image_diff.dom.diff import (
+    Difference,
+    PageDiff,
+    change_kind,
+    changed_styles,
+    matches_any,
+    resized,
+    same_change,
+    size_changes,
+)
 from image_diff.dom.match import ElementPair
-from image_diff.model import Box, Element, Kind, Snapshot
+from image_diff.dom.moves import reorders, reparents, text_moves
+from image_diff.dom.shift_notes import with_shifts
+from image_diff.dom.spacing import Claim, Gap, changed_gaps, owner
+from image_diff.model import Box, Cause, Element, Kind, Snapshot
 
-# Edges round separately on each page, so a size can drift a pixel with nothing changed
-_SIZE_TOLERANCE_PX = 1
 # Layout triggering CSS properties except positions and used values, since these set an element's own size
 _SIZE_STYLES = [
     "font-*", "letter-spacing", "word-spacing", "line-height", "text-indent", "text-transform", "white-space",
     "box-sizing", "padding-*", "border-*-width", "min-*", "max-*", "flex-basis", "flex-grow", "flex-shrink", "overflow-*",
 ]  # fmt: skip
 _DISTRIBUTING = ("flex", "inline-flex", "grid", "inline-grid")
-# Words for the shift note, in CSS side order
-_DIRECTION_WORDS = {"top": "up", "right": "right", "bottom": "down", "left": "left"}
-
-
-class Cause(NamedTuple):
-    # None on a page where the element does not exist
-    before: Element | None
-    after: Element | None
-    kind: Kind
-    detail: str
 
 
 def _subtree_tops(snapshot: Snapshot, elements: tuple[Element, ...]) -> list[Element]:
-    visible_ids = {element.id for element in elements if element.visible}
+    ids = {element.id for element in elements}
     tops = []
     for element in elements:
         # Report a whole added or removed subtree once, on its outermost element
-        if element.id in visible_ids and not snapshot.is_inside(element, visible_ids):
+        if not snapshot.is_inside(element, ids):
             tops.append(element)
     return tops
-
-
-def _visible_pairs(page_diff: PageDiff) -> list[ElementPair]:
-    return [pair for pair in page_diff.matching.pairs if pair.before.visible and pair.after.visible]
-
-
-def _size_changes(pair: ElementPair) -> list[Difference]:
-    before, after = pair.before.box, pair.after.box
-    sizes = (("width", before.width, after.width), ("height", before.height, after.height))
-    changes = []
-    for name, was, now in sizes:
-        if abs(now - was) > _SIZE_TOLERANCE_PX:
-            changes.append(Difference(name, f"{was}px", f"{now}px"))
-    return changes
-
-
-def _resized(pair: ElementPair) -> bool:
-    return bool(_size_changes(pair))
 
 
 def _size_style_differences(page_diff: PageDiff, pair: ElementPair) -> list[Difference]:
     parent = page_diff.parent_pair(pair)
     differences = []
     for difference in changed_styles(pair):
-        name, was, now = difference
-        if not matches_any(name, _SIZE_STYLES):
+        if not matches_any(difference.name, _SIZE_STYLES):
             continue
         # Skip styles the parent changed the same way since the element inherited them
-        if parent and (parent.before.styles.get(name), parent.after.styles.get(name)) == (was, now):
+        if parent and same_change(pair, parent, difference.name):
             continue
         differences.append(difference)
     return differences
@@ -80,11 +60,37 @@ def _resize(page_diff: PageDiff, pair: ElementPair) -> Cause:
         # Add padding and line height since the paint differences leave them out
         if difference.name not in shown:
             differences.append(difference)
-    detail = "; ".join(str(difference) for difference in (*differences, *_size_changes(pair)))
+    detail = "; ".join(str(difference) for difference in (*differences, *size_changes(pair)))
     return Cause(pair.before, pair.after, change_kind(differences), detail)
 
 
-class _PageClaims:
+def _gap_causes(blamed: list[tuple[Claim, Gap]]) -> list[Cause]:
+    # Group by element since one element's margin or padding can change the gaps on several sides
+    groups: dict[int, list[tuple[Claim, Gap]]] = defaultdict(list)
+    for claim, gap in blamed:
+        groups[claim.pair.before.id].append((claim, gap))
+    causes = []
+    for group in groups.values():
+        details: dict[str, str] = {}
+        for claim, gap in group:
+            details.setdefault(claim.label, f"{claim.label} {gap.was}px -> {gap.now}px")
+
+        pair = group[0][0].pair
+        before_box = Box.union_all(gap.before_box for _, gap in group)
+        after_box = Box.union_all(gap.after_box for _, gap in group)
+        causes.append(
+            Cause(
+                pair.before,
+                pair.after,
+                Kind.SHAPE,
+                "; ".join(details.values()),
+                (before_box, after_box),
+            )
+        )
+    return causes
+
+
+class _PageAccountedFor:
     def __init__(self, snapshot: Snapshot):
         self.snapshot = snapshot
         self.ids: set[int] = set()
@@ -95,6 +101,9 @@ class _PageClaims:
         self.ids.add(element.id)
         self.holder_ids.update(ancestor.id for ancestor in self.snapshot.ancestors_of(element))
 
+    def has_accounted_child(self, element: Element) -> bool:
+        return any(self.snapshot.elements[claimed].parent == element.id for claimed in self.ids)
+
     def explains(self, element: Element) -> bool:
         if element.id in self.holder_ids or self.snapshot.is_inside(element, self.ids):
             return True
@@ -102,13 +111,13 @@ class _PageClaims:
         parent = self.snapshot.elements[element.parent] if element.parent is not None else None
         if parent is None or parent.styles.get("display") not in _DISTRIBUTING:
             return False
-        return any(self.snapshot.elements[claimed].parent == parent.id for claimed in self.ids)
+        return self.has_accounted_child(parent)
 
 
-class _Claims:
+class _AccountedFor:
     def __init__(self, page_diff: PageDiff):
-        self.before = _PageClaims(page_diff.before)
-        self.after = _PageClaims(page_diff.after)
+        self.before = _PageAccountedFor(page_diff.before)
+        self.after = _PageAccountedFor(page_diff.after)
 
     def add(self, before: Element | None, after: Element | None):
         if before:
@@ -119,18 +128,27 @@ class _Claims:
     def explains(self, pair: ElementPair) -> bool:
         return self.before.explains(pair.before) or self.after.explains(pair.after)
 
+    def redistributed(self, gap: Gap, resized_ids: set[int]) -> bool:
+        container = gap.container
+        # The container resized or a child did, so its layout moved the space around
+        if container.before.id in self.before.ids and resized(container):
+            return True
+        if self.before.has_accounted_child(container.before) or self.after.has_accounted_child(container.after):
+            return True
+        return any(child.id in resized_ids for child in self.before.snapshot.children_of(container.before))
 
-def _unexplained(pending: list[ElementPair], claims: _Claims) -> list[ElementPair]:
+
+def _unexplained_resizes(unowned_resizes: list[ElementPair], accounted_for: _AccountedFor) -> list[ElementPair]:
     settled = False
-    # Explaining one resize can explain its children and siblings, so repeat until a pass claims nothing
+    # Explaining one resize can explain its children and siblings, so repeat until a pass accounts for nothing new
     while not settled:
         settled = True
-        for pair in list(pending):
-            if claims.explains(pair):
-                claims.add(*pair)
-                pending.remove(pair)
+        for pair in list(unowned_resizes):
+            if accounted_for.explains(pair):
+                accounted_for.add(*pair)
+                unowned_resizes.remove(pair)
                 settled = False
-    return pending
+    return unowned_resizes
 
 
 def _without_holders(pairs: list[ElementPair], snapshot: Snapshot) -> list[ElementPair]:
@@ -140,88 +158,77 @@ def _without_holders(pairs: list[ElementPair], snapshot: Snapshot) -> list[Eleme
     return [pair for pair in pairs if pair.before.id not in holder_ids]
 
 
-def _push(before: Box | None, after: Box | None) -> tuple[int, int]:
-    if before is None or after is None:
-        return 0, 0
-    dx, dy = after.x1 - before.x1, after.y1 - before.y1
-    # A centered element's corner moves when it widens, so only count sideways movement at the same width
-    if before.width != after.width:
-        dx = 0
-    return dx, dy
+def _claimed_gaps(
+    page_diff: PageDiff, gaps: list[Gap], moved_text_ids: set[int]
+) -> tuple[list[tuple[Claim, Gap]], list[Gap]]:
+    claimed, unclaimed = [], []
+    for gap in gaps:
+        claim = owner(gap)
+        # Skip a margin claim on an unowned resize, since Chromium reports an auto margin as the space left over
+        follows_resize = claim and claim.is_margin and resized(claim.pair) and not _owns_resize(page_diff, claim.pair)
+        if claim is None or follows_resize:
+            unclaimed.append(gap)
+        elif claim.pair.before.id not in moved_text_ids:
+            claimed.append((claim, gap))
+    return claimed, unclaimed
 
 
-def _moves(dx: int, dy: int) -> list[tuple[str, int]]:
-    # How far a corner moved toward each side
-    toward = {"top": -dy, "right": dx, "bottom": dy, "left": -dx}
-    return [(side, distance) for side, distance in toward.items() if distance > 0]
-
-
-def _shift_note(moves: list[tuple[str, int]]) -> str:
-    steps = []
-    for side, word in _DIRECTION_WORDS.items():
-        distances = [distance for moved_side, distance in moves if moved_side == side]
-        # Note the most common distance toward each side
-        if distances:
-            steps.append(f"{mode(distances)}px {word}")
-    return "content moved " + ", ".join(steps)
-
-
-def _cause_box(cause: Cause) -> Box:
-    return cause.after.box if cause.after else cause.before.box
-
-
-def _with_shifts(causes: list[Cause], page_diff: PageDiff) -> list[Cause]:
-    before_ids = {cause.before.id for cause in causes if cause.before}
-    moves: list[list[tuple[str, int]]] = [[] for _ in causes]
-    for pair in _visible_pairs(page_diff):
-        dx, dy = _push(pair.before.box, pair.after.box)
-        # Skip content inside a cause, it moved because the cause grew around it
-        if (dx, dy) == (0, 0) or page_diff.before.is_inside(pair.before, before_ids):
-            continue
-        # A cause can be shifted by another cause but not by itself
-        others = [
-            index for index, cause in enumerate(causes) if cause.before is None or cause.before.id != pair.before.id
-        ]
-        if not others:
-            continue
-        nearest = min(others, key=lambda index: _cause_box(causes[index]).manhattan_distance(pair.before.box))
-        cause = causes[nearest]
-        # Measure the shift relative to the cause, since the cause might have been pushed too
-        cause_dx, cause_dy = _push(cause.before and cause.before.box, cause.after and cause.after.box)
-        moves[nearest] += _moves(dx - cause_dx, dy - cause_dy)
-
-    noted = []
-    for cause, cause_moves in zip(causes, moves):
-        detail = f"{cause.detail}. {_shift_note(cause_moves)}" if cause_moves else cause.detail
-        noted.append(cause._replace(detail=detail))
-    return noted
-
-
-def explain_layout(page_diff: PageDiff) -> list[Cause]:
+def _known_causes(page_diff: PageDiff) -> tuple[list[Cause], list[ElementPair], list[Gap]]:
     before, after, matching = page_diff.before, page_diff.after, page_diff.matching
     causes = []
     for element in _subtree_tops(before, matching.removed):
         causes.append(Cause(element, None, Kind.SHAPE, "removed"))
     for element in _subtree_tops(after, matching.added):
         causes.append(Cause(None, element, Kind.SHAPE, "added"))
+    text_move_causes = text_moves(page_diff)
+    causes += reorders(page_diff) + reparents(page_diff) + text_move_causes
 
-    pending = []
-    for pair in _visible_pairs(page_diff):
-        if not _resized(pair):
+    moved_text_ids = {cause.before.id for cause in text_move_causes}
+    claimed, unclaimed_gaps = _claimed_gaps(page_diff, changed_gaps(page_diff), moved_text_ids)
+    gap_causes = _gap_causes(claimed)
+    spaced_ids = {cause.before.id for cause in gap_causes}
+    causes += gap_causes
+
+    unowned_resizes = []
+    for pair in page_diff.matching.pairs:
+        if not resized(pair):
             continue
-        if _owns_resize(page_diff, pair):
+        if not _owns_resize(page_diff, pair):
+            unowned_resizes.append(pair)
+        # Padding that grew is already reported as the inset it changed
+        elif pair.before.id not in spaced_ids:
             causes.append(_resize(page_diff, pair))
+    return causes, unowned_resizes, unclaimed_gaps
+
+
+def _leftover_causes(
+    page_diff: PageDiff, known: list[Cause], unowned_resizes: list[ElementPair], unclaimed_gaps: list[Gap]
+) -> list[Cause]:
+    accounted_for = _AccountedFor(page_diff)
+    for cause in known:
+        accounted_for.add(cause.before, cause.after)
+    resized_ids = {pair.before.id for pair in page_diff.matching.pairs if resized(pair)}
+
+    causes = []
+    # Blame a gap nothing rearranged on its fallback and a resize nothing explains on itself, until nothing is left
+    while True:
+        unowned_resizes = _unexplained_resizes(unowned_resizes, accounted_for)
+        standalone_gaps = [gap for gap in unclaimed_gaps if not accounted_for.redistributed(gap, resized_ids)]
+        unclaimed_gaps = [gap for gap in unclaimed_gaps if accounted_for.redistributed(gap, resized_ids)]
+        if standalone_gaps:
+            found = _gap_causes([(gap.fallback, gap) for gap in standalone_gaps])
+        elif unowned_resizes:
+            found = [_resize(page_diff, pair) for pair in _without_holders(unowned_resizes, page_diff.before)]
+            found_ids = {cause.before.id for cause in found}
+            unowned_resizes = [pair for pair in unowned_resizes if pair.before.id not in found_ids]
         else:
-            pending.append(pair)
+            return causes
+        causes += found
+        for cause in found:
+            accounted_for.add(cause.before, cause.after)
 
-    claims = _Claims(page_diff)
-    for cause in causes:
-        claims.add(cause.before, cause.after)
 
-    # Report an unexplained resize as its own cause
-    while pending := _unexplained(pending, claims):
-        for pair in _without_holders(pending, before):
-            causes.append(_resize(page_diff, pair))
-            claims.add(*pair)
-            pending.remove(pair)
-    return _with_shifts(causes, page_diff)
+def explain_layout(page_diff: PageDiff) -> tuple[list[Cause], set[int]]:
+    causes, unowned_resizes, unclaimed_gaps = _known_causes(page_diff)
+    causes += _leftover_causes(page_diff, causes, unowned_resizes, unclaimed_gaps)
+    return with_shifts(causes, page_diff)
