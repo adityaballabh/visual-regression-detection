@@ -13,7 +13,7 @@ from image_diff.dom.diff import (
     size_changes,
 )
 from image_diff.dom.match import ElementPair
-from image_diff.dom.moves import reorders, reparents, text_moves
+from image_diff.dom.moves import reorders, reparents, text_moves, transform_moves
 from image_diff.dom.shift_notes import with_shifts
 from image_diff.dom.spacing import Claim, Gap, changed_gaps, owner
 from image_diff.model import Box, Cause, Element, Kind, Snapshot
@@ -180,8 +180,10 @@ def _known_causes(page_diff: PageDiff) -> tuple[list[Cause], list[ElementPair], 
         causes.append(Cause(element, None, Kind.SHAPE, "removed"))
     for element in _subtree_tops(after, matching.added):
         causes.append(Cause(None, element, Kind.SHAPE, "added"))
-    text_move_causes = text_moves(page_diff)
-    causes += reorders(page_diff) + reparents(page_diff) + text_move_causes
+    text_move_causes, transform_causes = text_moves(page_diff), transform_moves(page_diff)
+    # A transformed element keeps its place in the flow, so leave it out of the reorders
+    transformed_ids = {cause.before.id for cause in transform_causes}
+    causes += reorders(page_diff, transformed_ids) + reparents(page_diff) + text_move_causes + transform_causes
 
     moved_text_ids = {cause.before.id for cause in text_move_causes}
     claimed, unclaimed_gaps = _claimed_gaps(page_diff, changed_gaps(page_diff), moved_text_ids)

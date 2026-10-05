@@ -1,9 +1,8 @@
 from collections import defaultdict
-from difflib import SequenceMatcher
 
-from image_diff.dom.diff import PageDiff, changed, changed_styles, resized
+from image_diff.dom.diff import Difference, PageDiff, changed, changed_styles, resized
 from image_diff.dom.match import ElementPair
-from image_diff.dom.spacing import relation
+from image_diff.dom.spacing import swapped_sides
 from image_diff.model import SIZE_TOLERANCE_PX, Box, Cause, Element, Kind, in_reading_order
 
 # Styles that move an element's text within its own box
@@ -14,10 +13,9 @@ _FORM_TAGS = ("input", "textarea", "select")
 def _reorder_detail(page_diff: PageDiff, pair: ElementPair, kept: list[ElementPair], position: int) -> str | None:
     flipped = []
     for index, other in enumerate(kept):
-        was, now = relation(pair.before.box, other.before.box), relation(pair.after.box, other.after.box)
         # Keep siblings that stayed put and ended up on the other side of the mover
-        if was and now and was != now:
-            flipped.append((abs(index - position), other, was, now))
+        if sides := swapped_sides(pair, other):
+            flipped.append((abs(index - position), other, *sides))
 
     if not flipped:
         return None
@@ -26,19 +24,37 @@ def _reorder_detail(page_diff: PageDiff, pair: ElementPair, kept: list[ElementPa
     return f"moved from {was.relation} {label} to {now.relation} {label}"
 
 
-def reorders(page_diff: PageDiff) -> list[Cause]:
+def _kept_ids(old_ids: list[int], new_ids: list[int], distance_moved: dict[int, int]) -> set[int]:
+    new_position = {sibling_id: index for index, sibling_id in enumerate(new_ids)}
+    runs: list[tuple[tuple[int, int], list[int]]] = []
+    for sibling_id in old_ids:
+        best = (1, -distance_moved[sibling_id]), [sibling_id]
+
+        for score, run in runs:
+            longer = (score[0] + 1, score[1] - distance_moved[sibling_id])
+            # Extend the longest run still in order, and when runs tie the one whose siblings moved least
+            if new_position[run[-1]] < new_position[sibling_id] and longer > best[0]:
+                best = longer, [*run, sibling_id]
+        runs.append(best)
+    return set(max(runs, key=lambda run: run[0])[1])
+
+
+def reorders(page_diff: PageDiff, transformed_ids: set[int]) -> list[Cause]:
     causes = []
     for parent in page_diff.matching.pairs:
-        children = page_diff.matched_children(parent)
+        children = [pair for pair in page_diff.matched_children(parent) if pair.before.id not in transformed_ids]
+        if len(children) < 2:
+            continue
         before = in_reading_order(children, lambda pair: pair.before.box)
         after = in_reading_order(children, lambda pair: pair.after.box)
         old_ids, new_ids = [pair.before.id for pair in before], [pair.before.id for pair in after]
 
-        # Siblings outside the longest run that kept its order are the ones that moved
-        blocks = SequenceMatcher(None, old_ids, new_ids).get_matching_blocks()
-        kept_ids = set()
-        for block in blocks:
-            kept_ids.update(old_ids[block.a : block.a + block.size])
+        distance_moved = {}
+        for pair in children:
+            dx, dy = pair.after.box.x1 - pair.before.box.x1, pair.after.box.y1 - pair.before.box.y1
+            distance_moved[pair.before.id] = abs(dx) + abs(dy)
+        # Custom LCS since difflib and rapidfuzz take no tie-break, and a swap needs one to name the sibling that moved further
+        kept_ids = _kept_ids(old_ids, new_ids, distance_moved)
 
         kept = [pair for pair in after if pair.before.id in kept_ids]
         for position, pair in enumerate(after):
@@ -65,6 +81,19 @@ def reparents(page_diff: PageDiff) -> list[Cause]:
         causes.append(
             Cause(pair.before, pair.after, Kind.SHAPE, f"moved from inside {was} to inside {now}", moved_itself=True)
         )
+    return causes
+
+
+def transform_moves(page_diff: PageDiff) -> list[Cause]:
+    causes = []
+    for pair in page_diff.matching.pairs:
+        before, after = pair.before.box, pair.after.box
+        # Skip a transform that resized the element, since the resize reports it
+        if not changed(pair, "transform") or resized(pair) or (before.x1, before.y1) == (after.x1, after.y1):
+            continue
+
+        detail = Difference("transform", pair.before.styles["transform"], pair.after.styles["transform"])
+        causes.append(Cause(pair.before, pair.after, Kind.SHAPE, str(detail), moved_itself=True))
     return causes
 
 
