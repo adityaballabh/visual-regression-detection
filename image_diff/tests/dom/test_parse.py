@@ -6,7 +6,7 @@ from image_diff.dom.parse import load_snapshot, parse_snapshot
 from image_diff.model import Box, Element, Snapshot
 
 _EXAMPLES = Path(__file__).parents[2] / "examples"
-_EXAMPLE = _EXAMPLES / "button_darkened" / "before_snapshot.json"
+_EXAMPLE = _EXAMPLES / "button_enlarged" / "input" / "before_snapshot.json"
 # Captured from iframe.html
 _IFRAME_PAGE = Path(__file__).parent / "iframe_snapshot.json"
 
@@ -20,13 +20,13 @@ class ParseTests(unittest.TestCase):
         snapshot = load_snapshot(_EXAMPLE)
         button = _first(snapshot, "button")
 
-        self.assertEqual(snapshot.label(button), "<button> 'Join Now'")
-        self.assertEqual(button.box, Box(16, 128, 99, 168))
-        self.assertEqual(button.text_box, Box(24, 139, 91, 157))
+        self.assertEqual(snapshot.label(button), "<button> 'Learn More'")
+        self.assertEqual(button.box, Box(580, 252, 700, 292))
+        self.assertEqual(button.text_box, Box(596, 263, 684, 281))
         self.assertEqual(
             button.selector, "html:nth-child(1) > body:nth-child(2) > section:nth-child(2) > button:nth-child(3)"
         )
-        self.assertEqual(button.styles["background-color"], "rgb(107, 114, 128)")
+        self.assertEqual(button.styles["background-color"], "rgb(16, 185, 129)")
         # Comes from same_everywhere
         self.assertEqual(button.styles["box-shadow"], "none")
 
@@ -37,7 +37,7 @@ class ParseTests(unittest.TestCase):
         snapshot = parse_snapshot(capture)
         button = _first(snapshot, "button")
 
-        self.assertEqual(button.box, Box(32, 256, 198, 336))
+        self.assertEqual(button.box, Box(1161, 504, 1399, 584))
 
     def test_iframe_offset_by_border_and_padding(self):
         snapshot = load_snapshot(_IFRAME_PAGE)

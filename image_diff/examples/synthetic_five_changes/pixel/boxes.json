@@ -1,0 +1,11 @@
+[
+  {"id": 1, "type": "shape", "before": {"x": 984, "y": 21, "width": 41, "height": 13}, "after": null, "element": null, "selector": null, "frames": null, "detail": null},
+  {"id": 2, "type": "shape", "before": {"x": 1050, "y": 21, "width": 41, "height": 13}, "after": {"x": 1049, "y": 21, "width": 42, "height": 13}, "element": null, "selector": null, "frames": null, "detail": null},
+  {"id": 3, "type": "shape", "before": {"x": 23, "y": 109, "width": 531, "height": 128}, "after": {"x": 23, "y": 111, "width": 669, "height": 144}, "element": null, "selector": null, "frames": null, "detail": null},
+  {"id": 4, "type": "color", "before": {"x": 0, "y": 286, "width": 1280, "height": 17}, "after": {"x": 0, "y": 286, "width": 1280, "height": 17}, "element": null, "selector": null, "frames": null, "detail": null},
+  {"id": 5, "type": "shape", "before": {"x": 40, "y": 336, "width": 189, "height": 44}, "after": {"x": 40, "y": 354, "width": 189, "height": 44}, "element": null, "selector": null, "frames": null, "detail": null},
+  {"id": 6, "type": "shape", "before": {"x": 459, "y": 336, "width": 175, "height": 44}, "after": {"x": 442, "y": 334, "width": 395, "height": 80}, "element": null, "selector": null, "frames": null, "detail": null},
+  {"id": 7, "type": "shape", "before": {"x": 877, "y": 336, "width": 171, "height": 44}, "after": {"x": 877, "y": 354, "width": 171, "height": 44}, "element": null, "selector": null, "frames": null, "detail": null},
+  {"id": 8, "type": "shape", "before": {"x": 0, "y": 456, "width": 1280, "height": 153}, "after": {"x": 0, "y": 474, "width": 1280, "height": 132}, "element": null, "selector": null, "frames": null, "detail": null},
+  {"id": 9, "type": "shape", "before": {"x": 0, "y": 635, "width": 1280, "height": 1}, "after": {"x": 23, "y": 655, "width": 147, "height": 14}, "element": null, "selector": null, "frames": null, "detail": null}
+]
