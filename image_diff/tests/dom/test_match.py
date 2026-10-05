@@ -1,8 +1,8 @@
 import unittest
 
 from image_diff.dom.match import Matching, match
-from image_diff.model import Box, Element, Snapshot
-from image_diff.tests.fixtures import PAGE, Block, element, row, snapshot, stack
+from image_diff.model import Element, Snapshot
+from image_diff.tests.fixtures import Block, row, stack
 
 
 def _nav(*texts: str) -> Snapshot:
@@ -36,20 +36,13 @@ class MatchTests(unittest.TestCase):
         self.assertEqual(_pairs(match(page("save"), page("submit"))), [(0, 0), (1, 1)])
 
     def test_inserted_wrapper_added(self):
-        heading, paragraph = Box(24, 24, 480, 64), Box(24, 88, 720, 152)
-        before = snapshot(
-            element(0, None, "body", box=PAGE),
-            element(1, 0, "section", box=Box(0, 0, 960, 320)),
-            element(2, 1, "h2", "Our Services", box=heading),
-            element(3, 1, "p", "We deliver food.", box=paragraph),
-        )
-        after = snapshot(
-            element(0, None, "body", box=PAGE),
-            element(1, 0, "section", box=Box(0, 0, 960, 320)),
-            element(2, 1, "div", box=Box(12, 12, 948, 308)),
-            element(3, 2, "h2", "Our Services", box=heading),
-            element(4, 2, "p", "We deliver food.", box=paragraph),
-        )
+        def content(offset: int) -> tuple[Block, Block]:
+            heading = Block("h2", "Our Services", 40, margin=24, offset=offset, across=456)
+            return heading, Block("p", "We deliver food.", 64, margin=24, offset=offset, across=696)
+
+        before = stack(Block("section", size=320, children=content(24)), width=960, height=720)
+        wrapper = Block("div", size=296, margin=12, offset=12, across=936, children=content(12))
+        after = stack(Block("section", size=320, children=(wrapper,)), width=960, height=720)
 
         matching = match(before, after)
 
@@ -65,21 +58,13 @@ class MatchTests(unittest.TestCase):
         self.assertEqual(_texts(matching.added), ["News"])
 
     def test_content_pushed_down_paired(self):
-        before = snapshot(
-            element(0, None, "body", box=Box(0, 0, 960, 880)),
-            element(1, 0, "header", "Example", box=Box(0, 0, 960, 96)),
-            element(2, 0, "main", box=Box(0, 96, 960, 480)),
-            element(3, 2, "h1", "Welcome", box=Box(24, 120, 480, 164)),
-        )
-        after = snapshot(
-            element(0, None, "body", box=Box(0, 0, 960, 1240)),
-            element(1, 0, "div", "Closed on weekends.", box=Box(0, 0, 960, 360)),
-            element(2, 0, "header", "Example", box=Box(0, 360, 960, 456)),
-            element(3, 0, "main", box=Box(0, 456, 960, 840)),
-            element(4, 3, "h1", "Welcome", box=Box(24, 480, 480, 524)),
-        )
+        def page(banner: bool) -> Snapshot:
+            blocks = [Block("div", "Closed on weekends.", 360)] if banner else []
+            heading = Block("h1", "Welcome", 44, offset=24, across=456)
+            blocks += [Block("header", "Example", 96), Block("main", size=384, padding=24, children=(heading,))]
+            return stack(*blocks, width=960, height=1240 if banner else 880)
 
-        matching = match(before, after)
+        matching = match(page(False), page(True))
 
         self.assertEqual(_pairs(matching), [(0, 0), (1, 2), (2, 3), (3, 4)])
         self.assertEqual(_texts(matching.added), ["Closed on weekends."])

@@ -33,6 +33,13 @@ def relation(box: Box, other: Box) -> Edge | None:
     return None
 
 
+def swapped_sides(pair: ElementPair, other: ElementPair) -> tuple[Edge, Edge] | None:
+    was, now = relation(pair.before.box, other.before.box), relation(pair.after.box, other.after.box)
+    if was is not None and now is not None and was != now:
+        return was, now
+    return None
+
+
 class Claim(NamedTuple):
     pair: ElementPair
     styles: list[str]
