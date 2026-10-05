@@ -1,0 +1,3 @@
+[
+  {"id": 1, "type": "shape", "before": {"x": 16, "y": 112, "width": 1096, "height": 104}, "after": {"x": 16, "y": 112, "width": 1096, "height": 104}, "element": "<section> containing 'Welcome to our Agriculture Company'", "selector": "html:nth-child(1) > body:nth-child(2) > main:nth-child(2) > section:nth-child(1)", "frames": [], "detail": "text-align start -> center"}
+]
