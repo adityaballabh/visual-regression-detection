@@ -7,3 +7,6 @@
 venv/
 
 __pycache__/
+
+image_diff/samples/
+image_diff/out/
