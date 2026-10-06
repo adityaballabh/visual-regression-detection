@@ -4,7 +4,7 @@ set -euo pipefail
 # Edit these defaults for the PR being documented.
 PR_TITLE="Update the Student Courses Card"
 PR_SUMMARY="Update the Student Courses Card."
-PR_TESTING="Captured the Student Courses Card with the focused Playwright E2E spec."
+PR_TESTING="Captured the Student Courses Card screenshot and DOM snapshot with the focused Playwright E2E spec."
 
 prompt_for_pr_summary() {
   local default_summary="$1"
@@ -83,9 +83,13 @@ if [[ "${pr_repo##*/}" != "PrairieLearn" ]]; then
   exit 1
 fi
 
-if [[ "$stage" == "after" && ! -f "$ARTIFACT_DIR/before.png" ]]; then
-  printf 'Missing %s. Run the before stage before editing the UI.\n' "$ARTIFACT_DIR/before.png" >&2
-  exit 1
+if [[ "$stage" == "after" ]]; then
+  for before_artifact in before.png before_snapshot.json; do
+    if [[ ! -f "$ARTIFACT_DIR/$before_artifact" ]]; then
+      printf 'Missing %s. Run the before stage before editing the UI.\n' "$ARTIFACT_DIR/$before_artifact" >&2
+      exit 1
+    fi
+  done
 fi
 
 if [[ "$stage" == "after" ]]; then
@@ -116,13 +120,20 @@ fi
 )
 
 captured_image="$ARTIFACT_DIR/student-courses-card.png"
+captured_snapshot="$ARTIFACT_DIR/student-courses-card_snapshot.json"
 if [[ ! -f "$captured_image" ]]; then
   printf 'Expected screenshot was not created: %s\n' "$captured_image" >&2
+  exit 1
+fi
+if [[ ! -f "$captured_snapshot" ]]; then
+  printf 'Expected DOM snapshot was not created: %s\n' "$captured_snapshot" >&2
   exit 1
 fi
 
 cp "$captured_image" "$ARTIFACT_DIR/$stage.png"
 printf 'Saved %s screenshot: %s\n' "$stage" "$ARTIFACT_DIR/$stage.png"
+cp "$captured_snapshot" "$ARTIFACT_DIR/${stage}_snapshot.json"
+printf 'Saved %s DOM snapshot: %s\n' "$stage" "$ARTIFACT_DIR/${stage}_snapshot.json"
 
 if [[ "$stage" == "after" ]]; then
   prompt_for_pr_summary "$PR_SUMMARY"
@@ -130,13 +141,21 @@ if [[ "$stage" == "after" ]]; then
   mkdir -p "$PR_IMAGE_DIR"
   cp -f "$ARTIFACT_DIR/before.png" "$PR_IMAGE_DIR/before.png"
   cp -f "$ARTIFACT_DIR/after.png" "$PR_IMAGE_DIR/after.png"
+  cp -f "$ARTIFACT_DIR/before_snapshot.json" "$PR_IMAGE_DIR/before_snapshot.json"
+  cp -f "$ARTIFACT_DIR/after_snapshot.json" "$PR_IMAGE_DIR/after_snapshot.json"
 
   before_url="https://raw.githubusercontent.com/${pr_repo}/${pr_branch}/${PR_IMAGE_PATH}/before.png"
   after_url="https://raw.githubusercontent.com/${pr_repo}/${pr_branch}/${PR_IMAGE_PATH}/after.png"
+  before_snapshot_url="https://raw.githubusercontent.com/${pr_repo}/${pr_branch}/${PR_IMAGE_PATH}/before_snapshot.json"
+  after_snapshot_url="https://raw.githubusercontent.com/${pr_repo}/${pr_branch}/${PR_IMAGE_PATH}/after_snapshot.json"
 
   (
     cd "$PRAIRIELEARN_ROOT"
-    git add "$PR_IMAGE_PATH/before.png" "$PR_IMAGE_PATH/after.png"
+    git add \
+      "$PR_IMAGE_PATH/before.png" \
+      "$PR_IMAGE_PATH/after.png" \
+      "$PR_IMAGE_PATH/before_snapshot.json" \
+      "$PR_IMAGE_PATH/after_snapshot.json"
     if ! git diff --cached --quiet --exit-code; then
       git commit -m "Add Student Courses Card screenshots for PR review"
       git push origin "$pr_branch"
@@ -155,6 +174,11 @@ $PR_SUMMARY
 | --- | --- |
 | ![Before]($before_url) | ![After]($after_url) |
 
+## DOM Snapshots
+
+- [Before]($before_snapshot_url)
+- [After]($after_snapshot_url)
+
 ## Testing
 
 $PR_TESTING
@@ -171,5 +195,5 @@ EOF
     --title "$PR_TITLE" \
     --body-file "$PR_BODY_FILE")"
   printf 'Created draft PR: %s\n' "$pr_url"
-  printf 'The screenshot assets live in %s and GitHub can render them inline from %s and %s.\n' "$PR_IMAGE_DIR" "$before_url" "$after_url"
+  printf 'Screenshot and DOM snapshot assets live in %s.\n' "$PR_IMAGE_DIR"
 fi
