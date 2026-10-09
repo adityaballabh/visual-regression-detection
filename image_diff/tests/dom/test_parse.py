@@ -43,6 +43,7 @@ class ParseTests(unittest.TestCase):
         button = _first(snapshot, "button")
 
         self.assertEqual(button.box, Box(67, 156, 157, 192))
+        self.assertEqual(button.paint_order, 5)
         self.assertEqual(button.frames, ("html:nth-child(1) > body:nth-child(2) > iframe:nth-child(1)",))
         self.assertEqual(button.selector, "html:nth-child(1) > body:nth-child(2) > button:nth-child(1)")
 
