@@ -42,3 +42,7 @@ when capturing multiple components with the same filename. The `pr` command
 requires a pushed non-`master` branch and `gh` authentication. Capturing
 requires GitHub Copilot CLI with authentication configured, Node.js 24+, pnpm
 (or Corepack), and the normal local PrairieLearn E2E prerequisites.
+
+## Attribution
+- Element matching is adapted from Similo (Nass et al., 2023).
+- The example pages in `image_diff/examples/` are re-rendered from [WUICC](https://huggingface.co/datasets/zhangsan11111122/WUICC), which is built on [WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight). Both are [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
