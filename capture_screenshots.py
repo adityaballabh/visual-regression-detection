@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Capture before/after UI screenshots and create a draft PrairieLearn PR."""
 
 from __future__ import annotations
