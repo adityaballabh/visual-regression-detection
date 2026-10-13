@@ -45,9 +45,7 @@ def run(
     if result.returncode:
         detail = ""
         if capture_output:
-            detail = "\n".join(
-                part.strip() for part in (result.stdout, result.stderr) if part.strip()
-            )
+            detail = "\n".join(part.strip() for part in (result.stdout, result.stderr) if part.strip())
         message = f"Command failed ({result.returncode}): {' '.join(command)}"
         if detail:
             message += f"\n{detail}"
@@ -81,8 +79,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--name",
-        help="Capture name; defaults to the component filename for before, "
-        "and selects a capture for after/pr",
+        help="Capture name; defaults to the component filename for before, and selects a capture for after/pr",
     )
     parser.add_argument("--title", help="Optional pull request title")
     return parser.parse_args()
@@ -92,8 +89,7 @@ def resolve_root(root_arg: Path) -> Path:
     root = root_arg.expanduser().resolve()
     if not (root / "package.json").is_file() or not (root / E2E_DIR / "fixtures.ts").is_file():
         raise CaptureError(
-            f"{root} does not look like a PrairieLearn checkout "
-            f"(expected package.json and {E2E_DIR / 'fixtures.ts'})."
+            f"{root} does not look like a PrairieLearn checkout (expected package.json and {E2E_DIR / 'fixtures.ts'})."
         )
     return root
 
@@ -127,15 +123,10 @@ def run_agent(prompt: str, *, root: Path) -> str:
     return result.stdout
 
 
-def resolve_selected_spec(
-    root: Path, response: str, expected_new_spec: Path
-) -> Path:
+def resolve_selected_spec(root: Path, response: str, expected_new_spec: Path) -> Path:
     path_matches = re.findall(r"^CAPTURE_SPEC_PATH:\s*(.+?)\s*$", response, re.MULTILINE)
     if not path_matches:
-        raise CaptureError(
-            "Copilot did not report the new spec path. "
-            "Review its output and rerun before."
-        )
+        raise CaptureError("Copilot did not report the new spec path. Review its output and rerun before.")
     selected = Path(path_matches[-1])
     selected = selected.resolve() if selected.is_absolute() else (root / selected).resolve()
     e2e_root = (root / E2E_DIR).resolve()
@@ -149,8 +140,7 @@ def resolve_selected_spec(
         raise CaptureError(f"Copilot selected a spec that does not exist or is empty: {selected}")
     if selected != expected_new_spec.resolve():
         raise CaptureError(
-            f"Copilot must create the requested new spec at {expected_new_spec}, "
-            f"not select or reuse {selected}."
+            f"Copilot must create the requested new spec at {expected_new_spec}, not select or reuse {selected}."
         )
     return selected
 
@@ -202,11 +192,7 @@ CAPTURE_SPEC_PATH: apps/prairielearn/src/tests/e2e/relative-file.spec.ts
     selected = resolve_selected_spec(root, response, destination)
     print(f"Using new Playwright capture spec: {selected.relative_to(root)}")
     source = selected.read_text(encoding="utf-8")
-    if (
-        screenshot_name not in source
-        or snapshot_name not in source
-        or "CAPTURE_SCREENSHOTS" not in source
-    ):
+    if screenshot_name not in source or snapshot_name not in source or "CAPTURE_SCREENSHOTS" not in source:
         raise CaptureError(
             f"Selected spec must be gated by CAPTURE_SCREENSHOTS and write "
             f"{screenshot_name} and {snapshot_name}; review or correct the spec before retrying."
@@ -219,9 +205,7 @@ def select_pnpm() -> list[str]:
         return ["pnpm"]
     if shutil.which("corepack"):
         return ["corepack", f"pnpm@{PNPM_VERSION}"]
-    raise CaptureError(
-        f"pnpm was not found and Corepack is unavailable. Install Corepack or pnpm {PNPM_VERSION}."
-    )
+    raise CaptureError(f"pnpm was not found and Corepack is unavailable. Install Corepack or pnpm {PNPM_VERSION}.")
 
 
 def capture_command(root: Path, spec: Path, output_dir: Path) -> tuple[list[str], dict[str, str]]:
@@ -257,9 +241,7 @@ def capture_command(root: Path, spec: Path, output_dir: Path) -> tuple[list[str]
     return command, env
 
 
-def run_capture_attempt(
-    root: Path, spec: Path, output_dir: Path, name: str
-) -> str | None:
+def run_capture_attempt(root: Path, spec: Path, output_dir: Path, name: str) -> str | None:
     command, env = capture_command(root, spec, output_dir)
     for filename in (f"{name}.png", f"{name}_snapshot.json"):
         (output_dir / filename).unlink(missing_ok=True)
@@ -282,9 +264,7 @@ def run_capture_attempt(
         return f"E2E command failed with exit code {result.returncode}.\n{output}"
 
     missing = [
-        filename
-        for filename in (f"{name}.png", f"{name}_snapshot.json")
-        if not (output_dir / filename).is_file()
+        filename for filename in (f"{name}.png", f"{name}_snapshot.json") if not (output_dir / filename).is_file()
     ]
     if missing:
         return "E2E test passed but did not create required output files: " + ", ".join(missing)
@@ -345,9 +325,7 @@ def capture_until_passes(
         if failure is None:
             return
         if attempt == MAX_SPEC_ATTEMPTS:
-            raise CaptureError(
-                f"Capture spec did not pass after {MAX_SPEC_ATTEMPTS} attempts.\n{failure}"
-            )
+            raise CaptureError(f"Capture spec did not pass after {MAX_SPEC_ATTEMPTS} attempts.\n{failure}")
         repair_spec(
             root,
             spec,
@@ -359,9 +337,7 @@ def capture_until_passes(
         )
 
 
-def read_capture_manifest(
-    directory: Path, root: Path, *, require_spec: bool = True
-) -> dict[str, str]:
+def read_capture_manifest(directory: Path, root: Path, *, require_spec: bool = True) -> dict[str, str]:
     manifest = directory / "capture.json"
     if not manifest.is_file():
         raise CaptureError("No matching capture has been initialized. Run before first.")
@@ -567,9 +543,7 @@ def main() -> int:
                 raise CaptureError("before requires --component and --instructions.")
             component_path = Path(args.component)
             component_path = (
-                (root / component_path).resolve()
-                if not component_path.is_absolute()
-                else component_path.resolve()
+                (root / component_path).resolve() if not component_path.is_absolute() else component_path.resolve()
             )
             try:
                 component = component_path.relative_to(root)
