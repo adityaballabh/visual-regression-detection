@@ -52,6 +52,7 @@ python -m image_diff <before_image> <after_image> --out <path> --before-snapshot
 Sample input and output: [`image_diff/examples/`](image_diff/examples/)
 
 ## Attribution
-- Element matching is adapted from Similo (Nass et al., 2023).
-- Explaining changed pixels with the DOM is adapted from WebSee (Mahajan & Halfond, 2015).
+- Element matching is adapted from [Similo](https://doi.org/10.1145/3571855) (Nass et al., 2023).
+- Explaining changed pixels with the DOM is adapted from [WebSee](https://doi.org/10.1109/ICST.2015.7102586) (Mahajan & Halfond, 2015).
+- Reporting layout causes instead of everything that shifted is adapted from [X-PERT](https://doi.org/10.1109/ICSE.2013.6606616) (Choudhary, Prasad & Orso, 2013).
 - The example pages in [`image_diff/examples/`](image_diff/examples/) are re-rendered from [WUICC](https://huggingface.co/datasets/zhangsan11111122/WUICC), which is built on [WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight). Both are [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
