@@ -6,6 +6,17 @@ on:
   pull_request:
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - run: pip install ruff==0.16.10
+      - run: ruff check .
+      - run: ruff format --check .
+
   test:
     runs-on: ubuntu-latest
     steps:
@@ -14,7 +25,5 @@ jobs:
         with:
           python-version: "3.13"
           cache: pip
-      - run: pip install -r requirements.txt ruff==0.16.10
-      - run: ruff check .
-      - run: ruff format --check .
+      - run: pip install -r requirements.txt
       - run: python -m unittest discover -s image_diff/tests -t .
