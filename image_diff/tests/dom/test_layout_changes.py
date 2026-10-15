@@ -3,7 +3,7 @@ import unittest
 from image_diff.dom.diff import PageDiff
 from image_diff.dom.layout_changes import explain_layout
 from image_diff.dom.match import match
-from image_diff.model import Box, Snapshot
+from image_diff.model import Box, Kind, Snapshot
 from image_diff.tests.fixtures import element, snapshot
 
 
@@ -52,6 +52,14 @@ class LayoutChangesTests(unittest.TestCase):
             _causes(_page(), _page(intro_height=54)),
             [("<section> 'Intro'", "height 24px -> 54px. content moved 30px down")],
         )
+
+    def test_recolored_unexplained_resize_includes_shape(self):
+        before = _page(intro_styles={"color": "rgb(17, 24, 39)"})
+        after = _page(intro_height=54, intro_styles={"color": "rgb(75, 85, 99)"})
+
+        [cause] = explain_layout(PageDiff(before, after, match(before, after)))
+
+        self.assertEqual(cause.kind, Kind.COLOR_AND_SHAPE)
 
     def test_squeezed_flex_sibling_skipped(self):
         self.assertEqual(

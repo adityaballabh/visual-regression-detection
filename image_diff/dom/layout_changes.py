@@ -80,7 +80,8 @@ def _resize(page_diff: PageDiff, pair: ElementPair) -> Cause:
         # Add padding and line height since the paint differences leave them out
         if difference.name not in shown:
             differences.append(difference)
-    detail = "; ".join(str(difference) for difference in (*differences, *_size_changes(pair)))
+    differences += _size_changes(pair)
+    detail = "; ".join(str(difference) for difference in differences)
     return Cause(pair.before, pair.after, change_kind(differences), detail)
 
 
