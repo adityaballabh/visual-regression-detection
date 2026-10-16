@@ -57,13 +57,12 @@ class DiffImagesTests(unittest.TestCase):
         self.assertEqual(len(changes), 2)
         self.assertLess(changes[0].before.y2, _BUTTON.y1)
 
-    def test_height_padded(self):
-        after = np.vstack([_page(), np.full((50, _WIDTH, 3), 255, dtype=np.uint8)])
-        self.assertEqual(diff_images(*pad_to_match(_page(), after)), ())
+    def test_smaller_image_padded(self):
+        taller = np.vstack([_page(), np.full((50, _WIDTH, 3), 255, dtype=np.uint8)])
+        wider = np.hstack([_page(), np.full((_HEIGHT, 60, 3), 255, dtype=np.uint8)])
 
-    def test_width_padded(self):
-        after = np.hstack([_page(), np.full((_HEIGHT, 60, 3), 255, dtype=np.uint8)])
-        self.assertEqual(diff_images(*pad_to_match(_page(), after)), ())
+        self.assertEqual(diff_images(*pad_to_match(_page(), taller)), ())
+        self.assertEqual(diff_images(*pad_to_match(_page(), wider)), ())
 
 
 if __name__ == "__main__":
