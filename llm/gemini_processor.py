@@ -238,7 +238,9 @@ def evaluate(cases_dir: Path, model: str, out: Path | None, dry_run: bool):
     if not cases:
         raise SystemExit(f"no cases found in {cases_dir}")
 
-    counts = {m: dict(ctp=0, cfp=0, cfn=0, ctn=0, btp=0, bfp=0, bfn=0) for m in ("context", "baseline")}
+    counts = {
+        m: {"ctp": 0, "cfp": 0, "cfn": 0, "ctn": 0, "btp": 0, "bfp": 0, "bfn": 0} for m in ("context", "baseline")
+    }
     for case in cases:
         label = case.label()
         if label is None:
