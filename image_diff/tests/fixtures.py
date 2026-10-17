@@ -110,6 +110,8 @@ def row(
     justify = styles.get("justify-content")
     if justify == "center":
         _place(blocks, 0, (width - _extent(blocks)) // 2, box, False, elements)
+    elif justify == "flex-end":
+        _place(blocks, 0, width - _extent(blocks), box, False, elements)
     elif justify == "space-between":
         first, last = blocks[0], blocks[-1]
         _place((first,), 0, 0, box, False, elements)

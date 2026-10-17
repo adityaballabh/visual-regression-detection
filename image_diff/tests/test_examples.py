@@ -50,7 +50,7 @@ class ExampleTests(unittest.TestCase):
                     "<footer> '© 2026 Acme Studio'",
                     "padding-bottom 24px -> 48px; padding-top 24px -> 48px; height 66px -> 114px",
                 ),
-                ("<li> 'Tested'", "added. content moved 36px down"),
+                ("<li> 'Tested'", "added. content moved 18px down"),
             ],
             "heading_centered": [
                 ("<section> containing 'Welcome to our Agriculture Company'", "text-align start -> center")

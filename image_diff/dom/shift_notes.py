@@ -177,16 +177,35 @@ def _pusher(page_diff: PageDiff, causes: list[Cause], pair: ElementPair, vertica
     return min(candidates, key=distance)
 
 
+def _neighbor_pair(page_diff: PageDiff, cause: Cause) -> ElementPair | None:
+    if cause.before is None:
+        snapshot, element, pair_of = page_diff.after, cause.after, page_diff.by_after
+    else:
+        snapshot, element, pair_of = page_diff.before, cause.before, page_diff.by_before
+    # The closest earlier sibling on both pages, else the parent, moves with the spot the element was added or removed at
+    for sibling in reversed(snapshot.elements[: element.id]):
+        if sibling.parent == element.parent and sibling.id in pair_of:
+            return pair_of[sibling.id]
+    return pair_of.get(element.parent)
+
+
 def _cause_push(page_diff: PageDiff, causes: list[Cause], cause: Cause) -> tuple[int, int]:
-    # Only a resize or a gap is pushed by others
-    if cause.before is None or cause.after is None or cause.moved_itself:
+    if cause.moved_itself:
         return 0, 0
-    pair = page_diff.by_before[cause.before.id]
+    if cause.before is None or cause.after is None:
+        # An added or removed element exists on one page only, so measure the neighbor that marks its spot
+        pair = _neighbor_pair(page_diff, cause)
+        if pair is None:
+            return 0, 0
+    else:
+        pair = page_diff.by_before[cause.before.id]
     dx, dy = _push(page_diff, pair)
-    # Movement no cause accounts for, such as a flex row rebalancing, is not a push
-    if _pusher(page_diff, causes, pair, vertical=False) is None:
+    # Movement no other cause accounts for, such as a flex row rebalancing or a neighbor the cause moved, is not a push
+    horizontal_pusher = _pusher(page_diff, causes, pair, vertical=False)
+    if horizontal_pusher is None or causes[horizontal_pusher] is cause:
         dx = 0
-    if _pusher(page_diff, causes, pair, vertical=True) is None:
+    vertical_pusher = _pusher(page_diff, causes, pair, vertical=True)
+    if vertical_pusher is None or causes[vertical_pusher] is cause:
         dy = 0
     return dx, dy
 

@@ -20,6 +20,18 @@ class ShiftNotesTests(unittest.TestCase):
             )
             return row(*links, width=600, styles=FLEX)
 
+        def added_item(heading_height: int, size: str, tested: bool) -> Snapshot:
+            heading = Block("h1", "Welcome to Acme Studio", heading_height, {"font-size": size})
+            items = [Block("li", "Fast", 18), Block("li", "Documented", 18)]
+            if tested:
+                items.append(Block("li", "Tested", 18))
+            features = Block("ul", size=18 * len(items), children=tuple(items))
+            # The gap keeps the added item above where the footer started, like a section's bottom padding
+            return stack(heading, features, Block("footer", "Footer", 66, margin=24))
+
+        def right_aligned(*links: Block) -> Snapshot:
+            return row(*links, width=400, styles={"display": "flex", "justify-content": "flex-end"})
+
         with self.subTest("stacked"):
             self.assertEqual(
                 layout_causes(stacked(24, 40, "24px", "16px"), stacked(32, 50, "32px", "20px")),
@@ -35,6 +47,24 @@ class ShiftNotesTests(unittest.TestCase):
                     ("<a> 'Home'", "font-size 16px -> 20px; width 50px -> 70px. content moved 20px right"),
                     ("<a> 'About'", "font-size 16px -> 20px; width 50px -> 70px. content moved 20px right"),
                 ],
+            )
+        with self.subTest("added below a pushed item"):
+            self.assertEqual(
+                layout_causes(added_item(46, "40px", tested=False), added_item(64, "56px", tested=True)),
+                [
+                    ("<li> 'Tested'", "added. content moved 18px down"),
+                    (
+                        "<h1> 'Welcome to Acme Studio'",
+                        "font-size 40px -> 56px; height 46px -> 64px. content moved 18px down",
+                    ),
+                ],
+            )
+        with self.subTest("removed from a right-aligned row"):
+            home, blog = Block("a", "Home", 50), Block("a", "Blog", 50, margin=10)
+            # Home sits left of About, so removing About moves it right
+            self.assertEqual(
+                layout_causes(right_aligned(home, Block("a", "About", 50, margin=10), blog), right_aligned(home, blog)),
+                [("<a> 'About'", "removed. content moved 60px right")],
             )
 
     def test_resize_pushes_along_its_axis(self):
