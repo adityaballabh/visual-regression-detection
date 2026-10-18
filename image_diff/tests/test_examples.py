@@ -32,7 +32,7 @@ class ExampleTests(unittest.TestCase):
             "button_removed": [("<button> 'Get Involved'", "removed. content moved 40px up")],
             "synthetic_color_and_move": [
                 (
-                    "<button> 'Get Started'",
+                    "<button> 'Open an Account'",
                     (
                         "background-color rgb(37, 99, 235) -> rgb(220, 38, 38); padding-bottom 12px -> 24px; "
                         "padding-top 12px -> 24px; height 42px -> 66px. content moved 24px down"
@@ -42,15 +42,15 @@ class ExampleTests(unittest.TestCase):
             "synthetic_five_changes": [
                 ("<a> 'About'", "removed. content moved 66px right"),
                 (
-                    "<h1> 'Welcome to Acme Studio'",
+                    "<h1> 'Welcome to Banking Institution'",
                     "font-size 40px -> 56px; height 46px -> 64px. content moved 18px down",
                 ),
-                ("<div> containing 'Build'", "background-color rgb(220, 252, 231) -> rgb(254, 202, 202)"),
+                ("<div> containing 'Savings Accounts'", "background-color rgb(220, 252, 231) -> rgb(254, 202, 202)"),
                 (
-                    "<footer> '© 2026 Acme Studio'",
+                    "<footer> '© 2022 Banking Institution. All rights r...'",
                     "padding-bottom 24px -> 48px; padding-top 24px -> 48px; height 66px -> 114px",
                 ),
-                ("<li> 'Tested'", "added. content moved 18px down"),
+                ("<li> 'Personal finance coaching'", "added. content moved 18px down"),
             ],
             "heading_centered": [
                 ("<section> containing 'Welcome to our Agriculture Company'", "text-align start -> center")

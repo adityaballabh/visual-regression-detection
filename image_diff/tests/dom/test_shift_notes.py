@@ -21,10 +21,10 @@ class ShiftNotesTests(unittest.TestCase):
             return row(*links, width=600, styles=FLEX)
 
         def added_item(heading_height: int, size: str, tested: bool) -> Snapshot:
-            heading = Block("h1", "Welcome to Acme Studio", heading_height, {"font-size": size})
-            items = [Block("li", "Fast", 18), Block("li", "Documented", 18)]
+            heading = Block("h1", "Welcome to Banking Institution", heading_height, {"font-size": size})
+            items = [Block("li", "Investment advice", 18), Block("li", "Retirement planning", 18)]
             if tested:
-                items.append(Block("li", "Tested", 18))
+                items.append(Block("li", "Personal finance coaching", 18))
             features = Block("ul", size=18 * len(items), children=tuple(items))
             # The gap keeps the added item above where the footer started, like a section's bottom padding
             return stack(heading, features, Block("footer", "Footer", 66, margin=24))
@@ -52,9 +52,9 @@ class ShiftNotesTests(unittest.TestCase):
             self.assertEqual(
                 layout_causes(added_item(46, "40px", tested=False), added_item(64, "56px", tested=True)),
                 [
-                    ("<li> 'Tested'", "added. content moved 18px down"),
+                    ("<li> 'Personal finance coaching'", "added. content moved 18px down"),
                     (
-                        "<h1> 'Welcome to Acme Studio'",
+                        "<h1> 'Welcome to Banking Institution'",
                         "font-size 40px -> 56px; height 46px -> 64px. content moved 18px down",
                     ),
                 ],
