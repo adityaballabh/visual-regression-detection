@@ -18,8 +18,8 @@ def main():
         pixel = diff_images(before, after)
         dom = diff_images(before, after, snapshots)
 
-        write(folder / "pixel", before, after, pixel)
-        write(folder / "dom", before, after, dom)
+        write(folder / "out" / "pixel", before, after, pixel)
+        write(folder / "out" / "dom", before, after, dom)
         print(f"{folder.name}: {len(pixel)} pixel boxes, {len(dom)} rows")
 
 
