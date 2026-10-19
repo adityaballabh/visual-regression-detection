@@ -17,6 +17,7 @@ test that fails on the regressed version.
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+playwright install chromium
 ```
 
 Copy [`.env.example`](.env.example) to `.env` and add your Gemini API key.
