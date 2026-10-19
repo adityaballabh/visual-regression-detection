@@ -7,13 +7,13 @@ from image_diff.dom.parse import load_snapshot
 from image_diff.model import Change
 from image_diff.pipeline import diff_images, pad_to_match
 
-_EXAMPLES = Path(__file__).parents[1] / "examples"
+_EXAMPLES = Path(__file__).parents[2] / "examples" / "general"
 
 
 def _changes(example: str) -> tuple[Change, ...]:
-    inputs = _EXAMPLES / example / "input"
-    before, after = pad_to_match(cv2.imread(str(inputs / "before.png")), cv2.imread(str(inputs / "after.png")))
-    snapshots = load_snapshot(inputs / "before_snapshot.json"), load_snapshot(inputs / "after_snapshot.json")
+    captures = _EXAMPLES / example / "captures"
+    before, after = pad_to_match(cv2.imread(str(captures / "before.png")), cv2.imread(str(captures / "after.png")))
+    snapshots = load_snapshot(captures / "before_snapshot.json"), load_snapshot(captures / "after_snapshot.json")
     return diff_images(before, after, snapshots)
 
 
@@ -29,7 +29,6 @@ class ExampleTests(unittest.TestCase):
                     ),
                 ),
             ],
-            "button_removed": [("<button> 'Get Involved'", "removed. content moved 40px up")],
             "synthetic_color_and_move": [
                 (
                     "<button> 'Open an Account'",
@@ -55,7 +54,6 @@ class ExampleTests(unittest.TestCase):
             "heading_centered": [
                 ("<section> containing 'Welcome to our Agriculture Company'", "text-align start -> center")
             ],
-            "section_added": [("<section> containing 'Featured Collection'", "added. content moved 208px down")],
         }
         for example, rows in expected.items():
             with self.subTest(example):

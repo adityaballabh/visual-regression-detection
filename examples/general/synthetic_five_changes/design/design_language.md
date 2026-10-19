@@ -1,0 +1,3 @@
+Dark navy header and footer framing a light content area.
+Blue marks primary actions, and soft pastel cards group related content.
+Plain sans-serif text with bold headings, comfortable spacing and rounded corners on cards and buttons.
