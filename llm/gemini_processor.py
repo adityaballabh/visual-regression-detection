@@ -125,7 +125,8 @@ def load_env():
 
 
 class Case:
-    def __init__(self, directory: Path):
+    def __init__(self, directory: Path, design_folder: Path | None = None):
+        design_folder = design_folder or directory
         self.dir = directory
         self.name = directory.name
         boxes_file = directory / "boxes.json"
@@ -137,8 +138,8 @@ class Case:
         missing = [p for p in self.image_paths if not p.exists()]
         if missing:
             raise SystemExit(f"missing annotated images: {', '.join(map(str, missing))}")
-        self.design_intent = _read_optional(directory / "design_intent.md", "(not provided)")
-        self.design_language = _read_optional(directory / "design_language.md", "(not provided)")
+        self.design_intent = _read_optional(design_folder / "design_intent.md", "(not provided)")
+        self.design_language = _read_optional(design_folder / "design_language.md", "(not provided)")
 
     def boxes_for_prompt(self) -> str:
         # selector/frames are for generating assertions later, not for classification.

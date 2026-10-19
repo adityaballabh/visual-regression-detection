@@ -1,26 +1,19 @@
+import argparse
 from pathlib import Path
 
-import cv2
-
-from image_diff.dom.parse import load_snapshot
-from image_diff.output import write
-from image_diff.pipeline import diff_images, pad_to_match
+from pipeline import run_pipeline
 
 _EXAMPLES = Path(__file__).parent
 
 
 def main():
-    for captures in sorted(_EXAMPLES.glob("*/captures")):
-        folder = captures.parent
-        before, after = pad_to_match(cv2.imread(str(captures / "before.png")), cv2.imread(str(captures / "after.png")))
-        snapshots = load_snapshot(captures / "before_snapshot.json"), load_snapshot(captures / "after_snapshot.json")
+    parser = argparse.ArgumentParser(prog="update_outputs")
+    parser.add_argument("--llm-dry-run", action="store_true")
+    args = parser.parse_args()
 
-        pixel = diff_images(before, after)
-        dom = diff_images(before, after, snapshots)
-
-        write(folder / "out" / "pixel", before, after, pixel)
-        write(folder / "out" / "dom", before, after, dom)
-        print(f"{folder.name}: {len(pixel)} pixel boxes, {len(dom)} rows")
+    for case_folder in sorted(_EXAMPLES.glob("*/*/")):
+        reports = run_pipeline(case_folder, llm_input="dom", llm_mode="both", llm_dry_run=args.llm_dry_run)
+        print(f"{case_folder.relative_to(_EXAMPLES)}: {len(reports)} reports")
 
 
 if __name__ == "__main__":
