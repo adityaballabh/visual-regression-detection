@@ -152,6 +152,12 @@ class Snapshot:
     def children_of(self, element: Element) -> list[Element]:
         return [child for child in self.elements if child.parent == element.id]
 
+    def child_containing(self, container: Element, element: Element) -> Element | None:
+        for candidate in (element, *self.ancestors_of(element)):
+            if candidate.parent == container.id:
+                return candidate
+        return None
+
     def ancestors_of(self, element: Element) -> list[Element]:
         ancestors = []
         parent = element.parent

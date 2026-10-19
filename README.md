@@ -6,12 +6,20 @@ intent, the app's design language, and before/after screenshots with bounding bo
 whether a change is a regression, localizes it, and writes a
 test that fails on the regressed version.
 
-## Approach
+## Overview
 1. Collect design language and design intent for the change 
 2. Capture before and after screenshots
 3. Image-diff to produce candidate bounding boxes
 4. Classify regression vs. intended change through a stateless LLM API call
 5. If a regression is detected, a CLI agent inspects the codebase and generates a failing test
+
+## Setup
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Copy [`.env.example`](.env.example) to `.env` and add your Gemini API key.
 
 ## PrairieLearn screenshot capture
 
@@ -44,22 +52,32 @@ requires GitHub Copilot CLI with authentication configured, Node.js 24+, pnpm
 (or Corepack), and the normal local PrairieLearn E2E prerequisites.
 
 ## Image diff
+
+### Run
 ```bash
-pip install -r requirements.txt
 python -m image_diff <before_image> <after_image> --out <path> --before-snapshot <before_snapshot> --after-snapshot <after_snapshot>
 ```
 
+### Approach
+A simple pixel diff boxes everything a change moves, so if an element grows, everything below it gets a box. Instead, our image diff uses the DOM to report just that element, with what changed and how far it pushed the rest.
+
+1. Pixel diff\
+   Boxes pixels that changed color (Delta E > 3 in Lab) or shape (Canny edges).
+2. Element matching ([Similo](https://doi.org/10.1145/3571855), Nass et al., 2023)\
+   Pairs each element on the before page with its match on the after page.
+3. Causes ([X-PERT](https://doi.org/10.1109/ICSE.2013.6606616), Choudhary, Prasad & Orso, 2013)\
+   Finds the size, spacing and added, removed or reordered elements that changed the layout, and records how far each one pushed the rest.
+4. Box labeling ([WebSee](https://doi.org/10.1109/ICST.2015.7102586), Mahajan & Halfond, 2015)\
+   Matches each box to the changed element it covers, and drops boxes that only contain moved content.
+5. Unexplained boxes\
+   If no cause explains a box, like a replaced image, the box is still kept.
+
+### Examples
 Sample input and output: [`image_diff/examples/`](image_diff/examples/)
 
-## Attribution
-The example pages in `image_diff/examples/` are re-rendered from [WUICC](https://huggingface.co/datasets/zhangsan11111122/WUICC), which is built on [WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight). Both are [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/).
-- Element matching is adapted from [Similo](https://doi.org/10.1145/3571855) (Nass et al., 2023).
-- Explaining changed pixels with the DOM is adapted from [WebSee](https://doi.org/10.1109/ICST.2015.7102586) (Mahajan & Halfond, 2015).
-- Reporting layout causes instead of everything that shifted is adapted from [X-PERT](https://doi.org/10.1109/ICSE.2013.6606616) (Choudhary, Prasad & Orso, 2013).
-- The example pages in [`image_diff/examples/`](image_diff/examples/) are re-rendered from [WUICC](https://huggingface.co/datasets/zhangsan11111122/WUICC), which is built on [WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight). Both are [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+The example pages are re-rendered from [WUICC](https://huggingface.co/datasets/zhangsan11111122/WUICC), which is built on [WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight), and the synthetic ones use text from WUICC pages. WUICC and WebSight are both [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
-
-## LLM 
+## LLM-based regression detection
 
 The script lives in the <code>/llm</code> folder, called <code>gemini_processor.py</code>. 
 
@@ -68,44 +86,21 @@ The script ideally takes input from any folder. However, for structure, put all 
 Input structure: 
 ```/llm/<your change test set>/dom```
 
-Inside dom: 
-```
-	After_color.png 
-	After_shape.png
-	Before_color.png
-	Before_shape.png
-	Boxes.json
-```
-
-### Environment setup 
-
-Create an .env file in the root project folder (visual-regression-detection), not in llm. 
-
-Put 
-```GEMINI_API_KEY=redacted ```
-
-(find API key in proposal doc)
-
-as content for .env
-
-Create a python env and install the gemini packages: 
-```
-python3 -m venv .venv && source .venv/bin/activate && pip install google-genai pydantic
-```
+`dom` contains `before_color.png`, `after_color.png`, `before_shape.png`, `after_shape.png` and `boxes.json`.
 
 ### Run and Operation 
 
-To do a dry run (without calling gemini, checking inputs): 
+To do a dry run (without calling Gemini, checking inputs): 
 ```
 python llm/gemini_processor.py run "folder-containing-images" --mode both --dry-run
 ```
-To do a complete run (calling gemini): 
+To do a complete run (calling Gemini): 
 ```
 python llm/gemini_processor.py run "folder-containing-images" --mode both
 ```
 
 ### Parameters
-–mode takes three parameters: ```both, baseline, context ```
+`--mode` takes three values: `both`, `baseline`, `context`
 
 Both runs both baseline and context
 
