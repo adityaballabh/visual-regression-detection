@@ -6,7 +6,7 @@ intent, the app's design language, and before/after screenshots with bounding bo
 whether a change is a regression, localizes it, and writes a
 test that fails on the regressed version.
 
-## Overview
+## Pipeline
 1. Collect design language and design intent for the change 
 2. Capture before and after screenshots
 3. Image-diff to produce candidate bounding boxes
@@ -22,9 +22,39 @@ playwright install chromium
 
 Copy [`.env.example`](.env.example) to `.env` and add your Gemini API key.
 
+Run all commands from the repository root.
+
+## Run
+[`pipeline.py`](pipeline.py) runs steps 2 to 4 on one case folder:
+```bash
+python pipeline.py <case_folder> [--llm-input dom|pixel] [--llm-mode context|baseline|both] [--llm-dry-run]
+```
+
+A case folder holds one change:
+```
+<case_folder>/
+  html/       before.html and after.html (optional)
+  pr.txt      link to a PrairieLearn PR made by the capture script (optional)
+  captures/   before.png, after.png and their _snapshot.json files (if missing, generated from html/ or pr.txt)
+  design/     design_intent.md and design_language.md (optional)
+  out/        written by the pipeline: dom/ and pixel/ for the image diff, llm/ for the reports
+```
+
+If `captures/` is incomplete, the pipeline fills it. For a PrairieLearn change, put the link to the PR made by the [PrairieLearn screenshot capture](#prairielearn-screenshot-capture) in `pr.txt`, and the pipeline downloads the captures committed in that PR. For any other page, put the before and after HTML in `html/`, and the pipeline captures them itself. `--llm-dry-run` prints the LLM prompt without calling Gemini. `--llm-input` picks which diff the LLM reads, `dom` by default.
+
+### Examples
+Each folder in [`examples/general/`](examples/general/) is a case.
+
+To update every example's `out/` after a code change, run [`examples/update_outputs.py`](examples/update_outputs.py):
+```bash
+python -m examples.update_outputs [--llm-dry-run]
+```
+
+The example pages are re-rendered from [WUICC](https://huggingface.co/datasets/zhangsan11111122/WUICC), which is built on [WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight), and the synthetic ones use text from WUICC pages. WUICC and WebSight are both [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
 ## PrairieLearn screenshot capture
 
-`capture_screenshots.sh` accepts a PrairieLearn checkout and one of
+[`prairielearn_capture/capture_screenshots.sh`](prairielearn_capture/capture_screenshots.sh) accepts a PrairieLearn checkout and one of
 three commands. `before` asks GitHub Copilot CLI to generate a focused
 Playwright E2E spec from the component path and capture instructions. It always
 creates a new spec, even if related tests exist; it may inspect them for
@@ -35,11 +65,11 @@ reruns the selected spec without automatic repair.
 draft PR.
 
 ```sh
-./capture_screenshots.sh /path/to/PrairieLearn before \
+./prairielearn_capture/capture_screenshots.sh /path/to/PrairieLearn before \
   --component apps/prairielearn/src/components/example.tsx \
   --instructions "Open the student homepage as an enrolled student and capture the Example card."
-./capture_screenshots.sh /path/to/PrairieLearn after
-./capture_screenshots.sh /path/to/PrairieLearn pr
+./prairielearn_capture/capture_screenshots.sh /path/to/PrairieLearn after
+./prairielearn_capture/capture_screenshots.sh /path/to/PrairieLearn pr
 ```
 
 Screenshot and snapshot artifacts are saved under `.artifacts/` next to the
@@ -73,21 +103,13 @@ A simple pixel diff boxes everything a change moves, so if an element grows, eve
 5. Unexplained boxes\
    If no cause explains a box, like a replaced image, the box is still kept.
 
-### Examples
-Sample input and output: [`image_diff/examples/`](image_diff/examples/)
-
-The example pages are re-rendered from [WUICC](https://huggingface.co/datasets/zhangsan11111122/WUICC), which is built on [WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight), and the synthetic ones use text from WUICC pages. WUICC and WebSight are both [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
-
 ## LLM-based regression detection
 
-The script lives in the <code>/llm</code> folder, called <code>gemini_processor.py</code>. 
+The script is [`llm/gemini_processor.py`](llm/gemini_processor.py).
 
-The script ideally takes input from any folder. However, for structure, put all inputs in the <code>/input</code> folder. 
+It takes the image diff output folder of a case, like [`examples/general/button_enlarged/out/dom`](examples/general/button_enlarged/out/dom).
 
-Input structure: 
-```/llm/<your change test set>/dom```
-
-`dom` contains `before_color.png`, `after_color.png`, `before_shape.png`, `after_shape.png` and `boxes.json`.
+That folder contains `before_color.png`, `after_color.png`, `before_shape.png`, `after_shape.png` and `boxes.json`. [`pipeline.py`](pipeline.py) also passes `design_intent.md` and `design_language.md` from the case's `design/` folder if it exists.
 
 ### Run and Operation 
 

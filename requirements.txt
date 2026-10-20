@@ -7,3 +7,4 @@ rapidfuzz~=3.9
 google-genai~=2.0
 pydantic~=2.0
 playwright~=1.61
+PyGithub~=2.10

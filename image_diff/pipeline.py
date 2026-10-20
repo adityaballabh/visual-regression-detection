@@ -4,7 +4,7 @@ from image_diff.dom.box_changes import explain_boxes
 from image_diff.dom.diff import PageDiff
 from image_diff.dom.layout_changes import explain_layout
 from image_diff.dom.match import match
-from image_diff.model import Change, Snapshot, in_reading_order
+from image_diff.model import Change, Side, Snapshot, in_reading_order
 from image_diff.pixel.color import color_mask
 from image_diff.pixel.edges import edge_mask, find_edges
 from image_diff.pixel.regions import categorize_boxes, find_boxes, fit_to_edges, merge_boxes
@@ -22,9 +22,25 @@ def pad_to_match(before: np.ndarray, after: np.ndarray) -> tuple[np.ndarray, np.
     return _pad(before, height, width), _pad(after, height, width)
 
 
+def _check_page_fits(image: np.ndarray, snapshot: Snapshot, side: Side):
+    # The snapshot's element boxes only line up with a full page screenshot
+    height, width = image.shape[:2]
+    page_width, page_height = snapshot.page_size
+    if page_width > width or page_height > height:
+        raise SystemExit(
+            f"The {side} snapshot's page is {page_width}x{page_height} but the screenshot is {width}x{height}, "
+            "capture the full page"
+        )
+
+
 def diff_images(
     before: np.ndarray, after: np.ndarray, snapshots: tuple[Snapshot, Snapshot] | None = None
 ) -> tuple[Change, ...]:
+    if snapshots is not None:
+        for side, image, snapshot in zip(Side, (before, after), snapshots):
+            if snapshot.page_size is not None:
+                _check_page_fits(image, snapshot, side)
+
     before_edges, after_edges = find_edges(before), find_edges(after)
     shape_boxes = find_boxes(edge_mask(before_edges, after_edges))
     color_boxes = find_boxes(color_mask(before, after))
