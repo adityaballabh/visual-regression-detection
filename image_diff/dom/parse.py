@@ -148,8 +148,14 @@ class _Loader:
 def parse_snapshot(capture: dict) -> Snapshot:
     loader = _Loader(capture)
     loader.load_document(0)
-    return Snapshot(tuple(loader.elements))
+    page = capture["snapshot"]["documents"][0]
+    page_size = (round(page["contentWidth"] * loader.scale), round(page["contentHeight"] * loader.scale))
+    return Snapshot(tuple(loader.elements), page_size)
 
 
 def load_snapshot(path: Path) -> Snapshot:
-    return parse_snapshot(json.loads(path.read_text()))
+    capture = json.loads(path.read_text())
+    # The styles key is needed to pair each style with its value
+    if "styles" not in capture:
+        raise SystemExit(f"{path} is not in the expected format, it is missing the style names")
+    return parse_snapshot(capture)

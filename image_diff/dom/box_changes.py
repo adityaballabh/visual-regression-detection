@@ -1,6 +1,6 @@
 # Adapted from WebSee (Mahajan & Halfond, 2015)
 
-from image_diff.dom.diff import PageDiff, change_kind
+from image_diff.dom.differences import PageDiff, change_kind
 from image_diff.dom.match import ElementPair
 from image_diff.model import Box, Cause, Change, Element, Kind, Snapshot
 

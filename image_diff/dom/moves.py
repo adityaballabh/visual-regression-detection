@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from image_diff.dom.diff import Difference, PageDiff, changed, changed_styles, resized
+from image_diff.dom.differences import Difference, PageDiff, changed, changed_styles, resized
 from image_diff.dom.match import ElementPair
 from image_diff.dom.spacing import swapped_sides
 from image_diff.model import SIZE_TOLERANCE_PX, Box, Cause, Element, Kind, in_reading_order

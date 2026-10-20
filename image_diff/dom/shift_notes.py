@@ -1,6 +1,6 @@
 from statistics import mode
 
-from image_diff.dom.diff import PageDiff, changed, size_changes
+from image_diff.dom.differences import PageDiff, changed, size_changes
 from image_diff.dom.match import ElementPair
 from image_diff.dom.spacing import swapped_sides
 from image_diff.model import Box, Cause, Edge, Element, overlapping, px

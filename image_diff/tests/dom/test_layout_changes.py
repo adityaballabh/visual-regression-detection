@@ -1,6 +1,6 @@
 import unittest
 
-from image_diff.dom.diff import PageDiff
+from image_diff.dom.differences import PageDiff
 from image_diff.dom.layout_changes import explain_layout
 from image_diff.dom.match import match
 from image_diff.model import Kind, Snapshot

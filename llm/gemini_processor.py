@@ -1,9 +1,9 @@
-"""Regression classification with Gemini (Carl's stage of the pipeline).
+"""Regression classification with Gemini.
 
 Takes the output of the image-diff stage (four annotated screenshots plus
 boxes.json), the design intent and the design language, asks Gemini whether the
 change is a regression, and returns a structured report naming the offending
-boxes. A no-context baseline prompt (LLMShot-style: images only) runs through
+boxes. A no-context baseline prompt (images and boxes.json only) runs through
 the same schema so the two can be compared.
 
 Case directory layout (a case is one before/after pair):
@@ -12,12 +12,11 @@ Case directory layout (a case is one before/after pair):
     after_color.png
     before_shape.png
     after_shape.png
-    design_intent.md      what the change is supposed to do (Batya's PR description)
+    design_intent.md      what the change is supposed to do (from the PR description)
     design_language.md    themes, palettes, size restrictions, guidelines
     label.json            only for `eval`: {"regression": true, "boxes": [3, 5]}
 
 Usage:
-    pip install google-genai pydantic
     python llm/gemini_processor.py run  CASE_DIR [--mode context|baseline|both] [--out DIR]
     python llm/gemini_processor.py eval CASES_DIR [--out DIR]
     add --dry-run to print the prompt without calling the API
@@ -126,9 +125,12 @@ def load_env():
 
 
 class Case:
-    def __init__(self, directory: Path):
+    def __init__(self, directory: Path, design_folder: Path | None = None, files: str = "all"):
+        design_folder = design_folder or directory
         self.dir = directory
         self.name = directory.name
+        # Which inputs go to Gemini: "all", "images" or "boxes"
+        self.files = files
         boxes_file = directory / "boxes.json"
         if not boxes_file.exists():
             raise SystemExit(f"{boxes_file} not found")
@@ -138,8 +140,8 @@ class Case:
         missing = [p for p in self.image_paths if not p.exists()]
         if missing:
             raise SystemExit(f"missing annotated images: {', '.join(map(str, missing))}")
-        self.design_intent = _read_optional(directory / "design_intent.md", "(not provided)")
-        self.design_language = _read_optional(directory / "design_language.md", "(not provided)")
+        self.design_intent = _read_optional(design_folder / "design_intent.md", "(not provided)")
+        self.design_language = _read_optional(design_folder / "design_language.md", "(not provided)")
 
     def boxes_for_prompt(self) -> str:
         # selector/frames are for generating assertions later, not for classification.

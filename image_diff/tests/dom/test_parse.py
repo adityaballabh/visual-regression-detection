@@ -5,8 +5,8 @@ from pathlib import Path
 from image_diff.dom.parse import load_snapshot, parse_snapshot
 from image_diff.model import Box, Element, Snapshot
 
-_EXAMPLES = Path(__file__).parents[2] / "examples"
-_EXAMPLE = _EXAMPLES / "button_enlarged" / "input" / "before_snapshot.json"
+_EXAMPLES = Path(__file__).parents[3] / "examples" / "general"
+_EXAMPLE = _EXAMPLES / "button_enlarged" / "captures" / "before_snapshot.json"
 # Captured from iframe.html
 _IFRAME_PAGE = Path(__file__).parent / "iframe_snapshot.json"
 
