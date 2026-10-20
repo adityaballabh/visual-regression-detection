@@ -12,7 +12,9 @@ def main():
     args = parser.parse_args()
 
     for case_folder in sorted(_EXAMPLES.glob("*/*/")):
-        reports = run_pipeline(case_folder, llm_input="dom", llm_mode="both", llm_dry_run=args.llm_dry_run)
+        reports = run_pipeline(
+            case_folder, llm_input="dom", llm_files="all", llm_mode="both", llm_dry_run=args.llm_dry_run
+        )
         print(f"{case_folder.relative_to(_EXAMPLES)}: {len(reports)} reports")
 
 

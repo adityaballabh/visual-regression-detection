@@ -5,6 +5,7 @@ from pathlib import Path, PurePosixPath
 from urllib.parse import urlparse
 
 from github import Github
+from github.Repository import Repository
 
 from image_diff.capture import capture_html_pair
 from image_diff.diff import diff_files
@@ -12,6 +13,8 @@ from image_diff.model import Side
 from llm.gemini_processor import DEFAULT_MODEL, Case, RegressionReport, load_env, run_case
 
 _CAPTURE_NAMES = ("before.png", "before_snapshot.json", "after.png", "after_snapshot.json")
+# Hardcoded to where the PrairieLearn fork stores its design language
+_REPO_DESIGN_LANGUAGE_PATH = "docs/design-standards.md"
 
 
 def _has_captures(folder: Path) -> bool:
@@ -22,10 +25,14 @@ def _has_html_pair(folder: Path) -> bool:
     return all((folder / f"{side}.html").is_file() for side in Side)
 
 
-def _download_pr_captures(pr_url: str, captures_folder: Path):
-    # TODO: download design_intent.md too once the capture script commits it with the captures
+def _pr_repo(pr_url: str) -> tuple[Repository, int]:
     owner, repo, _, number = urlparse(pr_url).path.strip("/").split("/")[:4]
-    pull = Github().get_repo(f"{owner}/{repo}").get_pull(int(number))
+    return Github().get_repo(f"{owner}/{repo}"), int(number)
+
+
+def _download_pr_captures(pr_url: str, captures_folder: Path):
+    repo, number = _pr_repo(pr_url)
+    pull = repo.get_pull(number)
 
     # Group the capture files by their folder under .github/pr-images/
     raw_urls_by_capture = defaultdict(dict)
@@ -46,6 +53,23 @@ def _download_pr_captures(pr_url: str, captures_folder: Path):
         urllib.request.urlretrieve(raw_urls[name], captures_folder / name)
 
 
+def _download_design_language(pr_url: str, design_language: Path):
+    repo, _ = _pr_repo(pr_url)
+    content = repo.get_contents(_REPO_DESIGN_LANGUAGE_PATH).decoded_content
+    design_language.parent.mkdir(parents=True, exist_ok=True)
+    design_language.write_bytes(content)
+
+
+def _download_design_intent(pr_url: str, design_intent: Path):
+    repo, number = _pr_repo(pr_url)
+    description = repo.get_pull(number).body
+
+    # The capture script writes the intent under Description, before the screenshots
+    intent = description.partition("## Screenshots")[0].removeprefix("# Description").strip()
+    design_intent.parent.mkdir(parents=True, exist_ok=True)
+    design_intent.write_text(intent)
+
+
 def _diff(captures_folder: Path, out_folder: Path):
     before_path, after_path = captures_folder / "before.png", captures_folder / "after.png"
     snapshot_paths = captures_folder / "before_snapshot.json", captures_folder / "after_snapshot.json"
@@ -53,7 +77,9 @@ def _diff(captures_folder: Path, out_folder: Path):
     diff_files(before_path, after_path, out_folder / "pixel")
 
 
-def run_pipeline(case_folder: Path, llm_input: str, llm_mode: str, llm_dry_run: bool) -> dict[str, RegressionReport]:
+def run_pipeline(
+    case_folder: Path, llm_input: str, llm_files: str, llm_mode: str, llm_dry_run: bool
+) -> dict[str, RegressionReport]:
     captures_folder = case_folder / "captures"
     html_folder = case_folder / "html"
     pr_file = case_folder / "pr.txt"
@@ -66,11 +92,19 @@ def run_pipeline(case_folder: Path, llm_input: str, llm_mode: str, llm_dry_run: 
         else:
             raise SystemExit(f"{case_folder} needs captures/, html/ or pr.txt")
 
+    design_language = case_folder / "design" / "design_language.md"
+    design_intent = case_folder / "design" / "design_intent.md"
+    # Fetch the repo's design language and the PR's intent for a PR case without its own
+    if pr_file.is_file() and not design_language.is_file():
+        _download_design_language(pr_file.read_text().strip(), design_language)
+    if pr_file.is_file() and not design_intent.is_file():
+        _download_design_intent(pr_file.read_text().strip(), design_intent)
+
     out_folder = case_folder / "out"
     _diff(captures_folder, out_folder)
 
     load_env()
-    case = Case(out_folder / llm_input, case_folder / "design")
+    case = Case(out_folder / llm_input, case_folder / "design", llm_files)
     return run_case(case, llm_mode, DEFAULT_MODEL, out_folder / "llm", llm_dry_run)
 
 
@@ -85,11 +119,12 @@ def main():
     parser = argparse.ArgumentParser(prog="pipeline")
     parser.add_argument("case_folder", type=Path)
     parser.add_argument("--llm-input", choices=["dom", "pixel"], default="dom")
+    parser.add_argument("--llm-files", choices=["all", "images", "boxes"], default="all")
     parser.add_argument("--llm-mode", choices=["context", "baseline", "both"], default="context")
     parser.add_argument("--llm-dry-run", action="store_true")
     args = parser.parse_args()
 
-    reports = run_pipeline(args.case_folder, args.llm_input, args.llm_mode, args.llm_dry_run)
+    reports = run_pipeline(args.case_folder, args.llm_input, args.llm_files, args.llm_mode, args.llm_dry_run)
     for mode, report in reports.items():
         report_path = args.case_folder / "out" / "llm" / f"report_{mode}.json"
         print(f"{mode}: {_verdict(report)}, saved to {report_path}")
