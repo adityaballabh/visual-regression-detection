@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 
-from image_diff.dom.diff import (
+from image_diff.dom.differences import (
     Difference,
     PageDiff,
     change_kind,

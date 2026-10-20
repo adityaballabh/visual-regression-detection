@@ -1,10 +1,15 @@
+from pathlib import Path
+
+import cv2
 import numpy as np
 
 from image_diff.dom.box_changes import explain_boxes
-from image_diff.dom.diff import PageDiff
+from image_diff.dom.differences import PageDiff
 from image_diff.dom.layout_changes import explain_layout
 from image_diff.dom.match import match
+from image_diff.dom.parse import load_snapshot
 from image_diff.model import Change, Side, Snapshot, in_reading_order
+from image_diff.output import write
 from image_diff.pixel.color import color_mask
 from image_diff.pixel.edges import edge_mask, find_edges
 from image_diff.pixel.regions import categorize_boxes, find_boxes, fit_to_edges, merge_boxes
@@ -56,3 +61,22 @@ def diff_images(
     changes = fit_to_edges(changes, before_edges, after_edges)
     # Number by reading order, with the after box standing in for added elements
     return tuple(in_reading_order(explained + changes, lambda change: change.before or change.after))
+
+
+def _read(path: Path) -> np.ndarray:
+    image = cv2.imread(str(path), cv2.IMREAD_COLOR)
+    if image is None:
+        raise SystemExit(f"could not read image: {path}")
+    return image
+
+
+def diff_files(
+    before_path: Path, after_path: Path, out: Path, snapshot_paths: tuple[Path, Path] | None = None
+) -> tuple[Change, ...]:
+    before, after = pad_to_match(_read(before_path), _read(after_path))
+    snapshots = None
+    if snapshot_paths is not None:
+        snapshots = load_snapshot(snapshot_paths[0]), load_snapshot(snapshot_paths[1])
+    changes = diff_images(before, after, snapshots)
+    write(out, before, after, changes)
+    return changes

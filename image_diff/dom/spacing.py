@@ -1,6 +1,6 @@
 from typing import NamedTuple
 
-from image_diff.dom.diff import PageDiff, changed
+from image_diff.dom.differences import PageDiff, changed
 from image_diff.dom.match import ElementPair
 from image_diff.model import OVERLAP_TOLERANCE_PX, SIZE_TOLERANCE_PX, Box, Edge, Element, overlapping
 

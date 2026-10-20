@@ -3,9 +3,9 @@ from pathlib import Path
 
 import cv2
 
+from image_diff.diff import diff_images, pad_to_match
 from image_diff.dom.parse import load_snapshot
 from image_diff.model import Change
-from image_diff.pipeline import diff_images, pad_to_match
 
 _EXAMPLES = Path(__file__).parents[2] / "examples" / "general"
 

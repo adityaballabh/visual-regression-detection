@@ -4,14 +4,11 @@ from collections import defaultdict
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlparse
 
-import cv2
 from github import Github
 
 from image_diff.capture import capture_html_pair
-from image_diff.dom.parse import load_snapshot
+from image_diff.diff import diff_files
 from image_diff.model import Side
-from image_diff.output import write
-from image_diff.pipeline import diff_images, pad_to_match
 from llm.gemini_processor import DEFAULT_MODEL, Case, RegressionReport, load_env, run_case
 
 _CAPTURE_NAMES = ("before.png", "before_snapshot.json", "after.png", "after_snapshot.json")
@@ -50,15 +47,10 @@ def _download_pr_captures(pr_url: str, captures_folder: Path):
 
 
 def _diff(captures_folder: Path, out_folder: Path):
-    before = cv2.imread(str(captures_folder / "before.png"))
-    after = cv2.imread(str(captures_folder / "after.png"))
-    before, after = pad_to_match(before, after)
-    snapshots = (
-        load_snapshot(captures_folder / "before_snapshot.json"),
-        load_snapshot(captures_folder / "after_snapshot.json"),
-    )
-    write(out_folder / "dom", before, after, diff_images(before, after, snapshots))
-    write(out_folder / "pixel", before, after, diff_images(before, after))
+    before_path, after_path = captures_folder / "before.png", captures_folder / "after.png"
+    snapshot_paths = captures_folder / "before_snapshot.json", captures_folder / "after_snapshot.json"
+    diff_files(before_path, after_path, out_folder / "dom", snapshot_paths)
+    diff_files(before_path, after_path, out_folder / "pixel")
 
 
 def run_pipeline(case_folder: Path, llm_input: str, llm_mode: str, llm_dry_run: bool) -> dict[str, RegressionReport]:
