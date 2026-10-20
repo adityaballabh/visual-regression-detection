@@ -1,0 +1,1 @@
+The "About" link was removed from the navigation, the main heading was made larger, the "Savings Accounts" card was changed from green to red, a "Personal finance coaching" item was added to the list, and the footer was made taller by increasing its padding.
