@@ -34,9 +34,7 @@ def validate_capture_spec(source: str, name: str) -> None:
         rf"\bawait\s+captureSnapshot\s*\(\s*page\s*,\s*(['\"]){re.escape(name)}\1\s*\)",
         source,
     ):
-        raise CaptureError(
-            f"Capture spec must call captureSnapshot(page, '{name}') to write standardized outputs."
-        )
+        raise CaptureError(f"Capture spec must call captureSnapshot(page, '{name}') to write standardized outputs.")
     if re.search(r"\.screenshot\s*\(|\bnewCDPSession\s*\(|DOMSnapshot\.captureSnapshot", source):
         raise CaptureError("Capture specs must use the shared helper instead of capturing files directly.")
 
@@ -61,8 +59,7 @@ def validate_snapshot_file(snapshot_path: Path) -> None:
         or not all(isinstance(style, str) for style in snapshot["styles"])
         or not isinstance(snapshot["same_everywhere"], dict)
         or not all(
-            isinstance(style, str) and isinstance(value, str)
-            for style, value in snapshot["same_everywhere"].items()
+            isinstance(style, str) and isinstance(value, str) for style, value in snapshot["same_everywhere"].items()
         )
     ):
         raise CaptureError(f"DOM snapshot does not use the standardized format: {snapshot_path}")

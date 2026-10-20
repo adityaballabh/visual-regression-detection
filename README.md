@@ -25,9 +25,9 @@ Copy [`.env.example`](.env.example) to `.env` and add your Gemini API key.
 Run all commands from the repository root.
 
 ## Run
-[`pipeline.py`](pipeline.py) runs steps 2 to 4 on one case folder:
+[`pipeline.py`](pipeline.py) runs the first 4 steps on one case folder:
 ```bash
-python pipeline.py <case_folder> [--llm-input dom|pixel] [--llm-mode context|baseline|both] [--llm-dry-run]
+python pipeline.py <case_folder> [--llm-input dom|pixel] [--llm-files all|images|boxes] [--llm-mode context|baseline|both] [--llm-dry-run]
 ```
 
 A case folder holds one change:
@@ -36,21 +36,21 @@ A case folder holds one change:
   html/       before.html and after.html (optional)
   pr.txt      link to a PrairieLearn PR made by the capture script (optional)
   captures/   before.png, after.png and their _snapshot.json files (if missing, generated from html/ or pr.txt)
-  design/     design_intent.md and design_language.md (optional)
+  design/     design_intent.md and design_language.md (optional, pulled from pr.txt if missing)
   out/        written by the pipeline: dom/ and pixel/ for the image diff, llm/ for the reports
 ```
 
-If `captures/` is incomplete, the pipeline fills it. For a PrairieLearn change, put the link to the PR made by the [PrairieLearn screenshot capture](#prairielearn-screenshot-capture) in `pr.txt`, and the pipeline downloads the captures committed in that PR. For any other page, put the before and after HTML in `html/`, and the pipeline captures them itself. `--llm-dry-run` prints the LLM prompt without calling Gemini. `--llm-input` picks which diff the LLM reads, `dom` by default.
+If `captures/` is incomplete, the pipeline fills it. For a PrairieLearn change, put the link to the PR made by the [PrairieLearn screenshot capture](#prairielearn-screenshot-capture) in `pr.txt`, and the pipeline downloads the captures committed in that PR. Missing design files come from the PR too: the intent from its description and the design language from the PrairieLearn fork's `docs/design-standards.md`. For any other page, put the before and after HTML in `html/`, and the pipeline captures them itself. `--llm-dry-run` prints the LLM prompt without calling Gemini. `--llm-input` picks which diff the LLM reads, `dom` by default. `--llm-files` picks whether the LLM gets the annotated images, `boxes.json` or both.
 
 ### Examples
-Each folder in [`examples/general/`](examples/general/) is a case.
+Each folder in [`examples/general/`](examples/general/) and [`examples/prairielearn/`](examples/prairielearn/) is a case.
 
 To update every example's `out/` after a code change, run [`examples/update_outputs.py`](examples/update_outputs.py):
 ```bash
 python -m examples.update_outputs [--llm-dry-run]
 ```
 
-The example pages are re-rendered from [WUICC](https://huggingface.co/datasets/zhangsan11111122/WUICC), which is built on [WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight), and the synthetic ones use text from WUICC pages. WUICC and WebSight are both [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+The pages in `examples/general/` are re-rendered from [WUICC](https://huggingface.co/datasets/zhangsan11111122/WUICC), which is built on [WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight), and the synthetic ones use text from WUICC pages. WUICC and WebSight are both [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
 ## PrairieLearn screenshot capture
 
@@ -64,7 +64,7 @@ reruns the selected spec without automatic repair.
 `pr` publishes the before/after screenshots and DOM snapshots and creates a
 draft PR.
 
-Generated specs use PrairieLearn's shared E2E snapshot helper so screenshots
+Generated specs use the PrairieLearn fork's shared E2E snapshot helper so screenshots
 and DOM snapshots use the same viewport, wait for fonts and MathJax, freeze
 animations, and serialize computed styles in the normalized format consumed by
 `image_diff`.
@@ -134,4 +134,4 @@ Both runs both baseline and context
 
 Baseline takes in only the 4 images + boxes.json without any design context. 
 
-Context takes in the 4 images + boxes.json + PR link, design context and intent. 
+Context takes in the 4 images + boxes.json + design intent and design language.
