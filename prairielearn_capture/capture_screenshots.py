@@ -24,6 +24,70 @@ class CaptureError(Exception):
     """An expected failure with a concise command-line error."""
 
 
+def validate_capture_spec(source: str, name: str) -> None:
+    if not re.search(r"from\s+['\"]\.\./utils/capture-snapshot\.js['\"]", source):
+        raise CaptureError(
+            "Capture spec must import the standardized helper from "
+            "../utils/capture-snapshot.js. Rerun before to generate a compatible spec."
+        )
+    if "captureSnapshot" not in source or not re.search(
+        rf"\bawait\s+captureSnapshot\s*\(\s*page\s*,\s*(['\"]){re.escape(name)}\1\s*\)",
+        source,
+    ):
+        raise CaptureError(
+            f"Capture spec must call captureSnapshot(page, '{name}') to write standardized outputs."
+        )
+    if re.search(r"\.screenshot\s*\(|\bnewCDPSession\s*\(|DOMSnapshot\.captureSnapshot", source):
+        raise CaptureError("Capture specs must use the shared helper instead of capturing files directly.")
+
+
+def validate_snapshot_file(snapshot_path: Path) -> None:
+    try:
+        snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise CaptureError(f"Could not read a valid DOM snapshot: {snapshot_path}") from error
+
+    if not isinstance(snapshot, dict) or set(snapshot) != {
+        "device_pixel_ratio",
+        "styles",
+        "same_everywhere",
+        "snapshot",
+    }:
+        raise CaptureError(f"DOM snapshot does not use the standardized format: {snapshot_path}")
+    if (
+        not isinstance(snapshot["device_pixel_ratio"], (int, float))
+        or isinstance(snapshot["device_pixel_ratio"], bool)
+        or not isinstance(snapshot["styles"], list)
+        or not all(isinstance(style, str) for style in snapshot["styles"])
+        or not isinstance(snapshot["same_everywhere"], dict)
+        or not all(
+            isinstance(style, str) and isinstance(value, str)
+            for style, value in snapshot["same_everywhere"].items()
+        )
+    ):
+        raise CaptureError(f"DOM snapshot does not use the standardized format: {snapshot_path}")
+
+    data = snapshot["snapshot"]
+    if (
+        not isinstance(data, dict)
+        or not isinstance(data.get("documents"), list)
+        or not isinstance(data.get("strings"), list)
+        or not all(isinstance(value, str) for value in data["strings"])
+    ):
+        raise CaptureError(f"DOM snapshot does not use the standardized format: {snapshot_path}")
+    for document in data["documents"]:
+        if not isinstance(document, dict) or not isinstance(document.get("layout"), dict):
+            raise CaptureError(f"DOM snapshot does not use the standardized format: {snapshot_path}")
+        rows = document["layout"].get("styles")
+        if not isinstance(rows, list) or any(
+            not isinstance(row, list)
+            or (row and len(row) != len(snapshot["styles"]))
+            or not all(isinstance(index, int) and not isinstance(index, bool) for index in row)
+            for row in rows
+        ):
+            raise CaptureError(f"DOM snapshot does not use the standardized format: {snapshot_path}")
+
+
 def run(
     command: list[str],
     *,
@@ -170,14 +234,17 @@ them. Use PrairieLearn's existing fixtures and conventions for the required
 user, page, and data. If essential details cannot be inferred, do not invent
 fragile selectors or test data; report the ambiguity.
 
-The spec must be skipped unless CAPTURE_SCREENSHOTS=1, and write both files
-directly into the absolute directory supplied in process.env.OUT_DIR:
+The spec must be skipped unless CAPTURE_SCREENSHOTS=1. Import the shared
+capture helper exactly as:
+import {{ captureSnapshot }} from '../utils/capture-snapshot.js';
+For the requested page state, call:
+await captureSnapshot(page, '{name}');
+The helper sets the standard viewport, waits for fonts and MathJax, freezes
+animations, and writes both files into process.env.OUT_DIR:
 - {screenshot_name}
 - {snapshot_name}
-Capture the requested element/page as a PNG and a Chromium DOMSnapshot JSON
-including computed styles, device pixel ratio, and paint order. Create OUT_DIR
-if needed. Use PrairieLearn's existing E2E fixtures for its app server, test
-database, and test course.
+Do not capture screenshots or DOM snapshots directly. Use PrairieLearn's
+existing E2E fixtures for its app server, test database, and test course.
 
 Only create the specified new spec. Do not modify any existing files or other
 files, change repository state, commit, push, or create a pull request. Do not
@@ -192,11 +259,9 @@ CAPTURE_SPEC_PATH: apps/prairielearn/src/tests/e2e/relative-file.spec.ts
     selected = resolve_selected_spec(root, response, destination)
     print(f"Using new Playwright capture spec: {selected.relative_to(root)}")
     source = selected.read_text(encoding="utf-8")
-    if screenshot_name not in source or snapshot_name not in source or "CAPTURE_SCREENSHOTS" not in source:
-        raise CaptureError(
-            f"Selected spec must be gated by CAPTURE_SCREENSHOTS and write "
-            f"{screenshot_name} and {snapshot_name}; review or correct the spec before retrying."
-        )
+    if "CAPTURE_SCREENSHOTS" not in source:
+        raise CaptureError("Selected spec must be gated by CAPTURE_SCREENSHOTS.")
+    validate_capture_spec(source, name)
     return selected
 
 
@@ -242,6 +307,13 @@ def capture_command(root: Path, spec: Path, output_dir: Path) -> tuple[list[str]
 
 
 def run_capture_attempt(root: Path, spec: Path, output_dir: Path, name: str) -> str | None:
+    try:
+        validate_capture_spec(spec.read_text(encoding="utf-8"), name)
+    except OSError as error:
+        raise CaptureError(f"Could not read capture spec: {spec}") from error
+    except CaptureError as error:
+        return str(error)
+
     command, env = capture_command(root, spec, output_dir)
     for filename in (f"{name}.png", f"{name}_snapshot.json"):
         (output_dir / filename).unlink(missing_ok=True)
@@ -268,6 +340,10 @@ def run_capture_attempt(root: Path, spec: Path, output_dir: Path, name: str) -> 
     ]
     if missing:
         return "E2E test passed but did not create required output files: " + ", ".join(missing)
+    try:
+        validate_snapshot_file(output_dir / f"{name}_snapshot.json")
+    except CaptureError as error:
+        return str(error)
     return None
 
 
@@ -301,8 +377,11 @@ the failure output below. Fix the underlying test/spec issue without weakening
 the intended capture, removing meaningful assertions, or changing unrelated
 files. Edit only this selected spec; do not add another complete test or
 repurpose a spec for a different TSX component. Preserve PrairieLearn's existing fixtures and keep the
-CAPTURE_SCREENSHOTS=1 guard. Do not run commands, modify other files, commit,
-push, or create a pull request; the caller will rerun the test.
+CAPTURE_SCREENSHOTS=1 guard. Import captureSnapshot from
+../utils/capture-snapshot.js and call await captureSnapshot(page, '{name}');
+do not capture screenshots or snapshots directly. Do not run commands, modify
+other files, commit, push, or create a pull request; the caller will rerun the
+test.
 
 Failure output:
 {failure[-20000:]}

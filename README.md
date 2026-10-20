@@ -64,6 +64,11 @@ reruns the selected spec without automatic repair.
 `pr` publishes the before/after screenshots and DOM snapshots and creates a
 draft PR.
 
+Generated specs use PrairieLearn's shared E2E snapshot helper so screenshots
+and DOM snapshots use the same viewport, wait for fonts and MathJax, freeze
+animations, and serialize computed styles in the normalized format consumed by
+`image_diff`.
+
 ```sh
 ./prairielearn_capture/capture_screenshots.sh /path/to/PrairieLearn before \
   --component apps/prairielearn/src/components/example.tsx \
