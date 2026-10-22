@@ -1,0 +1,13 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "All detected changes match the provided design intent and adhere to the design language, with no unintended defects.",
+  "regressions": [],
+  "intended_box_ids": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ]
+}

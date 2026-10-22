@@ -1,0 +1,9 @@
+{
+  "is_regression": false,
+  "confidence": 0.9,
+  "summary": "The 'Learn More' button has been slightly resized and given more padding, which appears to be an intentional styling update.",
+  "regressions": [],
+  "intended_box_ids": [
+    1
+  ]
+}

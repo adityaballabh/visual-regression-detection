@@ -1,0 +1,9 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The 'Learn More' button was successfully increased in size via padding updates as specified in the design intent.",
+  "regressions": [],
+  "intended_box_ids": [
+    1
+  ]
+}

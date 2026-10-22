@@ -1,0 +1,12 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The changes remove the inner right padding/gap from the right-hand tags on question rows, which is a clean and intentional design refinement.",
+  "regressions": [],
+  "intended_box_ids": [
+    1,
+    2,
+    3,
+    4
+  ]
+}

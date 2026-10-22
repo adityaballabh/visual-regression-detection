@@ -34,7 +34,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_MODEL = "gemini-3.8-flash"
+DEFAULT_MODEL = "gemini-3.5-flash-lite"
 IMAGE_NAMES = ["before_color", "after_color", "before_shape", "after_shape"]
 
 
