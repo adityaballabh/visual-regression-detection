@@ -1,0 +1,82 @@
+from pathlib import Path
+
+import cv2
+import numpy as np
+
+from image_diff.dom.box_changes import explain_boxes
+from image_diff.dom.differences import PageDiff
+from image_diff.dom.layout_changes import explain_layout
+from image_diff.dom.match import match
+from image_diff.dom.parse import load_snapshot
+from image_diff.model import Change, Side, Snapshot, in_reading_order
+from image_diff.output import write
+from image_diff.pixel.color import color_mask
+from image_diff.pixel.edges import edge_mask, find_edges
+from image_diff.pixel.regions import categorize_boxes, find_boxes, fit_to_edges, merge_boxes
+
+
+def _pad(image: np.ndarray, height: int, width: int) -> np.ndarray:
+    margins = ((0, height - image.shape[0]), (0, width - image.shape[1]), (0, 0))
+    return np.pad(image, margins, constant_values=255)
+
+
+def pad_to_match(before: np.ndarray, after: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    # Pads the bottom and right with white so both images are the same size
+    height = max(before.shape[0], after.shape[0])
+    width = max(before.shape[1], after.shape[1])
+    return _pad(before, height, width), _pad(after, height, width)
+
+
+def _check_page_fits(image: np.ndarray, snapshot: Snapshot, side: Side):
+    # The snapshot's element boxes only line up with a full page screenshot
+    height, width = image.shape[:2]
+    page_width, page_height = snapshot.page_size
+    if page_width > width or page_height > height:
+        raise SystemExit(
+            f"The {side} snapshot's page is {page_width}x{page_height} but the screenshot is {width}x{height}, "
+            "capture the full page"
+        )
+
+
+def diff_images(
+    before: np.ndarray, after: np.ndarray, snapshots: tuple[Snapshot, Snapshot] | None = None
+) -> tuple[Change, ...]:
+    if snapshots is not None:
+        for side, image, snapshot in zip(Side, (before, after), snapshots):
+            if snapshot.page_size is not None:
+                _check_page_fits(image, snapshot, side)
+
+    before_edges, after_edges = find_edges(before), find_edges(after)
+    shape_boxes = find_boxes(edge_mask(before_edges, after_edges))
+    color_boxes = find_boxes(color_mask(before, after))
+
+    explained = []
+    if snapshots is not None:
+        page_diff = PageDiff(*snapshots, match(*snapshots))
+        causes, shifted_ids = explain_layout(page_diff)
+        explained, shape_boxes, color_boxes = explain_boxes(shape_boxes, color_boxes, page_diff, causes, shifted_ids)
+
+    # Only boxes the DOM does not explain get merged
+    changes = categorize_boxes(merge_boxes(shape_boxes), merge_boxes(color_boxes))
+    changes = fit_to_edges(changes, before_edges, after_edges)
+    # Number by reading order, with the after box standing in for added elements
+    return tuple(in_reading_order(explained + changes, lambda change: change.before or change.after))
+
+
+def _read(path: Path) -> np.ndarray:
+    image = cv2.imread(str(path), cv2.IMREAD_COLOR)
+    if image is None:
+        raise SystemExit(f"could not read image: {path}")
+    return image
+
+
+def diff_files(
+    before_path: Path, after_path: Path, out: Path, snapshot_paths: tuple[Path, Path] | None = None
+) -> tuple[Change, ...]:
+    before, after = pad_to_match(_read(before_path), _read(after_path))
+    snapshots = None
+    if snapshot_paths is not None:
+        snapshots = load_snapshot(snapshot_paths[0]), load_snapshot(snapshot_paths[1])
+    changes = diff_images(before, after, snapshots)
+    write(out, before, after, changes)
+    return changes

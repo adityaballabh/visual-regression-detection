@@ -1,3 +1,0 @@
-[
-  {"id": 1, "type": "shape", "before": null, "after": {"x": 0, "y": 207, "width": 1221, "height": 183}, "element": "<section> containing 'Featured Collection'", "selector": "html:nth-child(1) > body:nth-child(2) > section:nth-child(3)", "frames": [], "detail": "added. content moved 208px down"}
-]

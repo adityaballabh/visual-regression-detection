@@ -14,6 +14,29 @@ class MovesTests(unittest.TestCase):
             [("<a> 'About'", "moved from right of <a> 'Home' to left of <a> 'Home'. content moved 60px right")],
         )
 
+    def test_swap_names_sibling_moved_further(self):
+        nav, main = Block("nav", "Menu", 50), Block("main", "Content", 300)
+
+        self.assertEqual(
+            layout_causes(stack(nav, main), stack(main, nav)),
+            [("<nav> 'Menu'", "moved from above <main> 'Content' to below <main> 'Content'. content moved 50px up")],
+        )
+
+    def test_transform_move_not_reorder(self):
+        def page(button_x: int, button_y: int, transform: str) -> Snapshot:
+            button = Block(
+                "button", "Get Started", 40, {"transform": transform}, margin=button_y, offset=button_x, across=120
+            )
+            paragraph = Block(
+                "p", "No contact details required.", 20, margin=130 - (button_y + 40), offset=24, across=240
+            )
+            return stack(button, paragraph, tag="section", width=800, height=200)
+
+        before, after = page(24, 80, "none"), page(144, 110, "matrix(1, 0, 0, 1, 120, 30)")
+        self.assertEqual(
+            layout_causes(before, after), [("<button> 'Get Started'", "transform none -> matrix(1, 0, 0, 1, 120, 30)")]
+        )
+
     def test_reparent_names_both_parents(self):
         def page(in_header: bool) -> Snapshot:
             button = (Block("button", "Sign up", 30),)

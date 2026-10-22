@@ -125,10 +125,12 @@ def load_env():
 
 
 class Case:
-    def __init__(self, directory: Path, design_folder: Path | None = None):
+    def __init__(self, directory: Path, design_folder: Path | None = None, files: str = "all"):
         design_folder = design_folder or directory
         self.dir = directory
         self.name = directory.name
+        # Which inputs go to Gemini: "all", "images" or "boxes"
+        self.files = files
         boxes_file = directory / "boxes.json"
         if not boxes_file.exists():
             raise SystemExit(f"{boxes_file} not found")

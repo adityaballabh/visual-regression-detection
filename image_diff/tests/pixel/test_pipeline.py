@@ -3,8 +3,8 @@ import unittest
 import cv2
 import numpy as np
 
+from image_diff.diff import diff_images, pad_to_match
 from image_diff.model import Box, Kind
-from image_diff.pipeline import diff_images, pad_to_match
 
 _HEIGHT, _WIDTH = 400, 600
 _BUTTON = Box(100, 80, 220, 120)

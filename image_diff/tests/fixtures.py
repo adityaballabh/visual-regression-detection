@@ -4,7 +4,7 @@ from collections import defaultdict
 from dataclasses import replace
 from typing import NamedTuple
 
-from image_diff.dom.diff import PageDiff
+from image_diff.dom.differences import PageDiff
 from image_diff.dom.layout_changes import explain_layout
 from image_diff.dom.match import match
 from image_diff.model import Box, Element, Snapshot
@@ -51,6 +51,11 @@ class Block(NamedTuple):
     margin: int = 0
     padding: int = 0
     attributes: dict[str, str] | None = None
+    # Start on the other axis, from the parent's edge
+    offset: int = 0
+    # Size on the other axis, the parent's by default
+    across: int | None = None
+    children_in_row: bool = False
 
 
 def _place(blocks: tuple[Block, ...], parent: int, start: int, across: Box, vertical: bool, elements: list[Element]):
@@ -58,12 +63,18 @@ def _place(blocks: tuple[Block, ...], parent: int, start: int, across: Box, vert
     for block in blocks:
         position += block.margin
         if vertical:
-            box = Box(across.x1, position, across.x2, position + block.size)
+            x1 = across.x1 + block.offset
+            x2 = across.x2 if block.across is None else x1 + block.across
+            box = Box(x1, position, x2, position + block.size)
         else:
-            box = Box(position, across.y1, position + block.size, across.y2)
+            y1 = across.y1 + block.offset
+            y2 = across.y2 if block.across is None else y1 + block.across
+            box = Box(position, y1, position + block.size, y2)
         element_id = len(elements)
         elements.append(element(element_id, parent, block.tag, block.text, block.attributes, box, block.styles))
-        _place(block.children, element_id, position + block.padding, box, vertical, elements)
+        children_vertical = vertical and not block.children_in_row
+        child_start = (box.y1 if children_vertical else box.x1) + block.padding
+        _place(block.children, element_id, child_start, box, children_vertical, elements)
         position += block.size
 
 
@@ -99,6 +110,8 @@ def row(
     justify = styles.get("justify-content")
     if justify == "center":
         _place(blocks, 0, (width - _extent(blocks)) // 2, box, False, elements)
+    elif justify == "flex-end":
+        _place(blocks, 0, width - _extent(blocks), box, False, elements)
     elif justify == "space-between":
         first, last = blocks[0], blocks[-1]
         _place((first,), 0, 0, box, False, elements)

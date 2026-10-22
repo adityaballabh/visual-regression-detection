@@ -138,6 +138,8 @@ class Element:
 class Snapshot:
     # In document order so an element's descendants are right after it
     elements: tuple[Element, ...]
+    # Width and height of the whole page in screenshot pixels, None for snapshots built in tests
+    page_size: tuple[int, int] | None = None
 
     def label(self, element: Element) -> str:
         tag = f"<{element.tag}{_given_name(element)}>"
@@ -151,6 +153,12 @@ class Snapshot:
 
     def children_of(self, element: Element) -> list[Element]:
         return [child for child in self.elements if child.parent == element.id]
+
+    def child_containing(self, container: Element, element: Element) -> Element | None:
+        for candidate in (element, *self.ancestors_of(element)):
+            if candidate.parent == container.id:
+                return candidate
+        return None
 
     def ancestors_of(self, element: Element) -> list[Element]:
         ancestors = []

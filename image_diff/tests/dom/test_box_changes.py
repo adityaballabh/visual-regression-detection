@@ -1,7 +1,7 @@
 import unittest
 
 from image_diff.dom.box_changes import explain_boxes
-from image_diff.dom.diff import PageDiff
+from image_diff.dom.differences import PageDiff
 from image_diff.dom.match import match
 from image_diff.model import Box, Cause, Change, Kind, Snapshot
 from image_diff.tests.fixtures import PAGE, Block, element, snapshot, stack

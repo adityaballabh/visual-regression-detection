@@ -1,6 +1,6 @@
 from typing import NamedTuple
 
-from image_diff.dom.diff import PageDiff, changed
+from image_diff.dom.differences import PageDiff, changed
 from image_diff.dom.match import ElementPair
 from image_diff.model import OVERLAP_TOLERANCE_PX, SIZE_TOLERANCE_PX, Box, Edge, Element, overlapping
 
@@ -30,6 +30,13 @@ def relation(box: Box, other: Box) -> Edge | None:
             aligned = overlapping(box.y1, box.y2, other.y1, other.y2)
         if aligned and _beyond(box, side.opposite, other):
             return side
+    return None
+
+
+def swapped_sides(pair: ElementPair, other: ElementPair) -> tuple[Edge, Edge] | None:
+    was, now = relation(pair.before.box, other.before.box), relation(pair.after.box, other.after.box)
+    if was is not None and now is not None and was != now:
+        return was, now
     return None
 
 
