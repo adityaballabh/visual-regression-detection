@@ -1,0 +1,12 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The changes remove right-hand padding/gaps from the question metadata containers consistently across all rows, which appears to be an intentional layout cleanup.",
+  "regressions": [],
+  "intended_box_ids": [
+    1,
+    2,
+    3,
+    4
+  ]
+}

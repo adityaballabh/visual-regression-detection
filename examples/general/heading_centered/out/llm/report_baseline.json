@@ -1,0 +1,9 @@
+{
+  "is_regression": false,
+  "confidence": 0.9,
+  "summary": "The heading and descriptive text section has been centered, which is an intentional and standard layout improvement.",
+  "regressions": [],
+  "intended_box_ids": [
+    1
+  ]
+}

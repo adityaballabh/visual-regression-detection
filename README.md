@@ -52,6 +52,14 @@ python -m examples.update_outputs [--llm-dry-run]
 
 The pages in `examples/general/` are re-rendered from [WUICC](https://huggingface.co/datasets/zhangsan11111122/WUICC), which is built on [WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight), and the synthetic ones use text from WUICC pages. WUICC and WebSight are both [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
+
+Note: for synthetic_five_changes, the case introduces intentional regression. The deliberate design_intent.md is: 
+
+the "Savings Accounts" card was not changed at all. 
+
+But in the actual code, the Savings Accounts is changed from green to red. 
+
+
 ## PrairieLearn screenshot capture
 
 [`prairielearn_capture/capture_screenshots.sh`](prairielearn_capture/capture_screenshots.sh) accepts a PrairieLearn checkout and one of

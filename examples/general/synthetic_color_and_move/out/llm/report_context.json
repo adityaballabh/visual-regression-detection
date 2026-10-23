@@ -1,0 +1,9 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The change to the Open an Account button correctly matches the design intent to update its color and increase its height.",
+  "regressions": [],
+  "intended_box_ids": [
+    1
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The changes successfully adjust the spacing for the question rows according to the intended design.",
+  "regressions": [],
+  "intended_box_ids": [
+    1,
+    2,
+    3,
+    4
+  ]
+}
