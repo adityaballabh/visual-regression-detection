@@ -1,7 +1,7 @@
 {
   "is_regression": false,
-  "confidence": 1.0,
-  "summary": "The heading text alignment changed from left to center, which is a standard and clean design improvement.",
+  "confidence": 0.9,
+  "summary": "The heading and descriptive text section has been centered, which is an intentional and standard layout improvement.",
   "regressions": [],
   "intended_box_ids": [
     1

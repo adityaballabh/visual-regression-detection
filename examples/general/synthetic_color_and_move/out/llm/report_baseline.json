@@ -1,7 +1,7 @@
 {
   "is_regression": false,
   "confidence": 0.9,
-  "summary": "The 'Open an Account' button has an updated red background and increased padding, which appears to be an intentional styling update.",
+  "summary": "The 'Open an Account' button has been intentionally updated with a red background and increased padding.",
   "regressions": [],
   "intended_box_ids": [
     1

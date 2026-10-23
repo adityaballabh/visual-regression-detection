@@ -1,7 +1,7 @@
 {
   "is_regression": false,
   "confidence": 1.0,
-  "summary": "The 'Open an Account' button was updated according to the design intent, changing its color from blue to red and increasing its height via padding.",
+  "summary": "The change to the Open an Account button correctly matches the design intent to update its color and increase its height.",
   "regressions": [],
   "intended_box_ids": [
     1
