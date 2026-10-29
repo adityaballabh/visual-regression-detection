@@ -14,11 +14,9 @@ Case directory layout (a case is one before/after pair):
     after_shape.png
     design_intent.md      what the change is supposed to do (from the PR description)
     design_language.md    themes, palettes, size restrictions, guidelines
-    label.json            only for `eval`: {"regression": true, "boxes": [3, 5]}
 
 Usage:
-    python llm/gemini_processor.py run  CASE_DIR [--mode context|baseline|both] [--out DIR]
-    python llm/gemini_processor.py eval CASES_DIR [--out DIR]
+    python regression_detection/gemini_processor.py run  CASE_DIR [--mode context|baseline|both] [--out DIR]
     add --dry-run to print the prompt without calling the API
 
 GEMINI_API_KEY is read from the environment or from a .env file at the repo root.
@@ -27,7 +25,6 @@ GEMINI_API_KEY is read from the environment or from a .env file at the repo root
 import argparse
 import json
 import os
-import sys
 from pathlib import Path
 from typing import Literal
 
@@ -61,51 +58,10 @@ class RegressionReport(BaseModel):
 
 # ---------------------------------------------------------------------- prompts
 
-SHARED_IMAGE_GUIDE = """\
-You are given screenshots of a web page before and after a code change. Each
-change found by an image diff is outlined in red and numbered; the same number
-marks the same change in every image. Images are provided in this order:
-  1. before_color  / 2. after_color  - color changes are outlined here
-  3. before_shape  / 4. after_shape  - shape changes (resized, moved, added,
-     removed elements) are outlined here. An added element only has a box on
-     the "after" image, a removed one only on "before".
-A change of type color_and_shape appears on all four images."""
-
-CONTEXT_PROMPT = """\
-{image_guide}
-
-Decide whether the change introduces a visual REGRESSION: an unintended
-visual defect. Changes that match the design intent are NOT regressions, even if
-large. Changes that contradict the design intent or break the design language
-are regressions, as are defects such as overlap, clipping, misalignment,
-broken spacing, unreadable text or unexpected missing elements.
-
-## Design intent
-{design_intent}
-
-## Design language
-{design_language}
-
-## Detected changes (boxes.json)
-Coordinates are pixels in the screenshot. "detail", when present, describes the
-DOM property change behind the box.
-{boxes}
-
-Report only boxes whose ids appear above. Put every box you judge to be an
-intended change in intended_box_ids. If nothing is a regression set
-is_regression to false and leave regressions empty."""
-
-BASELINE_PROMPT = """\
-{image_guide}
-
-Decide whether the change introduces a visual regression (an unintended visual
-defect). You have no information about what the change was meant to do.
-
-## Detected changes (boxes.json)
-{boxes}
-
-Report only boxes whose ids appear above. If nothing is a regression set
-is_regression to false and leave regressions empty."""
+PROMPTS_FOLDER = Path(__file__).parent / "prompts"
+SHARED_IMAGE_GUIDE = (PROMPTS_FOLDER / "shared_image_guide.md").read_text().strip()
+CONTEXT_PROMPT = (PROMPTS_FOLDER / "context.md").read_text().strip()
+BASELINE_PROMPT = (PROMPTS_FOLDER / "baseline.md").read_text().strip()
 
 
 # ---------------------------------------------------------------------- loading
@@ -147,10 +103,6 @@ class Case:
         # selector/frames are for generating assertions later, not for classification.
         slim = [{k: v for k, v in b.items() if k not in ("selector", "frames") and v is not None} for b in self.boxes]
         return json.dumps(slim, indent=1)
-
-    def label(self) -> dict | None:
-        f = self.dir / "label.json"
-        return json.loads(f.read_text()) if f.exists() else None
 
 
 def _read_optional(path: Path, default: str) -> str:
@@ -225,61 +177,6 @@ def run_case(case: Case, mode: str, model: str, out: Path | None, dry_run: bool)
     return reports
 
 
-# -------------------------------------------------------------------- evaluation
-
-
-def _prf(tp: int, fp: int, fn: int) -> tuple[float, float]:
-    precision = tp / (tp + fp) if tp + fp else 0.0
-    recall = tp / (tp + fn) if tp + fn else 0.0
-    return precision, recall
-
-
-def evaluate(cases_dir: Path, model: str, out: Path | None, dry_run: bool):
-    """Classification (case level) and localization (box level) precision/recall."""
-    cases = [Case(d) for d in sorted(cases_dir.iterdir()) if (d / "boxes.json").exists()]
-    if not cases:
-        raise SystemExit(f"no cases found in {cases_dir}")
-
-    counts = {
-        m: {"ctp": 0, "cfp": 0, "cfn": 0, "ctn": 0, "btp": 0, "bfp": 0, "bfn": 0} for m in ("context", "baseline")
-    }
-    for case in cases:
-        label = case.label()
-        if label is None:
-            print(f"skipping {case.name}: no label.json", file=sys.stderr)
-            continue
-        reports = run_case(case, "both", model, out / case.name if out else None, dry_run)
-        for m, report in reports.items():
-            c = counts[m]
-            truth, pred = label["regression"], report.is_regression
-            c["ctp"] += truth and pred
-            c["cfp"] += (not truth) and pred
-            c["cfn"] += truth and not pred
-            c["ctn"] += (not truth) and not pred
-            true_boxes, pred_boxes = set(label.get("boxes", [])), {r.box_id for r in report.regressions}
-            c["btp"] += len(true_boxes & pred_boxes)
-            c["bfp"] += len(pred_boxes - true_boxes)
-            c["bfn"] += len(true_boxes - pred_boxes)
-
-    if dry_run:
-        return
-    summary = {}
-    for m, c in counts.items():
-        cp, cr = _prf(c["ctp"], c["cfp"], c["cfn"])
-        bp, br = _prf(c["btp"], c["bfp"], c["bfn"])
-        summary[m] = {
-            "classification_precision": round(cp, 3),
-            "classification_recall": round(cr, 3),
-            "localization_precision": round(bp, 3),
-            "localization_recall": round(br, 3),
-            "counts": c,
-        }
-    print(json.dumps(summary, indent=2))
-    if out:
-        out.mkdir(parents=True, exist_ok=True)
-        (out / "eval_summary.json").write_text(json.dumps(summary, indent=2))
-
-
 # --------------------------------------------------------------------------- CLI
 
 
@@ -289,21 +186,15 @@ def main():
     run_p = sub.add_parser("run", help="classify one case")
     run_p.add_argument("case_dir", type=Path)
     run_p.add_argument("--mode", choices=["context", "baseline", "both"], default="context")
-    eval_p = sub.add_parser("eval", help="score context vs baseline over labeled cases")
-    eval_p.add_argument("cases_dir", type=Path)
-    for p in (run_p, eval_p):
-        p.add_argument("--out", type=Path, help="write report JSON files here")
-        p.add_argument("--model", default=DEFAULT_MODEL)
-        p.add_argument("--dry-run", action="store_true", help="print prompts, no API call")
+    run_p.add_argument("--out", type=Path, help="write report JSON files here")
+    run_p.add_argument("--model", default=DEFAULT_MODEL)
+    run_p.add_argument("--dry-run", action="store_true", help="print prompts, no API call")
     args = parser.parse_args()
 
     load_env()
-    if args.command == "run":
-        reports = run_case(Case(args.case_dir), args.mode, args.model, args.out, args.dry_run)
-        for m, report in reports.items():
-            print(f"--- {m} ---\n{report.model_dump_json(indent=2)}")
-    else:
-        evaluate(args.cases_dir, args.model, args.out, args.dry_run)
+    reports = run_case(Case(args.case_dir), args.mode, args.model, args.out, args.dry_run)
+    for m, report in reports.items():
+        print(f"--- {m} ---\n{report.model_dump_json(indent=2)}")
 
 
 if __name__ == "__main__":

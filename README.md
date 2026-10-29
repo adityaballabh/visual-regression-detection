@@ -118,7 +118,7 @@ A simple pixel diff boxes everything a change moves, so if an element grows, eve
 
 ## LLM-based regression detection
 
-The script is [`llm/gemini_processor.py`](llm/gemini_processor.py).
+The script is [`regression_detection/gemini_processor.py`](regression_detection/gemini_processor.py).
 
 It takes the image diff output folder of a case, like [`examples/general/button_enlarged/out/dom`](examples/general/button_enlarged/out/dom).
 
@@ -128,11 +128,11 @@ That folder contains `before_color.png`, `after_color.png`, `before_shape.png`, 
 
 To do a dry run (without calling Gemini, checking inputs): 
 ```
-python llm/gemini_processor.py run "folder-containing-images" --mode both --dry-run
+python regression_detection/gemini_processor.py run "folder-containing-images" --mode both --dry-run
 ```
 To do a complete run (calling Gemini): 
 ```
-python llm/gemini_processor.py run "folder-containing-images" --mode both
+python regression_detection/gemini_processor.py run "folder-containing-images" --mode both
 ```
 
 ### Parameters

@@ -10,7 +10,7 @@ from github.Repository import Repository
 from image_diff.capture import capture_html_pair
 from image_diff.diff import diff_files
 from image_diff.model import Side
-from llm.gemini_processor import DEFAULT_MODEL, Case, RegressionReport, load_env, run_case
+from regression_detection.gemini_processor import DEFAULT_MODEL, Case, RegressionReport, load_env, run_case
 
 _CAPTURE_NAMES = ("before.png", "before_snapshot.json", "after.png", "after_snapshot.json")
 # Hardcoded to where the PrairieLearn fork stores its design language
