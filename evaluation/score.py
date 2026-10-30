@@ -11,8 +11,20 @@ _LABELS = Path(__file__).parent / "labels"
 _MODES = ("context", "baseline")
 
 
-def _read_report(case_folder: Path, mode: str) -> RegressionReport | None:
-    report_file = case_folder / "out" / "llm" / f"report_{mode}.json"
+def _case_folder(label_file: Path) -> Path:
+    return _EXAMPLES / label_file.parent.name / label_file.stem
+
+
+def _runs() -> list[str]:
+    runs = set()
+    for label_file in _LABELS.glob("*/*.json"):
+        for run_folder in (_case_folder(label_file) / "out" / "regression_detection").glob("*/*"):
+            runs.add(f"{run_folder.parent.name}/{run_folder.name}")
+    return sorted(runs)
+
+
+def _read_report(case_folder: Path, run: str, mode: str) -> RegressionReport | None:
+    report_file = case_folder / "out" / "regression_detection" / run / f"report_{mode}.json"
     if not report_file.exists():
         return None
     return RegressionReport.model_validate_json(report_file.read_text())
@@ -33,16 +45,16 @@ def _print_scores(name: str, truth: list[bool], predicted: list[bool]):
     print(f"  {name}: precision {precision:.3f} recall {recall:.3f}")
 
 
-def score(mode: str):
+def score(run: str, mode: str):
     case_truth = []
     case_predicted = []
     box_truth = []
     box_predicted = []
     for label_file in sorted(_LABELS.glob("*/*.json")):
-        case_folder = _EXAMPLES / label_file.parent.name / label_file.stem
-        report = _read_report(case_folder, mode)
+        case_folder = _case_folder(label_file)
+        report = _read_report(case_folder, run, mode)
         if report is None:
-            print(f"skipping {case_folder.relative_to(_EXAMPLES)}: no {mode} report")
+            print(f"skipping {case_folder.relative_to(_EXAMPLES)}: no {run} {mode} report")
             continue
         label = json.loads(label_file.read_text())
         case_truth.append(label["regression"])
@@ -52,14 +64,15 @@ def score(mode: str):
             for box_id in _read_box_ids(case_folder):
                 box_truth.append(box_id in label["boxes"])
                 box_predicted.append(box_id in flagged_ids)
-    print(mode)
+    print(f"{run} {mode}")
     _print_scores("cases", case_truth, case_predicted)
     _print_scores("boxes", box_truth, box_predicted)
 
 
 def main():
-    for mode in _MODES:
-        score(mode)
+    for run in _runs():
+        for mode in _MODES:
+            score(run, mode)
 
 
 if __name__ == "__main__":

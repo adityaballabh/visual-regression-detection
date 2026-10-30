@@ -10,7 +10,7 @@ from github.Repository import Repository
 from image_diff.capture import capture_html_pair
 from image_diff.diff import diff_files
 from image_diff.model import Side
-from regression_detection.gemini_processor import DEFAULT_MODEL, Case, RegressionReport, load_env, run_case
+from regression_detection.gemini_processor import DEFAULT_MODEL, VARIANTS, Case, RegressionReport, load_env, run_case
 
 _CAPTURE_NAMES = ("before.png", "before_snapshot.json", "after.png", "after_snapshot.json")
 # Hardcoded to where the PrairieLearn fork stores its design language
@@ -77,8 +77,17 @@ def _diff(captures_folder: Path, out_folder: Path):
     diff_files(before_path, after_path, out_folder / "pixel")
 
 
+def reports_folder(case_folder: Path, model: str, variant: str) -> Path:
+    return case_folder / "out" / "regression_detection" / model / variant
+
+
 def run_pipeline(
-    case_folder: Path, llm_input: str, llm_files: str, llm_mode: str, llm_dry_run: bool
+    case_folder: Path,
+    detection_input: str,
+    detection_variant: str,
+    detection_model: str,
+    detection_mode: str,
+    detection_dry_run: bool,
 ) -> dict[str, RegressionReport]:
     captures_folder = case_folder / "captures"
     html_folder = case_folder / "html"
@@ -104,8 +113,9 @@ def run_pipeline(
     _diff(captures_folder, out_folder)
 
     load_env()
-    case = Case(out_folder / llm_input, case_folder / "design", llm_files)
-    return run_case(case, llm_mode, DEFAULT_MODEL, out_folder / "llm", llm_dry_run)
+    case = Case(out_folder / detection_input, case_folder / "design", detection_variant)
+    out = reports_folder(case_folder, detection_model, detection_variant)
+    return run_case(case, detection_mode, detection_model, out, detection_dry_run)
 
 
 def _verdict(report: RegressionReport) -> str:
@@ -118,16 +128,24 @@ def _verdict(report: RegressionReport) -> str:
 def main():
     parser = argparse.ArgumentParser(prog="pipeline")
     parser.add_argument("case_folder", type=Path)
-    parser.add_argument("--llm-input", choices=["dom", "pixel"], default="dom")
-    parser.add_argument("--llm-files", choices=["all", "images", "boxes"], default="all")
-    parser.add_argument("--llm-mode", choices=["context", "baseline", "both"], default="context")
-    parser.add_argument("--llm-dry-run", action="store_true")
+    parser.add_argument("--detection-input", choices=["dom", "pixel"], default="dom")
+    parser.add_argument("--detection-variant", choices=VARIANTS, default="all")
+    parser.add_argument("--detection-model", default=DEFAULT_MODEL)
+    parser.add_argument("--detection-mode", choices=["context", "baseline", "both"], default="context")
+    parser.add_argument("--detection-dry-run", action="store_true")
     args = parser.parse_args()
 
-    reports = run_pipeline(args.case_folder, args.llm_input, args.llm_files, args.llm_mode, args.llm_dry_run)
+    reports = run_pipeline(
+        args.case_folder,
+        args.detection_input,
+        args.detection_variant,
+        args.detection_model,
+        args.detection_mode,
+        args.detection_dry_run,
+    )
+    out = reports_folder(args.case_folder, args.detection_model, args.detection_variant)
     for mode, report in reports.items():
-        report_path = args.case_folder / "out" / "llm" / f"report_{mode}.json"
-        print(f"{mode}: {_verdict(report)}, saved to {report_path}")
+        print(f"{mode}: {_verdict(report)}, saved to {out / f'report_{mode}.json'}")
 
 
 if __name__ == "__main__":

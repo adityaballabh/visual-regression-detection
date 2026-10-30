@@ -16,7 +16,8 @@ Case directory layout (a case is one before/after pair):
     design_language.md    themes, palettes, size restrictions, guidelines
 
 Usage:
-    python regression_detection/gemini_processor.py run  CASE_DIR [--mode context|baseline|both] [--out DIR]
+    python regression_detection/gemini_processor.py run  CASE_DIR [--mode context|baseline|both]
+        [--variant all|images|boxes] [--out DIR]
     add --dry-run to print the prompt without calling the API
 
 GEMINI_API_KEY is read from the environment or from a .env file at the repo root.
@@ -28,11 +29,14 @@ import os
 from pathlib import Path
 from typing import Literal
 
+from jinja2 import Environment, FileSystemLoader, StrictUndefined
 from pydantic import BaseModel, Field
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_MODEL = "gemini-3.5-flash-lite"
 IMAGE_NAMES = ["before_color", "after_color", "before_shape", "after_shape"]
+# Which inputs go to Gemini, for the ablation
+VARIANTS = ["all", "images", "boxes"]
 
 
 # ---------------------------------------------------------------- report schema
@@ -71,10 +75,13 @@ class ReportWithUsage(RegressionReport):
 
 # ---------------------------------------------------------------------- prompts
 
-PROMPTS_FOLDER = Path(__file__).parent / "prompts"
-SHARED_IMAGE_GUIDE = (PROMPTS_FOLDER / "shared_image_guide.md").read_text().strip()
-CONTEXT_PROMPT = (PROMPTS_FOLDER / "context.md").read_text().strip()
-BASELINE_PROMPT = (PROMPTS_FOLDER / "baseline.md").read_text().strip()
+# Keep each file's last newline so an included guide ends with its own line break
+PROMPTS = Environment(
+    loader=FileSystemLoader(Path(__file__).parent / "prompts"),
+    trim_blocks=True,
+    keep_trailing_newline=True,
+    undefined=StrictUndefined,
+)
 
 
 # ---------------------------------------------------------------------- loading
@@ -94,12 +101,11 @@ def load_env():
 
 
 class Case:
-    def __init__(self, directory: Path, design_folder: Path | None = None, files: str = "all"):
+    def __init__(self, directory: Path, design_folder: Path | None = None, variant: str = "all"):
         design_folder = design_folder or directory
         self.dir = directory
         self.name = directory.name
-        # Which inputs go to Gemini: "all", "images" or "boxes"
-        self.files = files
+        self.variant = variant
         boxes_file = directory / "boxes.json"
         if not boxes_file.exists():
             raise SystemExit(f"{boxes_file} not found")
@@ -123,13 +129,13 @@ def _read_optional(path: Path, default: str) -> str:
 
 
 def build_prompt(case: Case, mode: str) -> str:
-    template = CONTEXT_PROMPT if mode == "context" else BASELINE_PROMPT
-    return template.format(
-        image_guide=SHARED_IMAGE_GUIDE,
+    prompt = PROMPTS.get_template(f"{mode}.md").render(
+        variant=case.variant,
         design_intent=case.design_intent,
         design_language=case.design_language,
         boxes=case.boxes_for_prompt(),
     )
+    return prompt.strip()
 
 
 # ----------------------------------------------------------------------- Gemini
@@ -137,8 +143,9 @@ def build_prompt(case: Case, mode: str) -> str:
 
 def classify(case: Case, mode: str, model: str, dry_run: bool = False) -> ReportWithUsage | None:
     prompt = build_prompt(case, mode)
+    image_paths = [] if case.variant == "boxes" else case.image_paths
     if dry_run:
-        print(f"===== {case.name} [{mode}] =====\n{prompt}\n(images: {[p.name for p in case.image_paths]})\n")
+        print(f"===== {case.name} [{mode}] =====\n{prompt}\n(images: {[p.name for p in image_paths]})\n")
         return None
 
     from google import genai
@@ -150,7 +157,7 @@ def classify(case: Case, mode: str, model: str, dry_run: bool = False) -> Report
     client = genai.Client(api_key=api_key)
 
     parts: list = [prompt]
-    for name, path in zip(IMAGE_NAMES, case.image_paths):
+    for name, path in zip(IMAGE_NAMES, image_paths):
         parts.append(f"{name}:")
         parts.append(types.Part.from_bytes(data=path.read_bytes(), mime_type="image/png"))
 
@@ -210,13 +217,14 @@ def main():
     run_p = sub.add_parser("run", help="classify one case")
     run_p.add_argument("case_dir", type=Path)
     run_p.add_argument("--mode", choices=["context", "baseline", "both"], default="context")
+    run_p.add_argument("--variant", choices=VARIANTS, default="all")
     run_p.add_argument("--out", type=Path, help="write report JSON files here")
     run_p.add_argument("--model", default=DEFAULT_MODEL)
     run_p.add_argument("--dry-run", action="store_true", help="print prompts, no API call")
     args = parser.parse_args()
 
     load_env()
-    reports = run_case(Case(args.case_dir), args.mode, args.model, args.out, args.dry_run)
+    reports = run_case(Case(args.case_dir, variant=args.variant), args.mode, args.model, args.out, args.dry_run)
     for m, report in reports.items():
         print(f"--- {m} ---\n{report.model_dump_json(indent=2)}")
 

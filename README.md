@@ -27,7 +27,7 @@ Run all commands from the repository root.
 ## Run
 [`pipeline.py`](pipeline.py) runs the first 4 steps on one case folder:
 ```bash
-python pipeline.py <case_folder> [--llm-input dom|pixel] [--llm-files all|images|boxes] [--llm-mode context|baseline|both] [--llm-dry-run]
+python pipeline.py <case_folder> [--detection-input dom|pixel] [--detection-variant all|images|boxes] [--detection-model MODEL] [--detection-mode context|baseline|both] [--detection-dry-run]
 ```
 
 A case folder holds one change:
@@ -37,17 +37,17 @@ A case folder holds one change:
   pr.txt      link to a PrairieLearn PR made by the capture script (optional)
   captures/   before.png, after.png and their _snapshot.json files (if missing, generated from html/ or pr.txt)
   design/     design_intent.md and design_language.md (optional, pulled from pr.txt if missing)
-  out/        written by the pipeline: dom/ and pixel/ for the image diff, llm/ for the reports
+  out/        written by the pipeline: dom/ and pixel/ for the image diff, regression_detection/<model>/<variant>/ for the reports
 ```
 
-If `captures/` is incomplete, the pipeline fills it. For a PrairieLearn change, put the link to the PR made by the [PrairieLearn screenshot capture](#prairielearn-screenshot-capture) in `pr.txt`, and the pipeline downloads the captures committed in that PR. Missing design files come from the PR too: the intent from its description and the design language from the PrairieLearn fork's `docs/design-standards.md`. For any other page, put the before and after HTML in `html/`, and the pipeline captures them itself. `--llm-dry-run` prints the LLM prompt without calling Gemini. `--llm-input` picks which diff the LLM reads, `dom` by default. `--llm-files` picks whether the LLM gets the annotated images, `boxes.json` or both.
+If `captures/` is incomplete, the pipeline fills it. For a PrairieLearn change, put the link to the PR made by the [PrairieLearn screenshot capture](#prairielearn-screenshot-capture) in `pr.txt`, and the pipeline downloads the captures committed in that PR. Missing design files come from the PR too: the intent from its description and the design language from the PrairieLearn fork's `docs/design-standards.md`. For any other page, put the before and after HTML in `html/`, and the pipeline captures them itself. `--detection-dry-run` prints the LLM prompt without calling Gemini. `--detection-input` picks which diff the LLM reads, `dom` by default. `--detection-variant` picks whether the LLM gets the annotated images, `boxes.json` or both (`all`, the default). `--detection-model` picks the Gemini model.
 
 ### Examples
 Each folder in [`examples/general/`](examples/general/) and [`examples/prairielearn/`](examples/prairielearn/) is a case.
 
 To update every example's `out/` after a code change, run [`evaluation/update_outputs.py`](evaluation/update_outputs.py):
 ```bash
-python -m evaluation.update_outputs [--llm-dry-run]
+python -m evaluation.update_outputs [--detection-model MODEL] [--detection-variant all|images|boxes] [--detection-dry-run]
 ```
 
 The pages in `examples/general/` are re-rendered from [WUICC](https://huggingface.co/datasets/zhangsan11111122/WUICC), which is built on [WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight), and the synthetic ones use text from WUICC pages. WUICC and WebSight are both [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
@@ -143,3 +143,5 @@ Both runs both baseline and context
 Baseline takes in only the 4 images + boxes.json without any design context. 
 
 Context takes in the 4 images + boxes.json + design intent and design language.
+
+`--variant` takes `all` (the default), `images` or `boxes`, and picks whether Gemini gets the annotated images, `boxes.json` or both.
