@@ -15,8 +15,8 @@ test that fails on the regressed version.
 
 ## Setup
 ```bash
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+python -m venv .venv && source .venv/bin/activate
+pip install -e .
 playwright install chromium
 ```
 
@@ -45,9 +45,9 @@ If `captures/` is incomplete, the pipeline fills it. For a PrairieLearn change, 
 ### Examples
 Each folder in [`examples/general/`](examples/general/) and [`examples/prairielearn/`](examples/prairielearn/) is a case.
 
-To update every example's `out/` after a code change, run [`examples/update_outputs.py`](examples/update_outputs.py):
+To update every example's `out/` after a code change, run [`evaluation/update_outputs.py`](evaluation/update_outputs.py):
 ```bash
-python -m examples.update_outputs [--llm-dry-run]
+python -m evaluation.update_outputs [--llm-dry-run]
 ```
 
 The pages in `examples/general/` are re-rendered from [WUICC](https://huggingface.co/datasets/zhangsan11111122/WUICC), which is built on [WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight), and the synthetic ones use text from WUICC pages. WUICC and WebSight are both [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).

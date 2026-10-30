@@ -3,7 +3,7 @@ from pathlib import Path
 
 from pipeline import run_pipeline
 
-_EXAMPLES = Path(__file__).parent
+_EXAMPLES = Path(__file__).resolve().parent.parent / "examples"
 
 
 def main():

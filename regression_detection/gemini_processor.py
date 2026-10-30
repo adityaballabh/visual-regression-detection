@@ -56,6 +56,19 @@ class RegressionReport(BaseModel):
     intended_box_ids: list[int] = Field(description="Boxes that look like intended changes")
 
 
+class TokenUsage(BaseModel):
+    text_tokens: int
+    image_tokens: int
+    output_tokens: int
+    thinking_tokens: int
+    total_tokens: int
+
+
+# Kept separate from RegressionReport since the usage should come directly from the API response
+class ReportWithUsage(RegressionReport):
+    usage: TokenUsage
+
+
 # ---------------------------------------------------------------------- prompts
 
 PROMPTS_FOLDER = Path(__file__).parent / "prompts"
@@ -122,7 +135,7 @@ def build_prompt(case: Case, mode: str) -> str:
 # ----------------------------------------------------------------------- Gemini
 
 
-def classify(case: Case, mode: str, model: str, dry_run: bool = False) -> RegressionReport | None:
+def classify(case: Case, mode: str, model: str, dry_run: bool = False) -> ReportWithUsage | None:
     prompt = build_prompt(case, mode)
     if dry_run:
         print(f"===== {case.name} [{mode}] =====\n{prompt}\n(images: {[p.name for p in case.image_paths]})\n")
@@ -150,8 +163,19 @@ def classify(case: Case, mode: str, model: str, dry_run: bool = False) -> Regres
             temperature=0,
         ),
     )
-    report = RegressionReport.model_validate_json(response.text)
-    return _drop_unknown_boxes(report, case.box_ids)
+    report = _drop_unknown_boxes(RegressionReport.model_validate_json(response.text), case.box_ids)
+    metadata = response.usage_metadata
+    prompt_counts = {detail.modality.name: detail.token_count for detail in metadata.prompt_tokens_details}
+    usage = TokenUsage(
+        text_tokens=prompt_counts.get("TEXT", 0),
+        # A variant without images has no image entry
+        image_tokens=prompt_counts.get("IMAGE", 0),
+        output_tokens=metadata.candidates_token_count,
+        # Gemini leaves this empty when the model does not think
+        thinking_tokens=metadata.thoughts_token_count or 0,
+        total_tokens=metadata.total_token_count,
+    )
+    return ReportWithUsage(**report.model_dump(), usage=usage)
 
 
 def _drop_unknown_boxes(report: RegressionReport, valid_ids: set[int]) -> RegressionReport:
@@ -163,7 +187,7 @@ def _drop_unknown_boxes(report: RegressionReport, valid_ids: set[int]) -> Regres
     return report
 
 
-def run_case(case: Case, mode: str, model: str, out: Path | None, dry_run: bool) -> dict[str, RegressionReport]:
+def run_case(case: Case, mode: str, model: str, out: Path | None, dry_run: bool) -> dict[str, ReportWithUsage]:
     modes = ["context", "baseline"] if mode == "both" else [mode]
     reports = {}
     for m in modes:

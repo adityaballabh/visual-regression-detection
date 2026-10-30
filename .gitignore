@@ -1,5 +1,4 @@
-.env
-.env.*
+.env*
 !.env.example
 
 .DS_Store
@@ -13,3 +12,6 @@ __pycache__/
 
 image_diff/samples/
 image_diff/out/
+
+*.egg-info/
+.python-version
