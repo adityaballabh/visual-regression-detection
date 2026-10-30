@@ -81,14 +81,7 @@ def reports_folder(case_folder: Path, model: str, variant: str) -> Path:
     return case_folder / "out" / "regression_detection" / model / variant
 
 
-def run_pipeline(
-    case_folder: Path,
-    detection_input: str,
-    detection_variant: str,
-    detection_model: str,
-    detection_mode: str,
-    detection_dry_run: bool,
-) -> dict[str, RegressionReport]:
+def prepare_case(case_folder: Path):
     captures_folder = case_folder / "captures"
     html_folder = case_folder / "html"
     pr_file = case_folder / "pr.txt"
@@ -109,11 +102,19 @@ def run_pipeline(
     if pr_file.is_file() and not design_intent.is_file():
         _download_design_intent(pr_file.read_text().strip(), design_intent)
 
-    out_folder = case_folder / "out"
-    _diff(captures_folder, out_folder)
+    _diff(captures_folder, case_folder / "out")
 
+
+def detect_regressions(
+    case_folder: Path,
+    detection_input: str,
+    detection_variant: str,
+    detection_model: str,
+    detection_mode: str,
+    detection_dry_run: bool,
+) -> dict[str, RegressionReport]:
     load_env()
-    case = Case(out_folder / detection_input, case_folder / "design", detection_variant)
+    case = Case(case_folder / "out" / detection_input, case_folder / "design", detection_variant)
     out = reports_folder(case_folder, detection_model, detection_variant)
     return run_case(case, detection_mode, detection_model, out, detection_dry_run)
 
@@ -135,7 +136,8 @@ def main():
     parser.add_argument("--detection-dry-run", action="store_true")
     args = parser.parse_args()
 
-    reports = run_pipeline(
+    prepare_case(args.case_folder)
+    reports = detect_regressions(
         args.case_folder,
         args.detection_input,
         args.detection_variant,

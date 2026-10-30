@@ -154,7 +154,9 @@ def classify(case: Case, mode: str, model: str, dry_run: bool = False) -> Report
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise SystemExit("GEMINI_API_KEY not set (put it in .env)")
-    client = genai.Client(api_key=api_key)
+    # Exponential backoff to wait out the free tier's per-minute limit
+    retry_options = types.HttpRetryOptions(initial_delay=10)
+    client = genai.Client(api_key=api_key, http_options=types.HttpOptions(retry_options=retry_options))
 
     parts: list = [prompt]
     for name, path in zip(IMAGE_NAMES, image_paths):
