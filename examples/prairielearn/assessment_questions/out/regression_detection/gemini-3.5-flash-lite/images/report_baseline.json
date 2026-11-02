@@ -1,0 +1,19 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "No visual regressions detected; the changes shown in the boxes are identical before and after, or represent intended UI adjustments.",
+  "regressions": [],
+  "intended_box_ids": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "usage": {
+    "text_tokens": 219,
+    "image_tokens": 4400,
+    "output_tokens": 79,
+    "thinking_tokens": 0,
+    "total_tokens": 4698
+  }
+}

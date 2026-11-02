@@ -1,0 +1,16 @@
+{
+  "is_regression": false,
+  "confidence": 0.5,
+  "summary": "The change reflects a deliberate text-align update from start to center, which is an intentional design adjustment rather than a defect.",
+  "regressions": [],
+  "intended_box_ids": [
+    1
+  ],
+  "usage": {
+    "text_tokens": 295,
+    "image_tokens": 0,
+    "output_tokens": 72,
+    "thinking_tokens": 0,
+    "total_tokens": 367
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The detected change matches the design intent to change the 'Open an Account' button color to red and increase its height through padding.",
+  "regressions": [],
+  "intended_box_ids": [
+    1
+  ],
+  "usage": {
+    "text_tokens": 524,
+    "image_tokens": 0,
+    "output_tokens": 73,
+    "thinking_tokens": 0,
+    "total_tokens": 597
+  }
+}
