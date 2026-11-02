@@ -17,8 +17,9 @@ test that fails on the regressed version.
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -e .
-playwright install chromium
 ```
+
+Captures use your installed Chrome.
 
 Copy [`.env.example`](.env.example) to `.env` and add your Gemini API key.
 
@@ -42,7 +43,13 @@ A case folder holds one change:
 
 If `captures/` is incomplete, the pipeline fills it. For a PrairieLearn change, put the link to the PR made by the [PrairieLearn screenshot capture](#prairielearn-screenshot-capture) in `pr.txt`, and the pipeline downloads the captures committed in that PR. Missing design files come from the PR too: the intent from its description and the design language from the PrairieLearn fork's `docs/design-standards.md`. For any other page, put the before and after HTML in `html/`, and the pipeline captures them itself.
 
-`--detection-variant` picks whether the LLM gets the annotated images, `boxes.json` or both (`all`, the default). `no_snapshots` sends both from the diff made without the DOM snapshots. `--detection-model` picks the Gemini model. `--detection-mode` picks the context prompt, the baseline prompt or both (`context` by default). `--detection-dry-run` prints the prompts without calling Gemini.
+`--detection-variant` picks what the LLM gets:
+- `all` (default): annotated images and `boxes.json`
+- `images`: annotated images only
+- `boxes`: `boxes.json` only
+- `no_snapshots`: annotated images and `boxes.json` from the pixel-only diff
+
+`--detection-model` picks the Gemini model. `--detection-mode` picks the context prompt, the baseline prompt or both (`context` by default). `--detection-dry-run` prints the prompts without calling Gemini.
 
 ### Examples
 Each folder in [`examples/general/`](examples/general/) and [`examples/prairielearn/`](examples/prairielearn/) is a case.
@@ -148,7 +155,7 @@ Baseline takes in only the 4 images + boxes.json without any design context.
 
 Context takes in the 4 images + boxes.json + design intent and design language.
 
-`--variant` takes `all` (the default), `images` or `boxes`, and picks whether Gemini gets the annotated images, `boxes.json` or both. It also takes `no_snapshots`, which works like `all` on a case's `out/pixel` folder.
+`--variant` takes the same values as `--detection-variant` above, `all` by default. For `no_snapshots`, we pass the case's `out/pixel` folder instead of `out/dom`.
 
 ### Output
 Each report ends with a `usage` block with the text, image, output, thinking and total token counts from the API response.
@@ -162,7 +169,7 @@ python -m evaluation.score
 
 The label for `examples/<group>/<case>/` goes in `evaluation/labels/<group>/<case>.json`:
 ```json
-{"regression": true, "boxes": [3]}
+{"regression": true, "dom_boxes": [3], "pixel_boxes": [4]}
 ```
 
-`regression` says whether the case is a regression. `boxes` is optional and lists the ids of the regressed boxes in `out/dom/boxes.json`. `pixel_boxes` is optional too and does the same for `out/pixel/boxes.json`, which the `no_snapshots` variant is scored on. The script prints case and box precision and recall for each model, variant and mode.
+`regression` says whether the case is a regression. `dom_boxes` is optional and lists the ids of the regressed boxes in `out/dom/boxes.json`. `pixel_boxes` is also optional and lists the regressed boxes by their ids in `out/pixel/boxes.json`, since a box has a different id there than in `out/dom/boxes.json`. The `no_snapshots` variant is scored based on it. The script prints case and box precision and recall for each model, variant and mode.

@@ -51,9 +51,9 @@ def score(run: str, mode: str):
     box_truth = []
     box_predicted = []
     variant = Path(run).name
-    boxes_key = "pixel_boxes" if variant == "no_snapshots" else "boxes"
     for label_file in sorted(_LABELS.glob("*/*.json")):
         case_folder = _case_folder(label_file)
+        boxes_key = f"{diff_folder(case_folder, variant).name}_boxes"
         report = _read_report(case_folder, run, mode)
         if report is None:
             print(f"skipping {case_folder.relative_to(_EXAMPLES)}: no {run} {mode} report")
