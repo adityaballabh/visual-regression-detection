@@ -3,9 +3,7 @@
   "confidence": 1.0,
   "summary": "The heading section was successfully centered according to the design intent without introducing any visual regressions.",
   "regressions": [],
-  "intended_box_ids": [
-    1
-  ],
+  "intended_box_ids": [1],
   "usage": {
     "text_tokens": 538,
     "image_tokens": 4400,

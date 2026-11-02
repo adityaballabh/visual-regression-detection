@@ -3,12 +3,7 @@
   "confidence": 0.8,
   "summary": "The inner gap adjustments on the partial credit elements are likely intentional layout refactorings.",
   "regressions": [],
-  "intended_box_ids": [
-    1,
-    2,
-    3,
-    4
-  ],
+  "intended_box_ids": [1, 2, 3, 4],
   "usage": {
     "text_tokens": 753,
     "image_tokens": 0,

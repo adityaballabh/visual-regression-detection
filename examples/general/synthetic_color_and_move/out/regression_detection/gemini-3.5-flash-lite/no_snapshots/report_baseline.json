@@ -1,0 +1,36 @@
+{
+  "is_regression": true,
+  "confidence": 0.9,
+  "summary": "The 'Open an Account' button changed its color from blue to red, and the content below shifted downwards due to sizing changes in the button, representing an unintended layout and styling regression.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "The button color was changed from blue to red without clear intent.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 2,
+      "category": "layout",
+      "severity": "medium",
+      "explanation": "The content cards section shifted down vertically due to layout changes.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 3,
+      "category": "layout",
+      "severity": "low",
+      "explanation": "The 'Our Services' section and footer shifted downwards following the changes above.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 572,
+    "image_tokens": 4400,
+    "output_tokens": 239,
+    "thinking_tokens": 0,
+    "total_tokens": 5211
+  }
+}

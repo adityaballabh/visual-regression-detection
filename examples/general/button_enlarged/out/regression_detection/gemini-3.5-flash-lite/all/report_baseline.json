@@ -3,9 +3,7 @@
   "confidence": 0.9,
   "summary": "The 'Learn More' button has been intentionally resized with increased padding.",
   "regressions": [],
-  "intended_box_ids": [
-    1
-  ],
+  "intended_box_ids": [1],
   "usage": {
     "text_tokens": 445,
     "image_tokens": 4320,

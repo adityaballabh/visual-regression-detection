@@ -3,13 +3,7 @@
   "confidence": 0.9,
   "summary": "The changes reflect a redesign of the banking page, including typography updates, navigation shifts, background color updates, and content additions.",
   "regressions": [],
-  "intended_box_ids": [
-    1,
-    2,
-    3,
-    4,
-    5
-  ],
+  "intended_box_ids": [1, 2, 3, 4, 5],
   "usage": {
     "text_tokens": 851,
     "image_tokens": 0,

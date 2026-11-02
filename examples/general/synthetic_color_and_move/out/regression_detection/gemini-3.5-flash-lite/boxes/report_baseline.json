@@ -3,9 +3,7 @@
   "confidence": 0.5,
   "summary": "The 'Open an Account' button has changed its color to red and increased in height and padding, which looks like a deliberate styling update rather than a defect.",
   "regressions": [],
-  "intended_box_ids": [
-    1
-  ],
+  "intended_box_ids": [1],
   "usage": {
     "text_tokens": 362,
     "image_tokens": 0,

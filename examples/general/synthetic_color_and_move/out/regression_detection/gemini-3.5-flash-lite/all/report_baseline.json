@@ -3,9 +3,7 @@
   "confidence": 0.9,
   "summary": "The button's background color changed from blue to red and its padding increased, which appear to be intentional styling updates.",
   "regressions": [],
-  "intended_box_ids": [
-    1
-  ],
+  "intended_box_ids": [1],
   "usage": {
     "text_tokens": 444,
     "image_tokens": 4400,

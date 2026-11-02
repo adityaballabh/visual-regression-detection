@@ -3,9 +3,7 @@
   "confidence": 1.0,
   "summary": "The change correctly increases the padding and size of the 'Learn More' button as specified in the design intent.",
   "regressions": [],
-  "intended_box_ids": [
-    1
-  ],
+  "intended_box_ids": [1],
   "usage": {
     "text_tokens": 513,
     "image_tokens": 0,

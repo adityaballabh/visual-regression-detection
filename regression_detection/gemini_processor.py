@@ -29,6 +29,7 @@ import os
 from pathlib import Path
 from typing import Literal
 
+from compact_json import Formatter
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 from pydantic import BaseModel, Field
 
@@ -71,6 +72,10 @@ class TokenUsage(BaseModel):
 # Kept separate from RegressionReport since the usage should come directly from the API response
 class ReportWithUsage(RegressionReport):
     usage: TokenUsage
+
+
+# Keeps short lists like intended_box_ids on one line
+REPORT_FORMATTER = Formatter(indent_spaces=2, omit_trailing_whitespace=True)
 
 
 # ---------------------------------------------------------------------- prompts
@@ -206,7 +211,7 @@ def run_case(case: Case, mode: str, model: str, out: Path | None, dry_run: bool)
         reports[m] = report
         if out:
             out.mkdir(parents=True, exist_ok=True)
-            (out / f"report_{m}.json").write_text(report.model_dump_json(indent=2))
+            (out / f"report_{m}.json").write_text(REPORT_FORMATTER.serialize(report.model_dump()))
     return reports
 
 

@@ -3,12 +3,7 @@
   "confidence": 1.0,
   "summary": "All detected spacing changes match the intended design update for question rows.",
   "regressions": [],
-  "intended_box_ids": [
-    1,
-    2,
-    3,
-    4
-  ],
+  "intended_box_ids": [1, 2, 3, 4],
   "usage": {
     "text_tokens": 1982,
     "image_tokens": 0,

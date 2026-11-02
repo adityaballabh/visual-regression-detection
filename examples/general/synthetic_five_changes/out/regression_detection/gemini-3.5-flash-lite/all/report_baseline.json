@@ -3,13 +3,7 @@
   "confidence": 1.0,
   "summary": "All visual differences (removed nav link, increased heading size, changed card color, footer padding adjustments, and new list item) appear to be intentional content and styling updates.",
   "regressions": [],
-  "intended_box_ids": [
-    1,
-    2,
-    3,
-    4,
-    5
-  ],
+  "intended_box_ids": [1, 2, 3, 4, 5],
   "usage": {
     "text_tokens": 933,
     "image_tokens": 4400,

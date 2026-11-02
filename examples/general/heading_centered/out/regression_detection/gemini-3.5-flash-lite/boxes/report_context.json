@@ -3,9 +3,7 @@
   "confidence": 1.0,
   "summary": "The section heading alignment was successfully changed to centered as requested by the design intent.",
   "regressions": [],
-  "intended_box_ids": [
-    1
-  ],
+  "intended_box_ids": [1],
   "usage": {
     "text_tokens": 456,
     "image_tokens": 0,

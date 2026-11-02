@@ -3,12 +3,7 @@
   "confidence": 1.0,
   "summary": "The spacing changes on the question rows match the design intent.",
   "regressions": [],
-  "intended_box_ids": [
-    1,
-    2,
-    3,
-    4
-  ],
+  "intended_box_ids": [1, 2, 3, 4],
   "usage": {
     "text_tokens": 2064,
     "image_tokens": 4400,

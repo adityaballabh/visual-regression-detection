@@ -3,9 +3,7 @@
   "confidence": 1.0,
   "summary": "The heading section was successfully centered as specified in the design intent.",
   "regressions": [],
-  "intended_box_ids": [
-    1
-  ],
+  "intended_box_ids": [1],
   "usage": {
     "text_tokens": 356,
     "image_tokens": 4400,

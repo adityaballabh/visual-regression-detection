@@ -3,9 +3,7 @@
   "confidence": 1.0,
   "summary": "The Learn More button was intentionally made larger by increasing its padding, matching the design intent.",
   "regressions": [],
-  "intended_box_ids": [
-    1
-  ],
+  "intended_box_ids": [1],
   "usage": {
     "text_tokens": 345,
     "image_tokens": 4320,

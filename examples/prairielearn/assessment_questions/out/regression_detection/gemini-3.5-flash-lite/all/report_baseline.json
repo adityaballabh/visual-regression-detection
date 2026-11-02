@@ -3,12 +3,7 @@
   "confidence": 1.0,
   "summary": "The changes remove right-side padding/spacing inside question row containers, which is an intentional layout refinement.",
   "regressions": [],
-  "intended_box_ids": [
-    1,
-    2,
-    3,
-    4
-  ],
+  "intended_box_ids": [1, 2, 3, 4],
   "usage": {
     "text_tokens": 835,
     "image_tokens": 4400,

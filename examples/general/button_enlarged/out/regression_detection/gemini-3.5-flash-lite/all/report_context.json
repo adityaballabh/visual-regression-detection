@@ -3,9 +3,7 @@
   "confidence": 1.0,
   "summary": "The 'Learn More' button was successfully enlarged by increasing its padding as specified in the design intent.",
   "regressions": [],
-  "intended_box_ids": [
-    1
-  ],
+  "intended_box_ids": [1],
   "usage": {
     "text_tokens": 595,
     "image_tokens": 4320,

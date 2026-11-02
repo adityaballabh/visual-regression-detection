@@ -11,12 +11,7 @@
       "violated_rule": "The Savings Accounts card was not changed at all according to design intent."
     }
   ],
-  "intended_box_ids": [
-    1,
-    2,
-    4,
-    5
-  ],
+  "intended_box_ids": [1, 2, 4, 5],
   "usage": {
     "text_tokens": 387,
     "image_tokens": 4400,

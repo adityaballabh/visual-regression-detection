@@ -3,9 +3,7 @@
   "confidence": 1.0,
   "summary": "The change centers the hero section heading and text, which is a standard layout improvement and not a regression.",
   "regressions": [],
-  "intended_box_ids": [
-    1
-  ],
+  "intended_box_ids": [1],
   "usage": {
     "text_tokens": 377,
     "image_tokens": 4400,
