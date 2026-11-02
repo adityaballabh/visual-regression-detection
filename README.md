@@ -27,7 +27,7 @@ Run all commands from the repository root.
 ## Run
 [`pipeline.py`](pipeline.py) runs the first 4 steps on one case folder:
 ```bash
-python pipeline.py <case_folder> [--detection-input dom|pixel] [--detection-variant all|images|boxes] [--detection-model MODEL] [--detection-mode context|baseline|both] [--detection-dry-run]
+python pipeline.py <case_folder> [--detection-variant all|images|boxes|no_snapshots] [--detection-model MODEL] [--detection-mode context|baseline|both] [--detection-dry-run]
 ```
 
 A case folder holds one change:
@@ -42,14 +42,14 @@ A case folder holds one change:
 
 If `captures/` is incomplete, the pipeline fills it. For a PrairieLearn change, put the link to the PR made by the [PrairieLearn screenshot capture](#prairielearn-screenshot-capture) in `pr.txt`, and the pipeline downloads the captures committed in that PR. Missing design files come from the PR too: the intent from its description and the design language from the PrairieLearn fork's `docs/design-standards.md`. For any other page, put the before and after HTML in `html/`, and the pipeline captures them itself.
 
-`--detection-input` picks which diff the LLM reads, `dom` by default. `--detection-variant` picks whether the LLM gets the annotated images, `boxes.json` or both (`all`, the default). `--detection-model` picks the Gemini model. `--detection-mode` picks the context prompt, the baseline prompt or both (`context` by default). `--detection-dry-run` prints the prompts without calling Gemini.
+`--detection-variant` picks whether the LLM gets the annotated images, `boxes.json` or both (`all`, the default). `no_snapshots` sends both from the diff made without the DOM snapshots. `--detection-model` picks the Gemini model. `--detection-mode` picks the context prompt, the baseline prompt or both (`context` by default). `--detection-dry-run` prints the prompts without calling Gemini.
 
 ### Examples
 Each folder in [`examples/general/`](examples/general/) and [`examples/prairielearn/`](examples/prairielearn/) is a case.
 
 To update every example's `out/` after a code change, run [`evaluation/update_outputs.py`](evaluation/update_outputs.py):
 ```bash
-python -m evaluation.update_outputs [--detection-model MODEL] [--detection-variant all|images|boxes] [--detection-dry-run]
+python -m evaluation.update_outputs [--detection-model MODEL] [--detection-variant all|images|boxes|no_snapshots] [--detection-dry-run]
 ```
 
 It always runs both modes, and runs every variant unless `--detection-variant` picks one. The other flags work as in `pipeline.py`.
@@ -148,7 +148,7 @@ Baseline takes in only the 4 images + boxes.json without any design context.
 
 Context takes in the 4 images + boxes.json + design intent and design language.
 
-`--variant` takes `all` (the default), `images` or `boxes`, and picks whether Gemini gets the annotated images, `boxes.json` or both.
+`--variant` takes `all` (the default), `images` or `boxes`, and picks whether Gemini gets the annotated images, `boxes.json` or both. It also takes `no_snapshots`, which works like `all` on a case's `out/pixel` folder.
 
 ### Output
 Each report ends with a `usage` block with the text, image, output, thinking and total token counts from the API response.
@@ -165,4 +165,4 @@ The label for `examples/<group>/<case>/` goes in `evaluation/labels/<group>/<cas
 {"regression": true, "boxes": [3]}
 ```
 
-`regression` says whether the case is a regression. `boxes` is optional and lists the ids of the regressed boxes in `out/dom/boxes.json`. The script prints case and box precision and recall for each model, variant and mode.
+`regression` says whether the case is a regression. `boxes` is optional and lists the ids of the regressed boxes in `out/dom/boxes.json`. `pixel_boxes` is optional too and does the same for `out/pixel/boxes.json`, which the `no_snapshots` variant is scored on. The script prints case and box precision and recall for each model, variant and mode.

@@ -77,6 +77,10 @@ def _diff(captures_folder: Path, out_folder: Path):
     diff_files(before_path, after_path, out_folder / "pixel")
 
 
+def diff_folder(case_folder: Path, variant: str) -> Path:
+    return case_folder / "out" / ("pixel" if variant == "no_snapshots" else "dom")
+
+
 def reports_folder(case_folder: Path, model: str, variant: str) -> Path:
     return case_folder / "out" / "regression_detection" / model / variant
 
@@ -107,14 +111,13 @@ def prepare_case(case_folder: Path):
 
 def detect_regressions(
     case_folder: Path,
-    detection_input: str,
     detection_variant: str,
     detection_model: str,
     detection_mode: str,
     detection_dry_run: bool,
 ) -> dict[str, RegressionReport]:
     load_env()
-    case = Case(case_folder / "out" / detection_input, case_folder / "design", detection_variant)
+    case = Case(diff_folder(case_folder, detection_variant), case_folder / "design", detection_variant)
     out = reports_folder(case_folder, detection_model, detection_variant)
     return run_case(case, detection_mode, detection_model, out, detection_dry_run)
 
@@ -129,7 +132,6 @@ def _verdict(report: RegressionReport) -> str:
 def main():
     parser = argparse.ArgumentParser(prog="pipeline")
     parser.add_argument("case_folder", type=Path)
-    parser.add_argument("--detection-input", choices=["dom", "pixel"], default="dom")
     parser.add_argument("--detection-variant", choices=VARIANTS, default="all")
     parser.add_argument("--detection-model", default=DEFAULT_MODEL)
     parser.add_argument("--detection-mode", choices=["context", "baseline", "both"], default="context")
@@ -139,7 +141,6 @@ def main():
     prepare_case(args.case_folder)
     reports = detect_regressions(
         args.case_folder,
-        args.detection_input,
         args.detection_variant,
         args.detection_model,
         args.detection_mode,

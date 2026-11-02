@@ -20,7 +20,6 @@ def main():
         for variant in variants:
             reports = detect_regressions(
                 case_folder,
-                detection_input="dom",
                 detection_variant=variant,
                 detection_model=args.detection_model,
                 detection_mode="both",

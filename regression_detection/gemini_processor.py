@@ -36,7 +36,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_MODEL = "gemini-3.5-flash-lite"
 IMAGE_NAMES = ["before_color", "after_color", "before_shape", "after_shape"]
 # Which inputs go to Gemini, for the ablation
-VARIANTS = ["all", "images", "boxes"]
+VARIANTS = ["all", "images", "boxes", "no_snapshots"]
 
 
 # ---------------------------------------------------------------- report schema

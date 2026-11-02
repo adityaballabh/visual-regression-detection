@@ -4,6 +4,7 @@ from pathlib import Path
 import numpy as np
 from sklearn.metrics import precision_score, recall_score
 
+from pipeline import diff_folder
 from regression_detection.gemini_processor import RegressionReport
 
 _EXAMPLES = Path(__file__).resolve().parent.parent / "examples"
@@ -30,9 +31,8 @@ def _read_report(case_folder: Path, run: str, mode: str) -> RegressionReport | N
     return RegressionReport.model_validate_json(report_file.read_text())
 
 
-def _read_box_ids(case_folder: Path) -> list[int]:
-    # The saved reports were made from the DOM boxes, matching update_outputs
-    boxes = json.loads((case_folder / "out" / "dom" / "boxes.json").read_text())
+def _read_box_ids(case_folder: Path, variant: str) -> list[int]:
+    boxes = json.loads((diff_folder(case_folder, variant) / "boxes.json").read_text())
     return [box["id"] for box in boxes]
 
 
@@ -50,6 +50,8 @@ def score(run: str, mode: str):
     case_predicted = []
     box_truth = []
     box_predicted = []
+    variant = Path(run).name
+    boxes_key = "pixel_boxes" if variant == "no_snapshots" else "boxes"
     for label_file in sorted(_LABELS.glob("*/*.json")):
         case_folder = _case_folder(label_file)
         report = _read_report(case_folder, run, mode)
@@ -59,10 +61,10 @@ def score(run: str, mode: str):
         label = json.loads(label_file.read_text())
         case_truth.append(label["regression"])
         case_predicted.append(report.is_regression)
-        if "boxes" in label:
+        if boxes_key in label:
             flagged_ids = {regression.box_id for regression in report.regressions}
-            for box_id in _read_box_ids(case_folder):
-                box_truth.append(box_id in label["boxes"])
+            for box_id in _read_box_ids(case_folder, variant):
+                box_truth.append(box_id in label[boxes_key])
                 box_predicted.append(box_id in flagged_ids)
     print(f"{run} {mode}")
     _print_scores("cases", case_truth, case_predicted)
