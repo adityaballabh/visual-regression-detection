@@ -6,7 +6,7 @@ from pathlib import Path
 
 from image_diff.snapshot_test import assert_snapshot_matches
 
-EXPECTED_SNAPSHOT = Path(__file__).with_name('test_button_snapshot.expected.json')
+EXPECTED_SNAPSHOT = Path(__file__).with_name("test_button_snapshot.expected.json")
 
 
 class GeneratedSnapshotTest(unittest.TestCase):
