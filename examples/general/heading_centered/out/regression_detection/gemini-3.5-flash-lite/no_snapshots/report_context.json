@@ -1,0 +1,17 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The heading and the descriptive text block were successfully centered as per the design intent.",
+  "regressions": [],
+  "intended_box_ids": [
+     1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+    21, 22, 23, 24
+  ],
+  "usage": {
+    "text_tokens": 3068,
+    "image_tokens": 4400,
+    "output_tokens": 147,
+    "thinking_tokens": 0,
+    "total_tokens": 7615
+  }
+}

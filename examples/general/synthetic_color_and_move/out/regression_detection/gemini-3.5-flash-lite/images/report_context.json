@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The Open an Account button was successfully changed from blue to red and made taller according to the design intent.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 357,
+    "image_tokens": 4400,
+    "output_tokens": 66,
+    "thinking_tokens": 0,
+    "total_tokens": 4823
+  }
+}

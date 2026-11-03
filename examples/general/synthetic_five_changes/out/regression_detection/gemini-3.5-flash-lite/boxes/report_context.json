@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The 'Savings Accounts' card background color changed unexpectedly from green to red, which violates the design intent stating the card should not be changed.",
+  "regressions": [
+    {
+      "box_id": 3,
+      "category": "color",
+      "severity": "high",
+      "explanation": "The Savings Accounts card background color was changed, which contradicts the explicit design intent that this card should not be changed at all.",
+      "violated_rule": "The 'Savings Accounts' card was not changed at all"
+    }
+  ],
+  "intended_box_ids": [1, 2, 4, 5],
+  "usage": {
+    "text_tokens": 1043,
+    "image_tokens": 0,
+    "output_tokens": 179,
+    "thinking_tokens": 0,
+    "total_tokens": 1222
+  }
+}
