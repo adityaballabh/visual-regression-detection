@@ -160,6 +160,29 @@ Context takes in the 4 images + boxes.json + design intent and design language.
 ### Output
 Each report ends with a `usage` block with the text, image, output, thinking and total token counts from the API response.
 
+### Generate a DOM snapshot test
+
+Generate a `unittest` that checks a captured DOM snapshot against either the
+before or after page state:
+```bash
+python -m image_diff.generate_snapshot_test \
+  captures/before_snapshot.json captures/after_snapshot.json \
+  --side after --output tests/generated/test_capture.py
+```
+
+The command writes `test_capture.expected.json` beside the test. Capture the
+page under test using the same snapshot format, then run the test from the
+repository root:
+```bash
+ACTUAL_SNAPSHOT=/path/to/current_snapshot.json \
+  python -m unittest discover -s tests/generated -p 'test_capture.py'
+```
+Use `--side before` to make the test expect the before state instead. It
+compares parsed rendered elements, layout, text, attributes, and computed
+styles; volatile raw CDP node identifiers are not compared. `--force` replaces
+generated files with the same names.
+
+
 ## Evaluation
 
 [`evaluation/score.py`](evaluation/score.py) compares the saved reports with hand-written labels and does not call Gemini:
