@@ -1,0 +1,29 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The About link was removed from navigation and the main heading font size unintentionally increased, causing overlap issues in the footer/content area.",
+  "regressions": [
+    {
+      "box_id": 2,
+      "category": "typography",
+      "severity": "high",
+      "explanation": "The main heading font size significantly increased without proper layout adjustments.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 5,
+      "category": "overflow",
+      "severity": "medium",
+      "explanation": "The newly added list item 'Personal finance coaching' overflows into the footer area due to improper spacing or positioning.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [1, 3, 4],
+  "usage": {
+    "text_tokens": 219,
+    "image_tokens": 4400,
+    "output_tokens": 193,
+    "thinking_tokens": 0,
+    "total_tokens": 4812
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.9,
+  "summary": "The 'Learn More' button has been intentionally resized with increased padding.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 445,
+    "image_tokens": 4320,
+    "output_tokens": 61,
+    "thinking_tokens": 0,
+    "total_tokens": 4826
+  }
+}

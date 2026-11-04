@@ -14,11 +14,10 @@ Case directory layout (a case is one before/after pair):
     after_shape.png
     design_intent.md      what the change is supposed to do (from the PR description)
     design_language.md    themes, palettes, size restrictions, guidelines
-    label.json            only for `eval`: {"regression": true, "boxes": [3, 5]}
 
 Usage:
-    python llm/gemini_processor.py run  CASE_DIR [--mode context|baseline|both] [--out DIR]
-    python llm/gemini_processor.py eval CASES_DIR [--out DIR]
+    python regression_detection/gemini_processor.py run  CASE_DIR [--mode context|baseline|both]
+        [--variant all|images|boxes] [--out DIR]
     add --dry-run to print the prompt without calling the API
 
 GEMINI_API_KEY is read from the environment or from a .env file at the repo root.
@@ -27,15 +26,18 @@ GEMINI_API_KEY is read from the environment or from a .env file at the repo root
 import argparse
 import json
 import os
-import sys
 from pathlib import Path
 from typing import Literal
 
+from compact_json import Formatter
+from jinja2 import Environment, FileSystemLoader, StrictUndefined
 from pydantic import BaseModel, Field
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_MODEL = "gemini-3.5-flash-lite"
 IMAGE_NAMES = ["before_color", "after_color", "before_shape", "after_shape"]
+# Which inputs go to Gemini, for the ablation
+VARIANTS = ["all", "images", "boxes", "no_snapshots"]
 
 
 # ---------------------------------------------------------------- report schema
@@ -59,53 +61,32 @@ class RegressionReport(BaseModel):
     intended_box_ids: list[int] = Field(description="Boxes that look like intended changes")
 
 
+class TokenUsage(BaseModel):
+    text_tokens: int
+    image_tokens: int
+    output_tokens: int
+    thinking_tokens: int
+    total_tokens: int
+
+
+# Kept separate from RegressionReport since the usage should come directly from the API response
+class ReportWithUsage(RegressionReport):
+    usage: TokenUsage
+
+
+# Keeps short lists like intended_box_ids on one line
+REPORT_FORMATTER = Formatter(indent_spaces=2, omit_trailing_whitespace=True)
+
+
 # ---------------------------------------------------------------------- prompts
 
-SHARED_IMAGE_GUIDE = """\
-You are given screenshots of a web page before and after a code change. Each
-change found by an image diff is outlined in red and numbered; the same number
-marks the same change in every image. Images are provided in this order:
-  1. before_color  / 2. after_color  - color changes are outlined here
-  3. before_shape  / 4. after_shape  - shape changes (resized, moved, added,
-     removed elements) are outlined here. An added element only has a box on
-     the "after" image, a removed one only on "before".
-A change of type color_and_shape appears on all four images."""
-
-CONTEXT_PROMPT = """\
-{image_guide}
-
-Decide whether the change introduces a visual REGRESSION: an unintended
-visual defect. Changes that match the design intent are NOT regressions, even if
-large. Changes that contradict the design intent or break the design language
-are regressions, as are defects such as overlap, clipping, misalignment,
-broken spacing, unreadable text or unexpected missing elements.
-
-## Design intent
-{design_intent}
-
-## Design language
-{design_language}
-
-## Detected changes (boxes.json)
-Coordinates are pixels in the screenshot. "detail", when present, describes the
-DOM property change behind the box.
-{boxes}
-
-Report only boxes whose ids appear above. Put every box you judge to be an
-intended change in intended_box_ids. If nothing is a regression set
-is_regression to false and leave regressions empty."""
-
-BASELINE_PROMPT = """\
-{image_guide}
-
-Decide whether the change introduces a visual regression (an unintended visual
-defect). You have no information about what the change was meant to do.
-
-## Detected changes (boxes.json)
-{boxes}
-
-Report only boxes whose ids appear above. If nothing is a regression set
-is_regression to false and leave regressions empty."""
+# Keep each file's last newline so an included guide ends with its own line break
+PROMPTS = Environment(
+    loader=FileSystemLoader(Path(__file__).parent / "prompts"),
+    trim_blocks=True,
+    keep_trailing_newline=True,
+    undefined=StrictUndefined,
+)
 
 
 # ---------------------------------------------------------------------- loading
@@ -125,12 +106,11 @@ def load_env():
 
 
 class Case:
-    def __init__(self, directory: Path, design_folder: Path | None = None, files: str = "all"):
+    def __init__(self, directory: Path, design_folder: Path | None = None, variant: str = "all"):
         design_folder = design_folder or directory
         self.dir = directory
         self.name = directory.name
-        # Which inputs go to Gemini: "all", "images" or "boxes"
-        self.files = files
+        self.variant = variant
         boxes_file = directory / "boxes.json"
         if not boxes_file.exists():
             raise SystemExit(f"{boxes_file} not found")
@@ -148,32 +128,29 @@ class Case:
         slim = [{k: v for k, v in b.items() if k not in ("selector", "frames") and v is not None} for b in self.boxes]
         return json.dumps(slim, indent=1)
 
-    def label(self) -> dict | None:
-        f = self.dir / "label.json"
-        return json.loads(f.read_text()) if f.exists() else None
-
 
 def _read_optional(path: Path, default: str) -> str:
     return path.read_text().strip() if path.exists() else default
 
 
 def build_prompt(case: Case, mode: str) -> str:
-    template = CONTEXT_PROMPT if mode == "context" else BASELINE_PROMPT
-    return template.format(
-        image_guide=SHARED_IMAGE_GUIDE,
+    prompt = PROMPTS.get_template(f"{mode}.md").render(
+        variant=case.variant,
         design_intent=case.design_intent,
         design_language=case.design_language,
         boxes=case.boxes_for_prompt(),
     )
+    return prompt.strip()
 
 
 # ----------------------------------------------------------------------- Gemini
 
 
-def classify(case: Case, mode: str, model: str, dry_run: bool = False) -> RegressionReport | None:
+def classify(case: Case, mode: str, model: str, dry_run: bool = False) -> ReportWithUsage | None:
     prompt = build_prompt(case, mode)
+    image_paths = [] if case.variant == "boxes" else case.image_paths
     if dry_run:
-        print(f"===== {case.name} [{mode}] =====\n{prompt}\n(images: {[p.name for p in case.image_paths]})\n")
+        print(f"===== {case.name} [{mode}] =====\n{prompt}\n(images: {[p.name for p in image_paths]})\n")
         return None
 
     from google import genai
@@ -182,10 +159,12 @@ def classify(case: Case, mode: str, model: str, dry_run: bool = False) -> Regres
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise SystemExit("GEMINI_API_KEY not set (put it in .env)")
-    client = genai.Client(api_key=api_key)
+    # Exponential backoff to wait out the free tier's per-minute limit
+    retry_options = types.HttpRetryOptions(initial_delay=10)
+    client = genai.Client(api_key=api_key, http_options=types.HttpOptions(retry_options=retry_options))
 
     parts: list = [prompt]
-    for name, path in zip(IMAGE_NAMES, case.image_paths):
+    for name, path in zip(IMAGE_NAMES, image_paths):
         parts.append(f"{name}:")
         parts.append(types.Part.from_bytes(data=path.read_bytes(), mime_type="image/png"))
 
@@ -198,8 +177,19 @@ def classify(case: Case, mode: str, model: str, dry_run: bool = False) -> Regres
             temperature=0,
         ),
     )
-    report = RegressionReport.model_validate_json(response.text)
-    return _drop_unknown_boxes(report, case.box_ids)
+    report = _drop_unknown_boxes(RegressionReport.model_validate_json(response.text), case.box_ids)
+    metadata = response.usage_metadata
+    prompt_counts = {detail.modality.name: detail.token_count for detail in metadata.prompt_tokens_details}
+    usage = TokenUsage(
+        text_tokens=prompt_counts.get("TEXT", 0),
+        # A variant without images has no image entry
+        image_tokens=prompt_counts.get("IMAGE", 0),
+        output_tokens=metadata.candidates_token_count,
+        # Gemini leaves this empty when the model does not think
+        thinking_tokens=metadata.thoughts_token_count or 0,
+        total_tokens=metadata.total_token_count,
+    )
+    return ReportWithUsage(**report.model_dump(), usage=usage)
 
 
 def _drop_unknown_boxes(report: RegressionReport, valid_ids: set[int]) -> RegressionReport:
@@ -211,7 +201,7 @@ def _drop_unknown_boxes(report: RegressionReport, valid_ids: set[int]) -> Regres
     return report
 
 
-def run_case(case: Case, mode: str, model: str, out: Path | None, dry_run: bool) -> dict[str, RegressionReport]:
+def run_case(case: Case, mode: str, model: str, out: Path | None, dry_run: bool) -> dict[str, ReportWithUsage]:
     modes = ["context", "baseline"] if mode == "both" else [mode]
     reports = {}
     for m in modes:
@@ -221,63 +211,8 @@ def run_case(case: Case, mode: str, model: str, out: Path | None, dry_run: bool)
         reports[m] = report
         if out:
             out.mkdir(parents=True, exist_ok=True)
-            (out / f"report_{m}.json").write_text(report.model_dump_json(indent=2))
+            (out / f"report_{m}.json").write_text(REPORT_FORMATTER.serialize(report.model_dump()))
     return reports
-
-
-# -------------------------------------------------------------------- evaluation
-
-
-def _prf(tp: int, fp: int, fn: int) -> tuple[float, float]:
-    precision = tp / (tp + fp) if tp + fp else 0.0
-    recall = tp / (tp + fn) if tp + fn else 0.0
-    return precision, recall
-
-
-def evaluate(cases_dir: Path, model: str, out: Path | None, dry_run: bool):
-    """Classification (case level) and localization (box level) precision/recall."""
-    cases = [Case(d) for d in sorted(cases_dir.iterdir()) if (d / "boxes.json").exists()]
-    if not cases:
-        raise SystemExit(f"no cases found in {cases_dir}")
-
-    counts = {
-        m: {"ctp": 0, "cfp": 0, "cfn": 0, "ctn": 0, "btp": 0, "bfp": 0, "bfn": 0} for m in ("context", "baseline")
-    }
-    for case in cases:
-        label = case.label()
-        if label is None:
-            print(f"skipping {case.name}: no label.json", file=sys.stderr)
-            continue
-        reports = run_case(case, "both", model, out / case.name if out else None, dry_run)
-        for m, report in reports.items():
-            c = counts[m]
-            truth, pred = label["regression"], report.is_regression
-            c["ctp"] += truth and pred
-            c["cfp"] += (not truth) and pred
-            c["cfn"] += truth and not pred
-            c["ctn"] += (not truth) and not pred
-            true_boxes, pred_boxes = set(label.get("boxes", [])), {r.box_id for r in report.regressions}
-            c["btp"] += len(true_boxes & pred_boxes)
-            c["bfp"] += len(pred_boxes - true_boxes)
-            c["bfn"] += len(true_boxes - pred_boxes)
-
-    if dry_run:
-        return
-    summary = {}
-    for m, c in counts.items():
-        cp, cr = _prf(c["ctp"], c["cfp"], c["cfn"])
-        bp, br = _prf(c["btp"], c["bfp"], c["bfn"])
-        summary[m] = {
-            "classification_precision": round(cp, 3),
-            "classification_recall": round(cr, 3),
-            "localization_precision": round(bp, 3),
-            "localization_recall": round(br, 3),
-            "counts": c,
-        }
-    print(json.dumps(summary, indent=2))
-    if out:
-        out.mkdir(parents=True, exist_ok=True)
-        (out / "eval_summary.json").write_text(json.dumps(summary, indent=2))
 
 
 # --------------------------------------------------------------------------- CLI
@@ -289,21 +224,16 @@ def main():
     run_p = sub.add_parser("run", help="classify one case")
     run_p.add_argument("case_dir", type=Path)
     run_p.add_argument("--mode", choices=["context", "baseline", "both"], default="context")
-    eval_p = sub.add_parser("eval", help="score context vs baseline over labeled cases")
-    eval_p.add_argument("cases_dir", type=Path)
-    for p in (run_p, eval_p):
-        p.add_argument("--out", type=Path, help="write report JSON files here")
-        p.add_argument("--model", default=DEFAULT_MODEL)
-        p.add_argument("--dry-run", action="store_true", help="print prompts, no API call")
+    run_p.add_argument("--variant", choices=VARIANTS, default="all")
+    run_p.add_argument("--out", type=Path, help="write report JSON files here")
+    run_p.add_argument("--model", default=DEFAULT_MODEL)
+    run_p.add_argument("--dry-run", action="store_true", help="print prompts, no API call")
     args = parser.parse_args()
 
     load_env()
-    if args.command == "run":
-        reports = run_case(Case(args.case_dir), args.mode, args.model, args.out, args.dry_run)
-        for m, report in reports.items():
-            print(f"--- {m} ---\n{report.model_dump_json(indent=2)}")
-    else:
-        evaluate(args.cases_dir, args.model, args.out, args.dry_run)
+    reports = run_case(Case(args.case_dir, variant=args.variant), args.mode, args.model, args.out, args.dry_run)
+    for m, report in reports.items():
+        print(f"--- {m} ---\n{report.model_dump_json(indent=2)}")
 
 
 if __name__ == "__main__":

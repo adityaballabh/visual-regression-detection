@@ -15,10 +15,11 @@ test that fails on the regressed version.
 
 ## Setup
 ```bash
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-playwright install chromium
+python -m venv .venv && source .venv/bin/activate
+pip install -e .
 ```
+
+Captures use your installed Chrome.
 
 Copy [`.env.example`](.env.example) to `.env` and add your Gemini API key.
 
@@ -27,7 +28,7 @@ Run all commands from the repository root.
 ## Run
 [`pipeline.py`](pipeline.py) runs the first 4 steps on one case folder:
 ```bash
-python pipeline.py <case_folder> [--llm-input dom|pixel] [--llm-files all|images|boxes] [--llm-mode context|baseline|both] [--llm-dry-run]
+python pipeline.py <case_folder> [--detection-variant all|images|boxes|no_snapshots] [--detection-model MODEL] [--detection-mode context|baseline|both] [--detection-dry-run]
 ```
 
 A case folder holds one change:
@@ -37,18 +38,28 @@ A case folder holds one change:
   pr.txt      link to a PrairieLearn PR made by the capture script (optional)
   captures/   before.png, after.png and their _snapshot.json files (if missing, generated from html/ or pr.txt)
   design/     design_intent.md and design_language.md (optional, pulled from pr.txt if missing)
-  out/        written by the pipeline: dom/ and pixel/ for the image diff, llm/ for the reports
+  out/        written by the pipeline: dom/ and pixel/ for the image diff, regression_detection/<model>/<variant>/ for the reports
 ```
 
-If `captures/` is incomplete, the pipeline fills it. For a PrairieLearn change, put the link to the PR made by the [PrairieLearn screenshot capture](#prairielearn-screenshot-capture) in `pr.txt`, and the pipeline downloads the captures committed in that PR. Missing design files come from the PR too: the intent from its description and the design language from the PrairieLearn fork's `docs/design-standards.md`. For any other page, put the before and after HTML in `html/`, and the pipeline captures them itself. `--llm-dry-run` prints the LLM prompt without calling Gemini. `--llm-input` picks which diff the LLM reads, `dom` by default. `--llm-files` picks whether the LLM gets the annotated images, `boxes.json` or both.
+If `captures/` is incomplete, the pipeline fills it. For a PrairieLearn change, put the link to the PR made by the [PrairieLearn screenshot capture](#prairielearn-screenshot-capture) in `pr.txt`, and the pipeline downloads the captures committed in that PR. Missing design files come from the PR too: the intent from its description and the design language from the PrairieLearn fork's `docs/design-standards.md`. For any other page, put the before and after HTML in `html/`, and the pipeline captures them itself.
+
+`--detection-variant` picks what the LLM gets:
+- `all` (default): annotated images and `boxes.json`
+- `images`: annotated images only
+- `boxes`: `boxes.json` only
+- `no_snapshots`: annotated images and `boxes.json` from the pixel-only diff
+
+`--detection-model` picks the Gemini model. `--detection-mode` picks the context prompt, the baseline prompt or both (`context` by default). `--detection-dry-run` prints the prompts without calling Gemini.
 
 ### Examples
 Each folder in [`examples/general/`](examples/general/) and [`examples/prairielearn/`](examples/prairielearn/) is a case.
 
-To update every example's `out/` after a code change, run [`examples/update_outputs.py`](examples/update_outputs.py):
+To update every example's `out/` after a code change, run [`evaluation/update_outputs.py`](evaluation/update_outputs.py):
 ```bash
-python -m examples.update_outputs [--llm-dry-run]
+python -m evaluation.update_outputs [--detection-model MODEL] [--detection-variant all|images|boxes|no_snapshots] [--detection-dry-run]
 ```
+
+It always runs both modes, and runs every variant unless `--detection-variant` picks one. The other flags work as in `pipeline.py`.
 
 The pages in `examples/general/` are re-rendered from [WUICC](https://huggingface.co/datasets/zhangsan11111122/WUICC), which is built on [WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight), and the synthetic ones use text from WUICC pages. WUICC and WebSight are both [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
@@ -118,7 +129,7 @@ A simple pixel diff boxes everything a change moves, so if an element grows, eve
 
 ## LLM-based regression detection
 
-The script is [`llm/gemini_processor.py`](llm/gemini_processor.py).
+The script is [`regression_detection/gemini_processor.py`](regression_detection/gemini_processor.py).
 
 It takes the image diff output folder of a case, like [`examples/general/button_enlarged/out/dom`](examples/general/button_enlarged/out/dom).
 
@@ -128,11 +139,11 @@ That folder contains `before_color.png`, `after_color.png`, `before_shape.png`, 
 
 To do a dry run (without calling Gemini, checking inputs): 
 ```
-python llm/gemini_processor.py run "folder-containing-images" --mode both --dry-run
+python regression_detection/gemini_processor.py run "folder-containing-images" --mode both --dry-run
 ```
 To do a complete run (calling Gemini): 
 ```
-python llm/gemini_processor.py run "folder-containing-images" --mode both
+python regression_detection/gemini_processor.py run "folder-containing-images" --mode both
 ```
 
 ### Parameters
@@ -143,3 +154,45 @@ Both runs both baseline and context
 Baseline takes in only the 4 images + boxes.json without any design context. 
 
 Context takes in the 4 images + boxes.json + design intent and design language.
+
+`--variant` takes the same values as `--detection-variant` above, `all` by default. For `no_snapshots`, we pass the case's `out/pixel` folder instead of `out/dom`.
+
+### Output
+Each report ends with a `usage` block with the text, image, output, thinking and total token counts from the API response.
+
+### Generate a DOM snapshot test
+
+Generate a `unittest` that checks a captured DOM snapshot against either the
+before or after page state:
+```bash
+python -m image_diff.generate_snapshot_test \
+  captures/before_snapshot.json captures/after_snapshot.json \
+  --side after --output tests/generated/test_capture.py
+```
+
+The command writes `test_capture.expected.json` beside the test. Capture the
+page under test using the same snapshot format, then run the test from the
+repository root:
+```bash
+ACTUAL_SNAPSHOT=/path/to/current_snapshot.json \
+  python -m unittest discover -s tests/generated -p 'test_capture.py'
+```
+Use `--side before` to make the test expect the before state instead. It
+compares parsed rendered elements, layout, text, attributes, and computed
+styles; volatile raw CDP node identifiers are not compared. `--force` replaces
+generated files with the same names.
+
+
+## Evaluation
+
+[`evaluation/score.py`](evaluation/score.py) compares the saved reports with hand-written labels and does not call Gemini:
+```bash
+python -m evaluation.score
+```
+
+The label for `examples/<group>/<case>/` goes in `evaluation/labels/<group>/<case>.json`:
+```json
+{"regression": true, "dom_boxes": [3], "pixel_boxes": [4]}
+```
+
+`regression` says whether the case is a regression. `dom_boxes` is optional and lists the ids of the regressed boxes in `out/dom/boxes.json`. `pixel_boxes` is also optional and lists the regressed boxes by their ids in `out/pixel/boxes.json`, since a box has a different id there than in `out/dom/boxes.json`. The `no_snapshots` variant is scored based on it. The script prints case and box precision and recall for each model, variant and mode.

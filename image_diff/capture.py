@@ -103,7 +103,8 @@ def capture_html_pair(html_folder: Path, out_folder: Path):
 
     out_folder.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as playwright:
-        page = playwright.chromium.launch().new_page(viewport=_VIEWPORT)
+        browser = playwright.chromium.launch(channel="chrome", chromium_sandbox=True)
+        page = browser.new_page(viewport=_VIEWPORT)
 
         for side in Side:
             page.goto(f"http://localhost:{server.server_port}/{side}.html", wait_until="networkidle")

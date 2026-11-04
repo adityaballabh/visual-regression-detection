@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "All changes reflect the intended spacing updates for question rows without introducing visual defects.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4, 5, 6],
+  "usage": {
+    "text_tokens": 2149,
+    "image_tokens": 4400,
+    "output_tokens": 77,
+    "thinking_tokens": 0,
+    "total_tokens": 6626
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "All changes match the intended design to increase the button height and change its color, which correctly pushes down the content below it.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 734,
+    "image_tokens": 4400,
+    "output_tokens": 78,
+    "thinking_tokens": 0,
+    "total_tokens": 5212
+  }
+}
