@@ -26,13 +26,15 @@ GEMINI_API_KEY is read from the environment or from a .env file at the repo root
 import argparse
 import json
 import os
-import time
 from pathlib import Path
 from typing import Literal
 
 from compact_json import Formatter
+from google.genai import types
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 from pydantic import BaseModel, Field
+
+from regression_detection.gemini_client import generate, make_client
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_MODEL = "gemini-3.5-flash-lite"
@@ -154,18 +156,6 @@ def classify(case: Case, mode: str, model: str, dry_run: bool = False) -> Report
         print(f"===== {case.name} [{mode}] =====\n{prompt}\n(images: {[p.name for p in image_paths]})\n")
         return None
 
-    from google import genai
-    from google.genai import types
-
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if not api_key:
-        raise SystemExit("GEMINI_API_KEY not set (put it in .env)")
-    # Retry server errors with backoff, rate limits are handled in _generate
-    retry_options = types.HttpRetryOptions(initial_delay=10, http_status_codes=[408, 500, 502, 503, 504])
-    # Time out a hung call so it gets retried instead of waiting forever
-    http_options = types.HttpOptions(timeout=60_000, retry_options=retry_options)
-    client = genai.Client(api_key=api_key, http_options=http_options)
-
     parts: list = [prompt]
     for name, path in zip(IMAGE_NAMES, image_paths):
         parts.append(f"{name}:")
@@ -176,7 +166,7 @@ def classify(case: Case, mode: str, model: str, dry_run: bool = False) -> Report
         response_schema=RegressionReport,
         temperature=0,
     )
-    response = _generate(client, model, parts, config)
+    response = generate(make_client(), model=model, contents=parts, config=config)
     report = _drop_unknown_boxes(RegressionReport.model_validate_json(response.text), case.box_ids)
     metadata = response.usage_metadata
     prompt_counts = {detail.modality.name: detail.token_count for detail in metadata.prompt_tokens_details}
@@ -190,37 +180,6 @@ def classify(case: Case, mode: str, model: str, dry_run: bool = False) -> Report
         total_tokens=metadata.total_token_count,
     )
     return ReportWithUsage(**report.model_dump(), usage=usage)
-
-
-def _generate(client, model: str, contents: list, config):
-    from google.genai import errors
-
-    while True:
-        try:
-            return client.models.generate_content(model=model, contents=contents, config=config)
-        except errors.ClientError as error:
-            if error.code != 429:
-                raise
-            details = error.details["error"]["details"]
-            if _hit_daily_limit(details):
-                raise SystemExit(f"Daily request limit reached for {model}. {error.message}") from error
-            time.sleep(_retry_delay(details))
-
-
-def _hit_daily_limit(details: list[dict]) -> bool:
-    for detail in details:
-        for violation in detail.get("violations", []):
-            if "PerDay" in violation["quotaId"]:
-                return True
-    return False
-
-
-def _retry_delay(details: list[dict]) -> float:
-    for detail in details:
-        if "retryDelay" in detail:
-            return float(detail["retryDelay"].removesuffix("s"))
-    # Wait out the per-minute window when Gemini gives no delay
-    return 60
 
 
 def _drop_unknown_boxes(report: RegressionReport, valid_ids: set[int]) -> RegressionReport:
