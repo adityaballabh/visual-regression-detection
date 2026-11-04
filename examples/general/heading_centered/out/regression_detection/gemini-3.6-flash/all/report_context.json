@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The text alignment of the section containing 'Welcome to our Agriculture Company' was changed to centered alignment, which perfectly matches the design intent.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 538,
+    "image_tokens": 4400,
+    "output_tokens": 78,
+    "thinking_tokens": 138,
+    "total_tokens": 5154
+  }
+}

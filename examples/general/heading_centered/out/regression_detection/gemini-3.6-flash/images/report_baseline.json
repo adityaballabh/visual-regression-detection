@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The main hero section heading and body text alignment changed from left-aligned to center-aligned, which appears to be an intentional design update.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 219,
+    "image_tokens": 4400,
+    "output_tokens": 76,
+    "thinking_tokens": 190,
+    "total_tokens": 4885
+  }
+}

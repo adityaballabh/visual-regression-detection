@@ -1,0 +1,17 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The hero section header and paragraph text have been centered on the page, which is a standard intended layout update.",
+  "regressions": [],
+  "intended_box_ids": [
+     1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+    21, 22, 23, 24
+  ],
+  "usage": {
+    "text_tokens": 2907,
+    "image_tokens": 4400,
+    "output_tokens": 154,
+    "thinking_tokens": 1086,
+    "total_tokens": 8547
+  }
+}

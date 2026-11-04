@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The vertical spacing changes across the question rows match the intended design update.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4],
+  "usage": {
+    "text_tokens": 1424,
+    "image_tokens": 4400,
+    "output_tokens": 70,
+    "thinking_tokens": 353,
+    "total_tokens": 6247
+  }
+}

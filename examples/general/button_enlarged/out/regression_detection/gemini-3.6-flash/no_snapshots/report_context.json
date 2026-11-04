@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The 'Learn More' button was resized larger per design intent, causing the subsequent sections below it to naturally shift down by 8 pixels.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+  "usage": {
+    "text_tokens": 2191,
+    "image_tokens": 4320,
+    "output_tokens": 127,
+    "thinking_tokens": 546,
+    "total_tokens": 7184
+  }
+}
