@@ -1,4 +1,6 @@
+import csv
 import json
+from collections import defaultdict
 from pathlib import Path
 
 import numpy as np
@@ -8,7 +10,9 @@ from pipeline import diff_folder
 from regression_detection.gemini_processor import RegressionReport
 
 _EXAMPLES = Path(__file__).resolve().parent.parent / "examples"
+_RESULTS = Path(__file__).parent / "results"
 _MODES = ("context", "baseline")
+_COLUMNS = ["variant", "mode", "case_precision", "case_recall", "box_precision", "box_recall"]
 
 
 def _runs() -> list[str]:
@@ -31,16 +35,15 @@ def _read_box_ids(case_folder: Path, variant: str) -> list[int]:
     return [box["id"] for box in boxes]
 
 
-def _print_scores(name: str, truth: list[bool], predicted: list[bool]):
+def _precision_recall(truth: list[bool], predicted: list[bool]) -> tuple[float, float]:
     if not truth:
-        print(f"  {name}: no labels")
-        return
+        return np.nan, np.nan
     precision = precision_score(truth, predicted, zero_division=np.nan)
     recall = recall_score(truth, predicted, zero_division=np.nan)
-    print(f"  {name}: precision {precision:.3f} recall {recall:.3f}")
+    return precision, recall
 
 
-def score(run: str, mode: str):
+def score(run: str, mode: str) -> dict[str, str | float]:
     case_truth = []
     case_predicted = []
     box_truth = []
@@ -61,15 +64,43 @@ def score(run: str, mode: str):
             for box_id in _read_box_ids(case_folder, variant):
                 box_truth.append(box_id in label[boxes_key])
                 box_predicted.append(box_id in flagged_ids)
-    print(f"{run} {mode}")
-    _print_scores("cases", case_truth, case_predicted)
-    _print_scores("boxes", box_truth, box_predicted)
+    case_precision, case_recall = _precision_recall(case_truth, case_predicted)
+    box_precision, box_recall = _precision_recall(box_truth, box_predicted)
+    return {
+        "variant": variant,
+        "mode": mode,
+        "case_precision": case_precision,
+        "case_recall": case_recall,
+        "box_precision": box_precision,
+        "box_recall": box_recall,
+    }
+
+
+def _write_scores(model: str, rows: list[dict[str, str | float]]):
+    scores_file = _RESULTS / model / "scores.csv"
+    scores_file.parent.mkdir(parents=True, exist_ok=True)
+    with scores_file.open("w", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=_COLUMNS)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({key: _cell(value) for key, value in row.items()})
+    print(f"wrote {scores_file.relative_to(_RESULTS.parent.parent)}")
+
+
+def _cell(value: str | float) -> str:
+    if isinstance(value, str):
+        return value
+    return "NaN" if np.isnan(value) else f"{value:.3f}"
 
 
 def main():
+    rows_by_model = defaultdict(list)
     for run in _runs():
+        model = Path(run).parent.name
         for mode in _MODES:
-            score(run, mode)
+            rows_by_model[model].append(score(run, mode))
+    for model, rows in rows_by_model.items():
+        _write_scores(model, rows)
 
 
 if __name__ == "__main__":

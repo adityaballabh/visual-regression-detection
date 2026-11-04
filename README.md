@@ -196,4 +196,4 @@ The label for a case goes in `label.json` in its folder:
 {"regression": true, "dom_boxes": [3], "pixel_boxes": [4]}
 ```
 
-`regression` says whether the case is a regression. `dom_boxes` is optional and lists the ids of the regressed boxes in `out/dom/boxes.json`. `pixel_boxes` is also optional and lists the regressed boxes by their ids in `out/pixel/boxes.json`, since a box has a different id there than in `out/dom/boxes.json`. The `no_snapshots` variant is scored based on it. The script prints case and box precision and recall for each model, variant and mode.
+`regression` says whether the case is a regression. `dom_boxes` is optional and lists the ids of the regressed boxes in `out/dom/boxes.json`. `pixel_boxes` is also optional and lists the regressed boxes by their ids in `out/pixel/boxes.json`, since a box has a different id there than in `out/dom/boxes.json`. The `no_snapshots` variant is scored based on it. The script writes case and box precision and recall for each variant and mode to `evaluation/results/<model>/scores.csv`. `NaN` means the run flagged nothing, so precision is undefined.
