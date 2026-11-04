@@ -8,18 +8,13 @@ from pipeline import diff_folder
 from regression_detection.gemini_processor import RegressionReport
 
 _EXAMPLES = Path(__file__).resolve().parent.parent / "examples"
-_LABELS = Path(__file__).parent / "labels"
 _MODES = ("context", "baseline")
-
-
-def _case_folder(label_file: Path) -> Path:
-    return _EXAMPLES / label_file.parent.name / label_file.stem
 
 
 def _runs() -> list[str]:
     runs = set()
-    for label_file in _LABELS.glob("*/*.json"):
-        for run_folder in (_case_folder(label_file) / "out" / "regression_detection").glob("*/*"):
+    for label_file in _EXAMPLES.glob("*/*/label.json"):
+        for run_folder in (label_file.parent / "out" / "regression_detection").glob("*/*"):
             runs.add(f"{run_folder.parent.name}/{run_folder.name}")
     return sorted(runs)
 
@@ -51,8 +46,8 @@ def score(run: str, mode: str):
     box_truth = []
     box_predicted = []
     variant = Path(run).name
-    for label_file in sorted(_LABELS.glob("*/*.json")):
-        case_folder = _case_folder(label_file)
+    for label_file in sorted(_EXAMPLES.glob("*/*/label.json")):
+        case_folder = label_file.parent
         boxes_key = f"{diff_folder(case_folder, variant).name}_boxes"
         report = _read_report(case_folder, run, mode)
         if report is None:
