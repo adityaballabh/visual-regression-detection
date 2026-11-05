@@ -199,3 +199,54 @@ The label for a case goes in `label.json` in its folder:
 `regression` says whether the case is a regression. `dom_boxes` is optional and lists the ids of the regressed boxes in `out/dom/boxes.json`. `pixel_boxes` is also optional and lists the regressed boxes by their ids in `out/pixel/boxes.json`, since a box has a different id there than in `out/dom/boxes.json`. The `no_snapshots` variant is scored on `pixel_boxes`.
 
 The script writes `evaluation/results/regression_detection/<model>.csv`, with case and box precision and recall for each variant and mode. `NaN` means the run flagged nothing, so precision is undefined. `avg_input_tokens` and `avg_output_tokens` are averages per call and output includes thinking tokens.
+
+
+## LLM based test generation 
+
+### Installation
+
+To run this, you will need to install claude code. 
+[Installation Instructions](https://code.claude.com/docs/en/quickstart)
+
+To date I have not yet figured out how to share my claude subscription. 
+
+----
+
+### Run
+
+['test_generation/llm_test_generation.py'](test_generation/llm_test_generation.py) generates a test written by Claude Code if regression is found from a existing report, otherwise, no tests are generated. 
+
+To run on a specific folder (test): 
+```bash
+python -m test_generation.llm_test_generation examples/general/synthetic_five_changes
+```
+
+To do a dry run: 
+
+```bash
+python -m test_generation.llm_test_generation examples/general/synthetic_five_changes --dry-run
+```
+
+To run an example entire folder 
+
+```bash
+for d in examples/general/*/; do python -m test_generation.llm_test_generation "$d" --run-detection; done
+```
+
+Note: if an regression is introduced, the pipeline must be ran to update the results that this script relies on. Else, old results will be fed into the script. 
+
+---
+
+### Results
+
+For a json result, look under the test, for example, for the test ```synthetic_five_changes```, results can be found in the folder: 
+
+```
+examples/general/synthetic_five_changes/out/test_generation/gemini-3.5-flash-lite/all/sonnet/
+```
+
+What is inside: 
+- <code>result.json</code>: the status (generated, skipped, invalid or agent_error), whether the test passed on the before snapshot and failed on the after snapshot, and token usage and cost.
+- <code>test_generated_regression.py</code>: the generated test. It should pass on the before snapshot and fail on an assertion on the after snapshot.
+
+Note: if no regression is found, you should not be seeing a <code>test_generated_regression.py</code> file. 
