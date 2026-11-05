@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The tags and metadata indicators on the right side of the question list items were uniformly shifted to the right, representing an intended layout refinement without visual defects.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4, 5, 6],
+  "usage": {
+    "text_tokens": 920,
+    "image_tokens": 4400,
+    "output_tokens": 93,
+    "thinking_tokens": 942,
+    "total_tokens": 6355
+  }
+}

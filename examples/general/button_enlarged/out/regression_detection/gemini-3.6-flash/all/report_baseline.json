@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The 'Learn More' button padding and size were increased as part of an intentional design refinement.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 445,
+    "image_tokens": 4320,
+    "output_tokens": 48,
+    "thinking_tokens": 392,
+    "total_tokens": 5205
+  }
+}

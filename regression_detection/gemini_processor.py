@@ -30,8 +30,11 @@ from pathlib import Path
 from typing import Literal
 
 from compact_json import Formatter
+from google.genai import types
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 from pydantic import BaseModel, Field
+
+from regression_detection.gemini_client import generate, make_client
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_MODEL = "gemini-3.5-flash-lite"
@@ -153,30 +156,17 @@ def classify(case: Case, mode: str, model: str, dry_run: bool = False) -> Report
         print(f"===== {case.name} [{mode}] =====\n{prompt}\n(images: {[p.name for p in image_paths]})\n")
         return None
 
-    from google import genai
-    from google.genai import types
-
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if not api_key:
-        raise SystemExit("GEMINI_API_KEY not set (put it in .env)")
-    # Exponential backoff to wait out the free tier's per-minute limit
-    retry_options = types.HttpRetryOptions(initial_delay=10)
-    client = genai.Client(api_key=api_key, http_options=types.HttpOptions(retry_options=retry_options))
-
     parts: list = [prompt]
     for name, path in zip(IMAGE_NAMES, image_paths):
         parts.append(f"{name}:")
         parts.append(types.Part.from_bytes(data=path.read_bytes(), mime_type="image/png"))
 
-    response = client.models.generate_content(
-        model=model,
-        contents=parts,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=RegressionReport,
-            temperature=0,
-        ),
+    config = types.GenerateContentConfig(
+        response_mime_type="application/json",
+        response_schema=RegressionReport,
+        temperature=0,
     )
+    response = generate(make_client(), model=model, contents=parts, config=config)
     report = _drop_unknown_boxes(RegressionReport.model_validate_json(response.text), case.box_ids)
     metadata = response.usage_metadata
     prompt_counts = {detail.modality.name: detail.token_count for detail in metadata.prompt_tokens_details}

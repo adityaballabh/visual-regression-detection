@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.9,
+  "summary": "The alignment and spacing of the topic badges and point values on question rows were updated to place the badges closer to the point values. The updated layout is clean and free of visual defects.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4],
+  "usage": {
+    "text_tokens": 219,
+    "image_tokens": 4400,
+    "output_tokens": 93,
+    "thinking_tokens": 816,
+    "total_tokens": 5528
+  }
+}

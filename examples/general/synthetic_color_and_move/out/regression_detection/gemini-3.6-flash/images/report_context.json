@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The changes to the 'Open an Account' button match the stated design intent, changing its background color to red and increasing its vertical padding.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 357,
+    "image_tokens": 4400,
+    "output_tokens": 75,
+    "thinking_tokens": 235,
+    "total_tokens": 5067
+  }
+}

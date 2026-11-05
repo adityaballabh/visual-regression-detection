@@ -1,0 +1,43 @@
+{
+  "is_regression": true,
+  "confidence": 0.85,
+  "summary": "The right padding for question list items was removed, causing tags and point values to flush directly against the right edge of the container.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "spacing",
+      "severity": "medium",
+      "explanation": "Right padding was removed (24px to 0px), causing the category tag and point values to stick directly against the right container boundary.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 2,
+      "category": "spacing",
+      "severity": "medium",
+      "explanation": "Right padding was removed (24px to 0px), causing the category tag and point values to stick directly against the right container boundary.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 3,
+      "category": "spacing",
+      "severity": "medium",
+      "explanation": "Right padding was removed (24px to 0px), causing the category tag and point values to stick directly against the right container boundary.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 4,
+      "category": "spacing",
+      "severity": "medium",
+      "explanation": "Right padding was removed (24px to 0px), causing the category tag and point values to stick directly against the right container boundary.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 835,
+    "image_tokens": 4400,
+    "output_tokens": 379,
+    "thinking_tokens": 1623,
+    "total_tokens": 7237
+  }
+}

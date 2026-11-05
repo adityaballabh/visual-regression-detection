@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The section containing 'Welcome to our Agriculture Company' was center-aligned in accordance with the specified design intent.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 356,
+    "image_tokens": 4400,
+    "output_tokens": 50,
+    "thinking_tokens": 279,
+    "total_tokens": 5085
+  }
+}

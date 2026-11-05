@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The shift in badge and points label positions is consistent with the intended spacing changes for question rows and introduces no visual regressions.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4, 5, 6],
+  "usage": {
+    "text_tokens": 2149,
+    "image_tokens": 4400,
+    "output_tokens": 63,
+    "thinking_tokens": 647,
+    "total_tokens": 7259
+  }
+}

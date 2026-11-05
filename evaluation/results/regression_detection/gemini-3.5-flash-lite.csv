@@ -1,0 +1,9 @@
+variant,mode,case_precision,case_recall,box_precision,box_recall,avg_input_tokens,avg_output_tokens
+all,context,1.000,0.500,1.000,0.200,5370,87
+all,baseline,NaN,0.000,NaN,0.000,4991,74
+boxes,context,1.000,0.500,1.000,0.200,904,91
+boxes,baseline,NaN,0.000,NaN,0.000,525,78
+images,context,1.000,0.500,1.000,0.200,4958,90
+images,baseline,1.000,0.500,0.000,0.000,4603,97
+no_snapshots,context,1.000,0.500,1.000,0.200,6223,125
+no_snapshots,baseline,0.000,0.000,0.000,0.000,5844,136

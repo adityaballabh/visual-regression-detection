@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The size and padding of the 'Learn More' CTA button were slightly increased, which improves target size and visual balance without introducing layout issues.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 219,
+    "image_tokens": 4320,
+    "output_tokens": 76,
+    "thinking_tokens": 655,
+    "total_tokens": 5270
+  }
+}

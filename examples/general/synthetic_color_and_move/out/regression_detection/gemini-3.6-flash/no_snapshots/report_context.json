@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The 'Open an Account' button was updated to red with increased height according to design intent, causing expected downward layout reflow for subsequent page elements.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 734,
+    "image_tokens": 4400,
+    "output_tokens": 84,
+    "thinking_tokens": 519,
+    "total_tokens": 5737
+  }
+}

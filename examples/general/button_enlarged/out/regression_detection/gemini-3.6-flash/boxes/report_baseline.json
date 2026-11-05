@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.9,
+  "summary": "The change to the 'Learn More' button consists of consistent padding adjustments and size increases, which reflects an intended design update rather than a visual defect.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 363,
+    "image_tokens": 0,
+    "output_tokens": 77,
+    "thinking_tokens": 410,
+    "total_tokens": 850
+  }
+}
