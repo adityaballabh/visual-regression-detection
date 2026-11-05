@@ -186,7 +186,7 @@ generated files with the same names.
 
 ## Evaluation
 
-[`evaluation/score.py`](evaluation/score.py) compares the saved reports with hand-written labels and does not call Gemini:
+[`evaluation/score.py`](evaluation/score.py) compares the saved reports with the manual ground-truth labels:
 ```bash
 python -m evaluation.score
 ```
@@ -196,4 +196,6 @@ The label for a case goes in `label.json` in its folder:
 {"regression": true, "dom_boxes": [3], "pixel_boxes": [4]}
 ```
 
-`regression` says whether the case is a regression. `dom_boxes` is optional and lists the ids of the regressed boxes in `out/dom/boxes.json`. `pixel_boxes` is also optional and lists the regressed boxes by their ids in `out/pixel/boxes.json`, since a box has a different id there than in `out/dom/boxes.json`. The `no_snapshots` variant is scored based on it. The script writes case and box precision and recall for each variant and mode to `evaluation/results/<model>/scores.csv`. `NaN` means the run flagged nothing, so precision is undefined.
+`regression` says whether the case is a regression. `dom_boxes` is optional and lists the ids of the regressed boxes in `out/dom/boxes.json`. `pixel_boxes` is also optional and lists the regressed boxes by their ids in `out/pixel/boxes.json`, since a box has a different id there than in `out/dom/boxes.json`. The `no_snapshots` variant is scored on `pixel_boxes`.
+
+The script writes `evaluation/results/regression_detection/<model>.csv`, with case and box precision and recall for each variant and mode. `NaN` means the run flagged nothing, so precision is undefined. `avg_input_tokens` and `avg_output_tokens` are averages per call and output includes thinking tokens.

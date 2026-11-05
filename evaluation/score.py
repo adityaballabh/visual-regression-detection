@@ -7,12 +7,21 @@ import numpy as np
 from sklearn.metrics import precision_score, recall_score
 
 from pipeline import diff_folder
-from regression_detection.gemini_processor import RegressionReport
+from regression_detection.gemini_processor import ReportWithUsage
 
 _EXAMPLES = Path(__file__).resolve().parent.parent / "examples"
-_RESULTS = Path(__file__).parent / "results"
+_RESULTS = Path(__file__).parent / "results" / "regression_detection"
 _MODES = ("context", "baseline")
-_COLUMNS = ["variant", "mode", "case_precision", "case_recall", "box_precision", "box_recall"]
+_COLUMNS = [
+    "variant",
+    "mode",
+    "case_precision",
+    "case_recall",
+    "box_precision",
+    "box_recall",
+    "avg_input_tokens",
+    "avg_output_tokens",
+]
 
 
 def _runs() -> list[str]:
@@ -23,11 +32,11 @@ def _runs() -> list[str]:
     return sorted(runs)
 
 
-def _read_report(case_folder: Path, run: str, mode: str) -> RegressionReport | None:
+def _read_report(case_folder: Path, run: str, mode: str) -> ReportWithUsage | None:
     report_file = case_folder / "out" / "regression_detection" / run / f"report_{mode}.json"
     if not report_file.exists():
         return None
-    return RegressionReport.model_validate_json(report_file.read_text())
+    return ReportWithUsage.model_validate_json(report_file.read_text())
 
 
 def _read_box_ids(case_folder: Path, variant: str) -> list[int]:
@@ -43,11 +52,13 @@ def _precision_recall(truth: list[bool], predicted: list[bool]) -> tuple[float, 
     return precision, recall
 
 
-def score(run: str, mode: str) -> dict[str, str | float]:
+def summarize(run: str, mode: str) -> dict[str, str | float]:
     case_truth = []
     case_predicted = []
     box_truth = []
     box_predicted = []
+    input_tokens = []
+    output_tokens = []
     variant = Path(run).name
     for label_file in sorted(_EXAMPLES.glob("*/*/label.json")):
         case_folder = label_file.parent
@@ -56,6 +67,9 @@ def score(run: str, mode: str) -> dict[str, str | float]:
         if report is None:
             print(f"skipping {case_folder.relative_to(_EXAMPLES)}: no {run} {mode} report")
             continue
+        input_tokens.append(report.usage.text_tokens + report.usage.image_tokens)
+        # Thinking is billed at the output price
+        output_tokens.append(report.usage.output_tokens + report.usage.thinking_tokens)
         label = json.loads(label_file.read_text())
         case_truth.append(label["regression"])
         case_predicted.append(report.is_regression)
@@ -73,23 +87,25 @@ def score(run: str, mode: str) -> dict[str, str | float]:
         "case_recall": case_recall,
         "box_precision": box_precision,
         "box_recall": box_recall,
+        "avg_input_tokens": round(np.mean(input_tokens)),
+        "avg_output_tokens": round(np.mean(output_tokens)),
     }
 
 
-def _write_scores(model: str, rows: list[dict[str, str | float]]):
-    scores_file = _RESULTS / model / "scores.csv"
-    scores_file.parent.mkdir(parents=True, exist_ok=True)
-    with scores_file.open("w", newline="") as file:
+def _write_summary(model: str, rows: list[dict[str, str | float]]):
+    summary_file = _RESULTS / f"{model}.csv"
+    summary_file.parent.mkdir(parents=True, exist_ok=True)
+    with summary_file.open("w", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=_COLUMNS)
         writer.writeheader()
         for row in rows:
             writer.writerow({key: _cell(value) for key, value in row.items()})
-    print(f"wrote {scores_file.relative_to(_RESULTS.parent.parent)}")
+    print(f"wrote {summary_file.relative_to(_EXAMPLES.parent)}")
 
 
 def _cell(value: str | float) -> str:
-    if isinstance(value, str):
-        return value
+    if isinstance(value, (str, int)):
+        return str(value)
     return "NaN" if np.isnan(value) else f"{value:.3f}"
 
 
@@ -98,9 +114,9 @@ def main():
     for run in _runs():
         model = Path(run).parent.name
         for mode in _MODES:
-            rows_by_model[model].append(score(run, mode))
+            rows_by_model[model].append(summarize(run, mode))
     for model, rows in rows_by_model.items():
-        _write_scores(model, rows)
+        _write_summary(model, rows)
 
 
 if __name__ == "__main__":
