@@ -1,7 +1,7 @@
 {
   "is_regression": false,
   "confidence": 1.0,
-  "summary": "The heading section was successfully centered according to the design intent without introducing any visual regressions.",
+  "summary": "The heading and text section successfully transitioned to centered alignment as specified in the design intent.",
   "regressions": [],
   "intended_box_ids": [1],
   "usage": {

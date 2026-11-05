@@ -1,14 +1,14 @@
 {
   "is_regression": false,
   "confidence": 1.0,
-  "summary": "All observed changes correctly match the specified design intent.",
+  "summary": "All detected changes correctly implement the specified design intent without introducing any visual regressions.",
   "regressions": [],
   "intended_box_ids": [1, 2, 3, 4, 5],
   "usage": {
     "text_tokens": 1125,
     "image_tokens": 4400,
-    "output_tokens": 69,
+    "output_tokens": 72,
     "thinking_tokens": 0,
-    "total_tokens": 5594
+    "total_tokens": 5597
   }
 }
