@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.85,
+  "summary": "The right inner gap across all 'Partial credit' list items was consistently reduced from 24px to 0px, reflecting an intended layout update.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4],
+  "usage": {
+    "text_tokens": 753,
+    "image_tokens": 0,
+    "output_tokens": 66,
+    "thinking_tokens": 473,
+    "total_tokens": 1292
+  }
+}

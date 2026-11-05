@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.85,
+  "summary": "The 'Open an Account' primary action button was changed to a destructive red color and given excessive vertical padding, violating color semantics and causing layout shift.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "color",
+      "severity": "high",
+      "explanation": "Changing the primary CTA 'Open an Account' button from blue to red (rgb(220, 38, 38)) violates UI color semantics where red indicates destructive actions. Additionally, doubling the vertical padding (12px to 24px) creates an awkwardly tall button and shifts downstream content by 24px.",
+      "violated_rule": "Color semantics for primary actions"
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 362,
+    "image_tokens": 0,
+    "output_tokens": 156,
+    "thinking_tokens": 594,
+    "total_tokens": 1112
+  }
+}

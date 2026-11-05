@@ -32,14 +32,15 @@ python pipeline.py <case_folder> [--detection-variant all|images|boxes|no_snapsh
 ```
 
 A case folder holds one change:
-```
-<case_folder>/
-  html/       before.html and after.html (optional)
-  pr.txt      link to a PrairieLearn PR made by the capture script (optional)
-  captures/   before.png, after.png and their _snapshot.json files (if missing, generated from html/ or pr.txt)
-  design/     design_intent.md and design_language.md (optional, pulled from pr.txt if missing)
-  out/        written by the pipeline: dom/ and pixel/ for the image diff, regression_detection/<model>/<variant>/ for the reports
-```
+
+| Path | Contents |
+|---|---|
+| `html/` | `before.html` and `after.html` (optional) |
+| `pr.txt` | Link to a PrairieLearn PR made by the capture script (optional) |
+| `captures/` | `before.png`, `after.png` and their `_snapshot.json` files. If missing, they're generated from `html/` or `pr.txt` |
+| `design/` | `design_intent.md` and `design_language.md` (optional, pulled from `pr.txt` if missing) |
+| `label.json` | Ground truth for evaluation: `regression`, `dom_boxes` and `pixel_boxes` (optional) |
+| `out/` | Written by the pipeline: `dom/` and `pixel/` for the image diff, `regression_detection/<model>/<variant>/` for the reports |
 
 If `captures/` is incomplete, the pipeline fills it. For a PrairieLearn change, put the link to the PR made by the [PrairieLearn screenshot capture](#prairielearn-screenshot-capture) in `pr.txt`, and the pipeline downloads the captures committed in that PR. Missing design files come from the PR too: the intent from its description and the design language from the PrairieLearn fork's `docs/design-standards.md`. For any other page, put the before and after HTML in `html/`, and the pipeline captures them itself.
 
@@ -185,17 +186,19 @@ generated files with the same names.
 
 ## Evaluation
 
-[`evaluation/score.py`](evaluation/score.py) compares the saved reports with hand-written labels and does not call Gemini:
+[`evaluation/score.py`](evaluation/score.py) compares the saved reports with the manual ground-truth labels:
 ```bash
 python -m evaluation.score
 ```
 
-The label for `examples/<group>/<case>/` goes in `evaluation/labels/<group>/<case>.json`:
+The label for a case goes in `label.json` in its folder:
 ```json
 {"regression": true, "dom_boxes": [3], "pixel_boxes": [4]}
 ```
 
-`regression` says whether the case is a regression. `dom_boxes` is optional and lists the ids of the regressed boxes in `out/dom/boxes.json`. `pixel_boxes` is also optional and lists the regressed boxes by their ids in `out/pixel/boxes.json`, since a box has a different id there than in `out/dom/boxes.json`. The `no_snapshots` variant is scored based on it. The script prints case and box precision and recall for each model, variant and mode.
+`regression` says whether the case is a regression. `dom_boxes` is optional and lists the ids of the regressed boxes in `out/dom/boxes.json`. `pixel_boxes` is also optional and lists the regressed boxes by their ids in `out/pixel/boxes.json`, since a box has a different id there than in `out/dom/boxes.json`. The `no_snapshots` variant is scored on `pixel_boxes`.
+
+The script writes `evaluation/results/regression_detection/<model>.csv`, with case and box precision and recall for each variant and mode. `NaN` means the run flagged nothing, so precision is undefined. `avg_input_tokens` and `avg_output_tokens` are averages per call and output includes thinking tokens.
 
 
 ## LLM based test generation 

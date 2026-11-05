@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The color and dimensions of the 'Open an Account' button were updated, which appears to be an intended styling change with no visual defects.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 219,
+    "image_tokens": 4400,
+    "output_tokens": 76,
+    "thinking_tokens": 589,
+    "total_tokens": 5284
+  }
+}

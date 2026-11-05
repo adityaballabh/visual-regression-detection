@@ -16,7 +16,7 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).resolve().parent
 ARTIFACT_ROOT = SCRIPT_DIR / ".artifacts"
 E2E_DIR = Path("apps/prairielearn/src/tests/e2e")
-PNPM_VERSION = "11.19.0"
+PNPM_VERSION = "12.17.0"
 MAX_SPEC_ATTEMPTS = 5
 
 
@@ -262,11 +262,21 @@ CAPTURE_SPEC_PATH: apps/prairielearn/src/tests/e2e/relative-file.spec.ts
     return selected
 
 
-def select_pnpm() -> list[str]:
-    if shutil.which("pnpm"):
-        return ["pnpm"]
+def select_pnpm(root: Path) -> list[str]:
+    pnpm = shutil.which("pnpm")
+    if pnpm:
+        version = run([pnpm, "--version"], cwd=root, capture_output=True).stdout.strip()
+        match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", version)
+        if match:
+            major, minor, patch = (int(part) for part in match.groups())
+            if major == 12 and (minor, patch) >= (17, 0):
+                return [pnpm]
     if shutil.which("corepack"):
         return ["corepack", f"pnpm@{PNPM_VERSION}"]
+    if pnpm:
+        raise CaptureError(
+            f"PrairieLearn requires pnpm ^12.17.0, but {version} is installed and Corepack is unavailable."
+        )
     raise CaptureError(f"pnpm was not found and Corepack is unavailable. Install Corepack or pnpm {PNPM_VERSION}.")
 
 
@@ -294,7 +304,7 @@ def capture_command(root: Path, spec: Path, output_dir: Path) -> tuple[list[str]
     env["CAPTURE_SCREENSHOTS"] = "1"
     env["OUT_DIR"] = str(output_dir)
     command = [
-        *select_pnpm(),
+        *select_pnpm(root),
         "--filter",
         "@prairielearn/prairielearn",
         "test:e2e",

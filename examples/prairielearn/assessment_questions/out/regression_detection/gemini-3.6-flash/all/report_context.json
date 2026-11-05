@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The spacing changes within the question rows match the design intent without introducing layout or visual defects.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4],
+  "usage": {
+    "text_tokens": 2064,
+    "image_tokens": 4400,
+    "output_tokens": 74,
+    "thinking_tokens": 481,
+    "total_tokens": 7019
+  }
+}

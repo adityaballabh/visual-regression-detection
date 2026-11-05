@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The 'Learn More' button padding was increased to make the button larger, matching the explicit design intent.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 595,
+    "image_tokens": 4320,
+    "output_tokens": 70,
+    "thinking_tokens": 278,
+    "total_tokens": 5263
+  }
+}

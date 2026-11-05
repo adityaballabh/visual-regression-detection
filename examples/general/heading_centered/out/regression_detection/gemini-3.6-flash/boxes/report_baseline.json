@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.85,
+  "summary": "The text alignment in the welcome section changed from left-aligned to centered, which is characteristic of an intentional styling update.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 295,
+    "image_tokens": 0,
+    "output_tokens": 53,
+    "thinking_tokens": 409,
+    "total_tokens": 757
+  }
+}
