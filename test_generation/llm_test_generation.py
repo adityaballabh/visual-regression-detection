@@ -201,6 +201,24 @@ def _code_context(case_folder: Path, out_folder: Path, cache_dir: Path, fetch: b
     return CodeContext(kind="none")
 
 
+def _portable_path(path: Path) -> str:
+    if path.is_relative_to(REPO_ROOT):
+        return str(path.relative_to(REPO_ROOT))
+    # Leave the username out of paths like the cached PR checkout
+    if path.is_relative_to(Path.home()):
+        return str("~" / path.relative_to(Path.home()))
+    return str(path)
+
+
+def _portable_code(code: CodeContext) -> CodeContext:
+    paths = {}
+    for name in ("code_dir", "diff_file"):
+        path = getattr(code, name)
+        if path:
+            paths[name] = _portable_path(Path(path))
+    return code.model_copy(update=paths)
+
+
 def _snapshot_facts(case_folder: Path, flagged: list[dict]) -> list[dict]:
     """What the two snapshots say about each flagged element, so the agent starts from real values."""
     captures = case_folder / "captures"
@@ -573,7 +591,7 @@ def generate_test(
     def result(status: str, **fields) -> GenerationResult:
         base = {
             "status": status,
-            "case": str(case_folder),
+            "case": _portable_path(case_folder),
             "detection_model": detection_model,
             "detection_variant": detection_variant,
             "detection_mode": detection_mode,
@@ -643,8 +661,8 @@ def generate_test(
         result(
             status,
             reason=reason,
-            code=code,
-            test_file=str(test_file) if test_file.is_file() else None,
+            code=_portable_code(code),
+            test_file=_portable_path(test_file) if test_file.is_file() else None,
             attempts=attempts,
             usage=total,
         )
