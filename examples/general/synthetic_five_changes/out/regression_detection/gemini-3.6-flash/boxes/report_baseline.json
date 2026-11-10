@@ -1,13 +1,13 @@
 {
   "is_regression": true,
-  "confidence": 0.9,
-  "summary": "The background color of the 'Savings Accounts' card unexpectedly changed from light green to light red, which introduces a semantic color regression. Other visual changes appear to be intended design updates.",
+  "confidence": 0.85,
+  "summary": "The page redesign updates typography, footer spacing, and content structure, but introduces a visual regression where the 'Savings Accounts' card background color inappropriately changes from green to red.",
   "regressions": [
     {
       "box_id": 3,
       "category": "color",
       "severity": "medium",
-      "explanation": " background-color changed from light green (rgb(220, 252, 231)) to light red (rgb(254, 202, 202)), which incorrectly applies a warning/error color state to a standard feature section.",
+      "explanation": "The background color of the 'Savings Accounts' section changed from light green (rgb(220, 252, 231)) to light red (rgb(254, 202, 202)). Red background styling connotes danger, loss, or warning, which is incorrect for a savings account product feature.",
       "violated_rule": null
     }
   ],
@@ -15,8 +15,8 @@
   "usage": {
     "text_tokens": 851,
     "image_tokens": 0,
-    "output_tokens": 153,
-    "thinking_tokens": 1108,
-    "total_tokens": 2112
+    "output_tokens": 166,
+    "thinking_tokens": 900,
+    "total_tokens": 1917
   }
 }

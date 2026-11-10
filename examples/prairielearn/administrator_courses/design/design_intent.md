@@ -1,0 +1,1 @@
+Updated the text for administrator courses card

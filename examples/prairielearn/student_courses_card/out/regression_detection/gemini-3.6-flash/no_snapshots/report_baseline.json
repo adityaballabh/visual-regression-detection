@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The header background color for the 'Courses' card unexpectedly changed from blue to grey, breaking visual consistency with the 'Development Mode' card above it.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "The background color of the 'Courses' card header changed from primary blue to grey, creating an inconsistent visual appearance compared to the 'Development Mode' header.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 346,
+    "image_tokens": 4400,
+    "output_tokens": 157,
+    "thinking_tokens": 841,
+    "total_tokens": 5744
+  }
+}

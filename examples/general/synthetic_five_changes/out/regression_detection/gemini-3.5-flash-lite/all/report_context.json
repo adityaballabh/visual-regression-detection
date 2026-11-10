@@ -1,14 +1,22 @@
 {
-  "is_regression": false,
-  "confidence": 1.0,
-  "summary": "All detected changes correctly implement the specified design intent without introducing any visual regressions.",
-  "regressions": [],
-  "intended_box_ids": [1, 2, 3, 4, 5],
+  "is_regression": true,
+  "confidence": 0.98,
+  "summary": "The Savings Accounts card color unexpectedly changed from green to red, which violates the design intent stating the card should not be changed.",
+  "regressions": [
+    {
+      "box_id": 3,
+      "category": "color",
+      "severity": "high",
+      "explanation": "The 'Savings Accounts' card background color changed to a red/pastel-red tone instead of remaining unchanged as specified in the design intent.",
+      "violated_rule": "The 'Savings Accounts' card was not changed at all"
+    }
+  ],
+  "intended_box_ids": [1, 2, 4, 5],
   "usage": {
     "text_tokens": 1125,
     "image_tokens": 4400,
-    "output_tokens": 72,
+    "output_tokens": 172,
     "thinking_tokens": 0,
-    "total_tokens": 5597
+    "total_tokens": 5697
   }
 }

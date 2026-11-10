@@ -1,13 +1,13 @@
 {
   "is_regression": true,
-  "confidence": 0.95,
-  "summary": "The background color of the 'Savings Accounts' card was changed to a light red/pink tint, which conflicts with the card's context and breaks the design palette of the feature section.",
+  "confidence": 0.9,
+  "summary": "The background color of the 'Savings Accounts' card was changed to light red, which introduces a semantic color regression for a positive financial feature.",
   "regressions": [
     {
       "box_id": 3,
       "category": "color",
       "severity": "medium",
-      "explanation": "The background color of the 'Savings Accounts' card changed from light green to light red/pink, which visually conveys an error/alert state and breaks the color harmony among the feature cards.",
+      "explanation": "The background color of the 'Savings Accounts' card changed from light green to light red/pink. Red conveys errors, warnings, or negative balances in financial UI design, making it inappropriate for a savings account feature card.",
       "violated_rule": null
     }
   ],
@@ -15,8 +15,8 @@
   "usage": {
     "text_tokens": 933,
     "image_tokens": 4400,
-    "output_tokens": 190,
-    "thinking_tokens": 927,
-    "total_tokens": 6450
+    "output_tokens": 178,
+    "thinking_tokens": 1616,
+    "total_tokens": 7127
   }
 }

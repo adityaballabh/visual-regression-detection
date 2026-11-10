@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The changes to the padding and background color of the student courses card match the design intent.",
+  "regressions": [],
+  "intended_box_ids": [1, 2],
+  "usage": {
+    "text_tokens": 1786,
+    "image_tokens": 4400,
+    "output_tokens": 68,
+    "thinking_tokens": 0,
+    "total_tokens": 6254
+  }
+}

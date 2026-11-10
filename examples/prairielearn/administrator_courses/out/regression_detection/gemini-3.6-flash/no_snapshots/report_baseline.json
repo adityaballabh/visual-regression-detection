@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.9,
+  "summary": "The card header background color unexpectedly changed from primary blue to dark grey, reducing contrast and visual hierarchy. All other highlighted changes are minor subpixel rendering differences caused by dynamic temporary file paths.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "The section card header background color changed from primary blue to dark grey, which breaks the primary section header styling and visual hierarchy.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 1815,
+    "image_tokens": 4400,
+    "output_tokens": 157,
+    "thinking_tokens": 1770,
+    "total_tokens": 8142
+  }
+}
