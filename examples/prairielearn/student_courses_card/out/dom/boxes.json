@@ -1,0 +1,4 @@
+[
+  {"id": 1, "type": "shape", "before": {"x": 160, "y": 372, "width": 960, "height": 128}, "after": {"x": 160, "y": 372, "width": 960, "height": 112}, "element": "<div> containing 'PrairieLearn Homepage'", "selector": "html:nth-child(1) > body:nth-child(2) > div:nth-child(1) > div:nth-child(2) > div:nth-child(1) > main:nth-child(1) > div:nth-child(1)", "frames": [], "detail": "gap below 40px -> 24px"},
+  {"id": 2, "type": "color", "before": {"x": 161, "y": 372, "width": 958, "height": 48}, "after": {"x": 161, "y": 372, "width": 958, "height": 48}, "element": "<div> containing 'Courses'", "selector": "html:nth-child(1) > body:nth-child(2) > div:nth-child(1) > div:nth-child(2) > div:nth-child(1) > main:nth-child(1) > div:nth-child(1) > div:nth-child(5) > div:nth-child(1) > div:nth-child(1)", "frames": [], "detail": "background-color rgb(13, 110, 253) -> rgb(108, 117, 125)"}
+]

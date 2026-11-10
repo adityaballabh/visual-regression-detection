@@ -1,22 +1,22 @@
 {
   "is_regression": true,
   "confidence": 0.95,
-  "summary": "The removal of the 'About' link and the increase in main heading size are intended changes, but the Savings Accounts card color unexpectedly changed to pink, breaking the design language.",
+  "summary": "The removal of the 'About' link and the main heading resize are intended changes, but the Savings Accounts card color unexpectedly changed to pink, breaking the design language.",
   "regressions": [
     {
       "box_id": 4,
       "category": "color",
-      "severity": "medium",
-      "explanation": "The Savings Accounts card background color changed to a reddish/pink tint, which contradicts the design intent stating that the card was not supposed to change at all.",
-      "violated_rule": "The 'Savings Accounts' card was not changed at all"
+      "severity": "high",
+      "explanation": "The Savings Accounts card background color changed to a pinkish tone, contradicting the design intent that it should not change and violating the soft pastel grouping convention.",
+      "violated_rule": "The 'Savings Accounts' card was not changed at all, and soft pastel cards should group related content."
     }
   ],
   "intended_box_ids": [1, 2, 3, 5, 6],
   "usage": {
     "text_tokens": 1054,
     "image_tokens": 4400,
-    "output_tokens": 196,
+    "output_tokens": 195,
     "thinking_tokens": 0,
-    "total_tokens": 5650
+    "total_tokens": 5649
   }
 }

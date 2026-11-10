@@ -1,14 +1,14 @@
 {
   "is_regression": false,
   "confidence": 0.9,
-  "summary": "The changes reflect a redesign of the banking page, including typography updates, navigation shifts, background color updates, and content additions.",
+  "summary": "The changes reflect a purposeful design update, including a larger main heading, updated section styling, adjusted padding, and an added list item.",
   "regressions": [],
   "intended_box_ids": [1, 2, 3, 4, 5],
   "usage": {
     "text_tokens": 851,
     "image_tokens": 0,
-    "output_tokens": 84,
+    "output_tokens": 86,
     "thinking_tokens": 0,
-    "total_tokens": 935
+    "total_tokens": 937
   }
 }

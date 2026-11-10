@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The changes consist of intentional styling updates to the Courses section container, including background color adjustment and spacing refinement.",
+  "regressions": [],
+  "intended_box_ids": [1, 2],
+  "usage": {
+    "text_tokens": 545,
+    "image_tokens": 4400,
+    "output_tokens": 69,
+    "thinking_tokens": 0,
+    "total_tokens": 5014
+  }
+}
