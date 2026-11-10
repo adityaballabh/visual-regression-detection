@@ -1,0 +1,29 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The header background color of the Courses panel unexpectedly changed from blue to dark gray, creating visual inconsistency with the Development Mode panel.",
+  "regressions": [
+    {
+      "box_id": 2,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "The Courses section header background color changed from primary blue to dark gray, breaking color consistency with the blue Development Mode section header above it.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 1,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "The Courses card header styling unexpectedly turned gray, creating an inconsistent visual appearance relative to the rest of the dashboard panels.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 219,
+    "image_tokens": 4400,
+    "output_tokens": 218,
+    "thinking_tokens": 2037,
+    "total_tokens": 6874
+  }
+}
