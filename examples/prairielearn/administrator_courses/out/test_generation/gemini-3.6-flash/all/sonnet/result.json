@@ -1,0 +1,58 @@
+{
+  "status": "generated",
+  "reason": null,
+  "case": "examples/prairielearn/administrator_courses",
+  "detection_model": "gemini-3.6-flash",
+  "detection_variant": "all",
+  "detection_mode": "context",
+  "flagged_box_ids": [
+    1,
+    2
+  ],
+  "cli": {
+    "name": "claude-code",
+    "version": "2.1.318 (Claude Code)",
+    "model": "sonnet"
+  },
+  "code": {
+    "kind": "pull_request",
+    "pr_url": "https://github.com/bzamansky/PrairieLearn/pull/13",
+    "head_sha": "0cdcc808c87e8d5a516e0c30a8d24ac7f31532a8",
+    "code_dir": "~/.cache/visual-regression-detection/checkouts/bzamansky__PrairieLearn-pr13-0cdcc808",
+    "diff_file": "examples/prairielearn/administrator_courses/out/test_generation/gemini-3.6-flash/all/sonnet/code_changes.diff"
+  },
+  "test_file": "examples/prairielearn/administrator_courses/out/test_generation/gemini-3.6-flash/all/sonnet/test_generated_regression.py",
+  "attempts": [
+    {
+      "usage": {
+        "input_tokens": 4,
+        "cache_creation_input_tokens": 18886,
+        "cache_read_input_tokens": 39369,
+        "output_tokens": 1509,
+        "total_cost_usd": 0.0945789,
+        "num_turns": 4,
+        "duration_ms": 10149
+      },
+      "session_id": "f585e3c0-dad9-4af5-9fa6-69ca65309de3",
+      "error": null,
+      "validation": {
+        "passes_on_before": true,
+        "fails_on_after": true,
+        "fails_by_assertion": true,
+        "names_flagged_element": true,
+        "before_output": ".\n----------------------------------------------------------------------\nRan 1 test in 0.003s\n\nOK\n",
+        "after_output": "F\n======================================================================\nFAIL: test_card_header_and_add_course_button_colors (test_generated_regression.GeneratedRegressionTest.test_card_header_and_add_course_button_colors)\nGuards the 'Courses' card header and 'Add course' button colors.\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/carl/Documents/GitHub/visual-regression-detection/examples/prairielearn/administrator_courses/out/test_generation/gemini-3.6-flash/all/sonnet/test_generated_regression.py\", line 45, in test_card_header_and_add_course_button_colors\n    self._check(HEADER_SELECTOR, \"background-color\", \"rgb(13, 110, 253)\")\n  File \"/Users/carl/Documents/GitHub/visual-regression-detection/examples/prairielearn/administrator_courses/out/test_generation/gemini-3.6-flash/all/sonnet/test_generated_regression.py\", line 32, in _check\n    self.assertEqual(\nAssertionError: 'rgb(108, 117, 125)' != 'rgb(13, 110, 253)'\n- rgb(108, 117, 125)\n?      ^^    ^  -\n+ rgb(13, 110, 253)\n?      ^    ^    +\n : html:nth-child(1) > body:nth-child(2) > div:nth-child(1) > div:nth-child(2) > div:nth-child(1) > main:nth-child(2) > div:nth-child(3) > div:nth-child(2) > div:nth-child(1): background-color expected 'rgb(13, 110, 253)' but got 'rgb(108, 117, 125)'\n\n----------------------------------------------------------------------\nRan 1 test in 0.003s\n\nFAILED (failures=1)\n"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 4,
+    "cache_creation_input_tokens": 18886,
+    "cache_read_input_tokens": 39369,
+    "output_tokens": 1509,
+    "total_cost_usd": 0.0945789,
+    "num_turns": 4,
+    "duration_ms": 10149
+  },
+  "created_at": "2026-11-10T21:03:41+00:00"
+}

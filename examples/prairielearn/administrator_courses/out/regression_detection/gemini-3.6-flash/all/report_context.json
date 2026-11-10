@@ -1,29 +1,29 @@
 {
   "is_regression": true,
   "confidence": 0.95,
-  "summary": "The card header and button colors unexpectedly changed from the primary blue brand style to a dark grey theme, which contradicts the design intent of only updating card text.",
+  "summary": "The card header background color and 'Add course' button color unexpectedly changed from primary blue/light to grey/dark, which does not match the stated design intent.",
   "regressions": [
     {
       "box_id": 1,
       "category": "color",
       "severity": "medium",
-      "explanation": "The card header background color changed from primary blue (rgb(13, 110, 253)) to grey (rgb(108, 117, 125)), which is an unintended visual change given the design intent.",
-      "violated_rule": "Prefer Bootstrap's semantic CSS variables and maintain consistent card header styling across PrairieLearn UI."
+      "explanation": "The header background color changed from primary blue to grey, which lowers visual emphasis and contradicts the application's card header styling patterns.",
+      "violated_rule": "Prefer Bootstrap's semantic CSS variables, such as --bs-body-color, --bs-body-bg, and --bs-primary, over hard-coded colors."
     },
     {
       "box_id": 2,
       "category": "color",
       "severity": "medium",
-      "explanation": "The '+ Add course' button styling changed to dark grey with white text instead of maintaining standard button contrast and styling for card header actions.",
-      "violated_rule": "Maintain consistent control styling and contrast for header actions."
+      "explanation": "The 'Add course' button background color changed to dark grey, which reduces visual consistency with standard primary card action buttons.",
+      "violated_rule": null
     }
   ],
-  "intended_box_ids": [],
+  "intended_box_ids": [3, 4, 5, 6],
   "usage": {
     "text_tokens": 2630,
     "image_tokens": 4400,
-    "output_tokens": 284,
-    "thinking_tokens": 716,
-    "total_tokens": 8030
+    "output_tokens": 280,
+    "thinking_tokens": 1182,
+    "total_tokens": 8492
   }
 }
