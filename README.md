@@ -197,10 +197,11 @@ so use the `out/dom` boxes file rather than pixel-only boxes:
 ```bash
 python -m unittest discover -s tests/generated -p 'test_capture.py'
 ```
-It compares parsed rendered elements, layout, text, attributes, and computed
-styles only for target elements; unrelated page changes are ignored. Volatile
-raw CDP node identifiers are not compared. `--force` replaces generated files
-with the same names.
+The generated assertion checks only the changed CSS properties on the report's
+target elements; unrelated styles and other element changes are ignored.
+Generation errors if a reported target has no identifiable changed CSS
+property. Volatile raw CDP node identifiers are not compared. `--force` replaces
+generated files with the same names.
 
 
 ## Evaluation

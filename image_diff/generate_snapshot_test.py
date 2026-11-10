@@ -7,7 +7,10 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from image_diff.dom.parse import load_snapshot
-from image_diff.snapshot_test import ElementTarget
+from image_diff.model import Snapshot
+from image_diff.snapshot_test import ElementTarget, StyleTarget
+
+ReportTarget = tuple[int, ElementTarget, str]
 
 
 def _pr_identity(pr_url: str) -> tuple[str, str, int]:
@@ -78,7 +81,7 @@ def _resolve_pr_inputs(pr_url: str, repository: Path) -> tuple[Path, Path, Path,
     return before, after, report, boxes
 
 
-def _report_targets(report_path: Path, boxes_path: Path) -> tuple[str, tuple[ElementTarget, ...]]:
+def _report_targets(report_path: Path, boxes_path: Path) -> tuple[str, tuple[ReportTarget, ...]]:
     report = json.loads(report_path.read_text(encoding="utf-8"))
     if not isinstance(report, dict) or not isinstance(report.get("is_regression"), bool):
         raise TypeError(f"Regression report must contain a boolean 'is_regression': {report_path}")
@@ -123,20 +126,88 @@ def _report_targets(report_path: Path, boxes_path: Path) -> tuple[str, tuple[Ele
         selector = box.get("selector")
         if not isinstance(selector, str) or not selector:
             raise ValueError(f"Target box {box_id} has no DOM selector in {boxes_path}; use DOM diff boxes.json")
+        detail = box.get("detail", "")
+        if not isinstance(detail, str):
+            raise TypeError(f"Target box {box_id} has invalid change detail in {boxes_path}")
         frames = box.get("frames") or []
         if not isinstance(frames, list) or not all(isinstance(frame, str) for frame in frames):
             raise TypeError(f"Target box {box_id} has invalid frame selectors in {boxes_path}")
-        targets.append((tuple(frames), selector))
+        targets.append((box_id, (tuple(frames), selector), detail))
 
     return side, tuple(targets)
 
 
-def _targets_literal(targets: tuple[ElementTarget, ...]) -> str:
-    rendered = []
-    for frames, selector in targets:
-        frame_tuple = f"({', '.join(json.dumps(frame) for frame in frames)}{',' if len(frames) == 1 else ''})"
-        rendered.append(f"({frame_tuple}, {json.dumps(selector)})")
-    return f"({', '.join(rendered)}{',' if len(rendered) == 1 else ''})"
+def _reported_style_targets(
+    targets: tuple[ReportTarget, ...],
+    before: Snapshot,
+    after: Snapshot,
+) -> tuple[StyleTarget, ...]:
+    before_by_key = {(element.frames, element.selector): element for element in before.elements}
+    after_by_key = {(element.frames, element.selector): element for element in after.elements}
+    styles_by_target: dict[ElementTarget, set[str]] = {}
+    for box_id, target, detail in targets:
+        before_element = before_by_key.get(target)
+        after_element = after_by_key.get(target)
+        if before_element is None or after_element is None:
+            missing_side = "before" if before_element is None else "after"
+            raise ValueError(f"Target box {box_id} element {target[1]} is missing from the {missing_side} snapshot")
+
+        changed_styles = {
+            name
+            for name in set(before_element.styles) | set(after_element.styles)
+            if before_element.styles.get(name) != after_element.styles.get(name)
+            and name not in {"width", "height", "perspective-origin", "transform-origin"}
+        }
+        reported_styles = set()
+        for change in detail.split(";"):
+            name, separator, values = change.strip().partition(" ")
+            if separator and " -> " in values and name in changed_styles:
+                reported_styles.add(name)
+        if not reported_styles and len(changed_styles) == 1:
+            reported_styles = changed_styles
+        if not reported_styles:
+            if changed_styles:
+                styles = ", ".join(sorted(changed_styles))
+                raise ValueError(f"Target box {box_id} ({target[1]}) has ambiguous changed CSS styles ({styles})")
+            raise ValueError(f"Target box {box_id} ({target[1]}) has no changed CSS style")
+        styles_by_target.setdefault(target, set()).update(reported_styles)
+
+    return tuple((target, tuple(sorted(styles))) for target, styles in sorted(styles_by_target.items()))
+
+
+def _style_targets_literal(targets: tuple[StyleTarget, ...]) -> str:
+    def tuple_line(values: tuple[str, ...], indentation: int) -> list[str]:
+        contents = ", ".join(json.dumps(value) for value in values)
+        one_line = f"({contents}{',' if len(values) == 1 else ''})"
+        prefix = " " * indentation
+        if len(prefix + one_line + ",") <= 120:
+            return [f"{prefix}{one_line},"]
+        return [
+            f"{prefix}(",
+            *(f"{prefix}    {json.dumps(value)}," for value in values),
+            f"{prefix}),",
+        ]
+
+    lines = ["("]
+    for (frames, selector), styles in targets:
+        selector_literal = json.dumps(selector)
+        target_line = f"        ({_string_tuple_literal(frames)}, {selector_literal}),"
+        lines.append("    (")
+        if len(target_line) <= 120:
+            lines.append(target_line)
+        else:
+            lines.append("        (")
+            lines.extend(tuple_line(frames, 12))
+            lines.append(f"            {selector_literal},")
+            lines.append("        ),")
+        lines.extend(tuple_line(styles, 8))
+        lines.append("    ),")
+    lines.append(")")
+    return "\n".join(lines)
+
+
+def _string_tuple_literal(values: tuple[str, ...]) -> str:
+    return f"({', '.join(json.dumps(value) for value in values)}{',' if len(values) == 1 else ''})"
 
 
 def generate_test(
@@ -153,18 +224,10 @@ def generate_test(
 
     side, targets = _report_targets(report, boxes)
 
-    # Validate snapshots and ensure every report target exists in at least one of them.
+    # Validate snapshots and ensure every report target has a report-relevant style change.
     before_snapshot = load_snapshot(before)
     after_snapshot = load_snapshot(after)
-    available_targets = {
-        (element.frames, element.selector)
-        for snapshot in (before_snapshot, after_snapshot)
-        for element in snapshot.elements
-    }
-    missing_targets = set(targets) - available_targets
-    if missing_targets:
-        missing = ", ".join(selector for _, selector in sorted(missing_targets))
-        raise ValueError(f"Report targets are missing from both snapshots: {missing}")
+    style_targets = _reported_style_targets(targets, before_snapshot, after_snapshot)
 
     expected_path = output.with_name(f"{output.stem}.expected.json")
     actual_path = output.with_name(f"{output.stem}.actual.json")
@@ -183,7 +246,7 @@ def generate_test(
     actual_path.write_bytes(after.read_bytes())
     expected_filename = json.dumps(expected_path.name)
     actual_filename = json.dumps(actual_path.name)
-    targets_literal = _targets_literal(targets)
+    style_targets_literal = _style_targets_literal(style_targets)
     output.write_text(
         f'''"""Generated DOM snapshot test; expected page state: {side}."""
 
@@ -195,14 +258,14 @@ from image_diff.snapshot_test import assert_snapshot_matches
 
 EXPECTED_SNAPSHOT = Path(__file__).with_name({expected_filename})
 DEFAULT_ACTUAL_SNAPSHOT = Path(__file__).with_name({actual_filename})
-TARGETS = {targets_literal}
+STYLE_TARGETS = {style_targets_literal}
 
 
 class GeneratedSnapshotTest(unittest.TestCase):
     def test_dom_matches_{side}_snapshot(self):
         actual_path = os.environ.get("ACTUAL_SNAPSHOT")
         actual_snapshot = Path(actual_path) if actual_path else DEFAULT_ACTUAL_SNAPSHOT
-        assert_snapshot_matches(EXPECTED_SNAPSHOT, actual_snapshot, TARGETS)
+        assert_snapshot_matches(EXPECTED_SNAPSHOT, actual_snapshot, style_targets=STYLE_TARGETS)
 
 
 if __name__ == "__main__":
