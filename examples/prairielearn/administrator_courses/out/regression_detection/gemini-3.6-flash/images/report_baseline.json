@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The visual changes reflect an intended theme color update for the card header and button, as well as expected dynamic temporary directory path variations in the data table.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4, 5, 6],
+  "usage": {
+    "text_tokens": 219,
+    "image_tokens": 4400,
+    "output_tokens": 93,
+    "thinking_tokens": 926,
+    "total_tokens": 5638
+  }
+}

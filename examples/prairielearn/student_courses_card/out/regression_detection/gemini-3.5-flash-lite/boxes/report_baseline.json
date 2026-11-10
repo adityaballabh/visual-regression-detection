@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.9,
+  "summary": "The changes include a layout spacing reduction and a button or background color change that indicate potential design updates or regressions.",
+  "regressions": [
+    {
+      "box_id": 2,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "The background color changed from a primary blue (rgb(13, 110, 253)) to a neutral gray (rgb(108, 117, 125)), which might unintendedly alter the visual hierarchy or branding.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 463,
+    "image_tokens": 0,
+    "output_tokens": 179,
+    "thinking_tokens": 0,
+    "total_tokens": 642
+  }
+}

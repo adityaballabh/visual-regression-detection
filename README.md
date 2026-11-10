@@ -163,24 +163,44 @@ Each report ends with a `usage` block with the text, image, output, thinking and
 
 ### Generate a DOM snapshot test
 
-Generate a `unittest` that checks a captured DOM snapshot against either the
-before or after page state:
+Generate a focused `unittest` from the regression report and the matching DOM
+`boxes.json`. A detected regression uses the before snapshot and the report's
+regression boxes; a non-regression uses the after snapshot and the report's
+intended box ids. The test compares only those target elements:
 ```bash
 python -m image_diff.generate_snapshot_test \
   captures/before_snapshot.json captures/after_snapshot.json \
-  --side after --output tests/generated/test_capture.py
+  --report out/regression_detection/gemini-3.5-flash-lite/all/report_context.json \
+  --boxes out/dom/boxes.json \
+  --output tests/generated/test_capture.py
 ```
 
-The command writes `test_capture.expected.json` beside the test. Capture the
-page under test using the same snapshot format, then run the test from the
-repository root:
+Alternatively, pass a PR URL and the visual-regression repository root. The
+generator finds the case whose `pr.txt` matches the PR, then uses its snapshots,
+`out/dom/boxes.json`, and most recently modified report under
+`out/regression_detection/` (excluding `no_snapshots`, whose box ids are
+pixel-based):
 ```bash
-ACTUAL_SNAPSHOT=/path/to/current_snapshot.json \
-  python -m unittest discover -s tests/generated -p 'test_capture.py'
+python -m image_diff.generate_snapshot_test \
+  --pr https://github.com/org/repo/pull/123 \
+  --repo /path/to/visual-regression-detection \
+  --output tests/generated/test_capture.py
 ```
-Use `--side before` to make the test expect the before state instead. It
-compares parsed rendered elements, layout, text, attributes, and computed
-styles; volatile raw CDP node identifiers are not compared. `--force` replaces
+The PR lookup reports an error if it finds no matching case, multiple matching
+cases, or the matching case is missing its snapshots, DOM boxes, or report.
+
+The command writes `test_capture.expected.json` and `test_capture.actual.json`
+beside the test. The actual fixture defaults to the supplied after snapshot, so
+the test runs without extra environment variables. To compare a fresh capture,
+set `ACTUAL_SNAPSHOT` to its path. Reported boxes must include DOM selectors,
+so use the `out/dom` boxes file rather than pixel-only boxes:
+```bash
+python -m unittest discover -s tests/generated -p 'test_capture.py'
+```
+The generated assertion checks only the changed CSS properties on the report's
+target elements; unrelated styles and other element changes are ignored.
+Generation errors if a reported target has no identifiable changed CSS
+property. Volatile raw CDP node identifiers are not compared. `--force` replaces
 generated files with the same names.
 
 

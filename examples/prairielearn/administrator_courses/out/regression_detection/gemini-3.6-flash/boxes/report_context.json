@@ -1,0 +1,29 @@
+{
+  "is_regression": true,
+  "confidence": 0.9,
+  "summary": "The Courses card header and 'Add course' button underwent unexpected color changes from blue/light to gray/dark, which does not match the design intent of updating card text.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "The background color of the card header changed from primary blue (rgb(13, 110, 253)) to gray (rgb(108, 117, 125)), which is unintended as the design intent only specified updating text.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 2,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "The 'Add course' button background color changed to dark (rgb(33, 37, 41)) with white text, altering the button styling unexpectedly.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [3, 4, 5, 6],
+  "usage": {
+    "text_tokens": 2548,
+    "image_tokens": 0,
+    "output_tokens": 210,
+    "thinking_tokens": 1226,
+    "total_tokens": 3984
+  }
+}

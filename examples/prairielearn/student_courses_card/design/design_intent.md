@@ -1,0 +1,1 @@
+Changing the UI of the student courses card.  Updating the padding and the background color.

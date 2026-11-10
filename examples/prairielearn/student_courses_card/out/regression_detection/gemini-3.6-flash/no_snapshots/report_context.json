@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The background color change of the Courses card header is consistent with the design intent to update the background color.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 1587,
+    "image_tokens": 4400,
+    "output_tokens": 72,
+    "thinking_tokens": 337,
+    "total_tokens": 6396
+  }
+}

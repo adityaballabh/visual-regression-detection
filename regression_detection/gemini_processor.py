@@ -17,7 +17,7 @@ Case directory layout (a case is one before/after pair):
 
 Usage:
     python regression_detection/gemini_processor.py run  CASE_DIR [--mode context|baseline|both]
-        [--variant all|images|boxes] [--out DIR]
+        [--variant all|images|boxes|no_snapshots] [--out DIR]
     add --dry-run to print the prompt without calling the API
 
 GEMINI_API_KEY is read from the environment or from a .env file at the repo root.

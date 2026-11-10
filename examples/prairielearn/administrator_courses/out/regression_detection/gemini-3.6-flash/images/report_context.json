@@ -1,0 +1,29 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The card header background color and button styling were unintentionally changed from primary blue to dark gray, which contradicts the design intent.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "color",
+      "severity": "high",
+      "explanation": "The card header background unexpectedly changed from primary blue to dark gray.",
+      "violated_rule": "Prefer Bootstrap's semantic CSS variables, such as --bs-body-color, --bs-body-bg, and --bs-primary, over hard-coded colors. This helps UI follow application themes."
+    },
+    {
+      "box_id": 2,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "The 'Add course' button style unexpectedly changed to a dark background.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [3, 4, 5, 6],
+  "usage": {
+    "text_tokens": 1425,
+    "image_tokens": 4400,
+    "output_tokens": 200,
+    "thinking_tokens": 2047,
+    "total_tokens": 8072
+  }
+}

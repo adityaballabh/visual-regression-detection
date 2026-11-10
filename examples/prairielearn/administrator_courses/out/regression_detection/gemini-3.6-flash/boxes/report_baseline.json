@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.9,
+  "summary": "The detected changes represent an intentional theme update to the header banner and buttons, accompanied by normal dynamic file path changes in test data.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4, 5, 6],
+  "usage": {
+    "text_tokens": 1318,
+    "image_tokens": 0,
+    "output_tokens": 64,
+    "thinking_tokens": 910,
+    "total_tokens": 2292
+  }
+}

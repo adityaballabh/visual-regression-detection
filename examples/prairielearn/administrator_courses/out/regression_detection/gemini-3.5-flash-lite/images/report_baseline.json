@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The changes consist of intentional redesigns, such as changing the table header bar color from blue to grey and updating text content within the table.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4, 5, 6],
+  "usage": {
+    "text_tokens": 219,
+    "image_tokens": 4400,
+    "output_tokens": 90,
+    "thinking_tokens": 0,
+    "total_tokens": 4709
+  }
+}
