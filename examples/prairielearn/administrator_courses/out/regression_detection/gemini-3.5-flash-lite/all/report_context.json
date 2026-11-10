@@ -1,14 +1,14 @@
 {
   "is_regression": false,
   "confidence": 1.0,
-  "summary": "The visual changes show an update to the administrator courses card header and styling, along with updated test data content, matching the design intent without introducing any defects.",
+  "summary": "All visual changes are intentional and correctly reflect the updated administrator courses card and data state.",
   "regressions": [],
   "intended_box_ids": [1, 2, 3, 4, 5, 6],
   "usage": {
     "text_tokens": 2630,
     "image_tokens": 4400,
-    "output_tokens": 91,
+    "output_tokens": 77,
     "thinking_tokens": 0,
-    "total_tokens": 7121
+    "total_tokens": 7107
   }
 }
