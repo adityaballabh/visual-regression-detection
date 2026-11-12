@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The card header background and 'Add course' button colors were cleanly updated with good contrast, while the remaining diffs are caused by a regenerated temporary directory path in the table.",
+  "regressions": [],
+  "intended_box_ids": [1, 2],
+  "usage": {
+    "text_tokens": 1988,
+    "image_tokens": 4400,
+    "output_tokens": 88,
+    "thinking_tokens": 765,
+    "total_tokens": 7241
+  }
+}

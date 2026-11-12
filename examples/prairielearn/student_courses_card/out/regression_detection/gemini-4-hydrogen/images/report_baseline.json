@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.9,
+  "summary": "The Courses card header cleanly changed from blue to gray with no layout, contrast, or alignment defects, indicating an intentional styling update.",
+  "regressions": [],
+  "intended_box_ids": [1, 2],
+  "usage": {
+    "text_tokens": 809,
+    "image_tokens": 4400,
+    "output_tokens": 92,
+    "thinking_tokens": 691,
+    "total_tokens": 5992
+  }
+}

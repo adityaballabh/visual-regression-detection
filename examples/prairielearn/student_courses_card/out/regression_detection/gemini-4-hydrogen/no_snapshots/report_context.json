@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The background color of the Courses card header changed from blue to gray, which directly matches the stated design intent without introducing visual defects.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 2169,
+    "image_tokens": 4400,
+    "output_tokens": 69,
+    "thinking_tokens": 543,
+    "total_tokens": 7181
+  }
+}

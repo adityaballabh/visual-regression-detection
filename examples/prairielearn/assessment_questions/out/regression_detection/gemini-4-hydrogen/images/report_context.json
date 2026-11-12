@@ -1,0 +1,43 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The spacing change on the question rows removes the right-side padding, shifting the badge and point values flush against the right edge of the viewport and clipping the trailing digit.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "overflow",
+      "severity": "medium",
+      "explanation": "The right-aligned 'Algebra' badge and points list ('10, 5, 1') shifted to the right edge with no padding, causing the final '1' to be clipped at the viewport boundary.",
+      "violated_rule": "Avoid dimensions or spacing that cause content to clip or become unusable."
+    },
+    {
+      "box_id": 2,
+      "category": "overflow",
+      "severity": "medium",
+      "explanation": "The right-aligned 'Algebra' badge and points list ('10, 5, 1') shifted to the right edge with no padding, causing the final '1' to be clipped at the viewport boundary.",
+      "violated_rule": "Avoid dimensions or spacing that cause content to clip or become unusable."
+    },
+    {
+      "box_id": 3,
+      "category": "overflow",
+      "severity": "medium",
+      "explanation": "The right-aligned 'Algebra' badge and points list ('15, 10, 5, 1') shifted to the right edge with no padding, causing the final '1' to be clipped at the viewport boundary.",
+      "violated_rule": "Avoid dimensions or spacing that cause content to clip or become unusable."
+    },
+    {
+      "box_id": 4,
+      "category": "overflow",
+      "severity": "medium",
+      "explanation": "The right-aligned 'Algebra' badge and points list ('20, 15, 10, 5, 1') shifted to the right edge with no padding, causing the final '1' to be clipped at the viewport boundary.",
+      "violated_rule": "Avoid dimensions or spacing that cause content to clip or become unusable."
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 2006,
+    "image_tokens": 4400,
+    "output_tokens": 527,
+    "thinking_tokens": 1180,
+    "total_tokens": 8113
+  }
+}

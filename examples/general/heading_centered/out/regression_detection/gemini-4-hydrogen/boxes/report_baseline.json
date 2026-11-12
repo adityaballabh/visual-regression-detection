@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.75,
+  "summary": "The only detected change is centering the text alignment within a welcome section without altering its bounding box or causing layout issues, which appears to be an intentional styling change rather than a visual defect.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 877,
+    "image_tokens": 0,
+    "output_tokens": 88,
+    "thinking_tokens": 322,
+    "total_tokens": 1287
+  }
+}

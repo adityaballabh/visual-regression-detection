@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The card header and '+ Add course' button were intentionally restyled from blue/white to dark gray/charcoal with clean contrast, while the remaining small diffs are minor 1px table reflows caused by a different generated temporary directory path.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+  "usage": {
+    "text_tokens": 2405,
+    "image_tokens": 4400,
+    "output_tokens": 157,
+    "thinking_tokens": 666,
+    "total_tokens": 7628
+  }
+}

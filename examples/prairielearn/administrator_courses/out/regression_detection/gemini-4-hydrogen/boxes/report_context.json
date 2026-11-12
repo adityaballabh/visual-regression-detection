@@ -1,0 +1,29 @@
+{
+  "is_regression": true,
+  "confidence": 0.9,
+  "summary": "The administrator courses card header and its 'Add course' button unexpectedly changed color schemes instead of only updating text, which introduces unintended visual regressions.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "The 'Courses' card header background changed from primary blue (rgb(13, 110, 253)) to secondary gray (rgb(108, 117, 125)), which is an unintended color change unrelated to updating the card text.",
+      "violated_rule": "Design intent: Updated the text for administrator courses card"
+    },
+    {
+      "box_id": 2,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "The 'Add course' button changed from a light style with black text (rgb(248, 249, 250) background, rgb(0, 0, 0) text) to a dark style with white text (rgb(33, 37, 41) background, rgb(255, 255, 255) text), which is an unintended styling change outside the design intent.",
+      "violated_rule": "Design intent: Updated the text for administrator courses card"
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 3120,
+    "image_tokens": 0,
+    "output_tokens": 290,
+    "thinking_tokens": 4263,
+    "total_tokens": 7673
+  }
+}

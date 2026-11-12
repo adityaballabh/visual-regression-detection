@@ -1,0 +1,43 @@
+{
+  "is_regression": true,
+  "confidence": 0.7,
+  "summary": "All four 'Partial credit' elements lost their 24px inner right gap and now sit flush against the right edge at x=1280, indicating a likely unintentional loss of right padding or spacing.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "spacing",
+      "severity": "medium",
+      "explanation": "The inner right gap inside the 'Partial credit 1' container dropped from 24px to 0px, leaving content flush with the right edge at x=1280.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 2,
+      "category": "spacing",
+      "severity": "medium",
+      "explanation": "The inner right gap inside the 'Partial credit 2' container dropped from 24px to 0px, leaving content flush with the right edge at x=1280.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 3,
+      "category": "spacing",
+      "severity": "medium",
+      "explanation": "The inner right gap inside the 'Partial credit 3' container dropped from 24px to 0px, leaving content flush with the right edge at x=1280.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 4,
+      "category": "spacing",
+      "severity": "medium",
+      "explanation": "The inner right gap inside the 'Partial credit 4' container dropped from 24px to 0px, leaving content flush with the right edge at x=1280.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 1335,
+    "image_tokens": 0,
+    "output_tokens": 332,
+    "thinking_tokens": 1747,
+    "total_tokens": 3414
+  }
+}

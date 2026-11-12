@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.85,
+  "summary": "The primary 'Open an Account' button unexpectedly changed to a danger red background color and doubled its vertical padding, resulting in an oversized button that shifts surrounding content down.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "The 'Open an Account' button changed from primary blue rgb(37, 99, 235) to red rgb(220, 38, 38), which conveys a destructive or error state rather than a primary call to action, while its vertical padding doubled from 12px to 24px, inflating its height from 42px to 66px and pushing content below it down by 24px.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 944,
+    "image_tokens": 0,
+    "output_tokens": 242,
+    "thinking_tokens": 364,
+    "total_tokens": 1550
+  }
+}

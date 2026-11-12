@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The changes intentionally update the Courses card header and Add course button to a dark gray and dark charcoal color scheme with clean contrast, while the remaining differences are due to a dynamically generated temporary directory path.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4, 5, 6],
+  "usage": {
+    "text_tokens": 809,
+    "image_tokens": 4400,
+    "output_tokens": 118,
+    "thinking_tokens": 470,
+    "total_tokens": 5797
+  }
+}

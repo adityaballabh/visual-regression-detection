@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The 'Open an Account' button changed from blue to red with increased top and bottom padding, which matches the stated design intent with no unintended visual defects.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 1195,
+    "image_tokens": 4400,
+    "output_tokens": 94,
+    "thinking_tokens": 275,
+    "total_tokens": 5964
+  }
+}

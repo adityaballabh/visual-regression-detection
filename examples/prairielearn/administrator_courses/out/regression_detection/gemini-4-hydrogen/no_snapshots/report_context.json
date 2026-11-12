@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.9,
+  "summary": "The administrator Courses card header unexpectedly changed from the primary blue background with a high-contrast light Add course button to a gray background with a dark button, which does not match the design intent of only updating text.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "The Courses card header background changed from Bootstrap primary blue to medium-dark gray, and the '+ Add course' button changed from a light button to a dark button against that gray header. This reduces visual contrast and prominence for the primary action and does not match the design intent, which only specifies updating the text.",
+      "violated_rule": "Check text and control contrast against their actual backgrounds, including in themed and interactive states."
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 3627,
+    "image_tokens": 4400,
+    "output_tokens": 200,
+    "thinking_tokens": 3052,
+    "total_tokens": 11279
+  }
+}

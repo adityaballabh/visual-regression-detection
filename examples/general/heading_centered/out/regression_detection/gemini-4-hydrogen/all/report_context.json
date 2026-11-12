@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.99,
+  "summary": "The section containing 'Welcome to our Agriculture Company' was centered as specified by the design intent, with no unintended layout, color, or readability defects.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 1127,
+    "image_tokens": 4400,
+    "output_tokens": 94,
+    "thinking_tokens": 466,
+    "total_tokens": 6087
+  }
+}

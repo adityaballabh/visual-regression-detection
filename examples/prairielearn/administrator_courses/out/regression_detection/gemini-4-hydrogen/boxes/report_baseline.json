@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.85,
+  "summary": "The header background and button colors were deliberately updated to a secondary/dark theme with proper contrast, while the remaining differences are minor 2px table column adjustments from a dynamic temporary file path and tiny subpixel color variations.",
+  "regressions": [],
+  "intended_box_ids": [1, 2],
+  "usage": {
+    "text_tokens": 1898,
+    "image_tokens": 0,
+    "output_tokens": 89,
+    "thinking_tokens": 1278,
+    "total_tokens": 3265
+  }
+}

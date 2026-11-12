@@ -1,0 +1,43 @@
+{
+  "is_regression": true,
+  "confidence": 0.9,
+  "summary": "Removing the right padding on the question rows (24px to 0px) pushes the point values flush against the right edge of the viewport, misaligning them with the rest of the page and crowding/clipping the rightmost digit.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "spacing",
+      "severity": "medium",
+      "explanation": "The inner right gap decreased from 24px to 0px, pushing '10, 5, 1' flush against the right viewport edge where the '1' is slightly clipped and misaligned with the Edit button above.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 2,
+      "category": "spacing",
+      "severity": "medium",
+      "explanation": "The inner right gap decreased from 24px to 0px, pushing '10, 5, 1' flush against the right viewport edge where the '1' is slightly clipped and lacks right margin.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 3,
+      "category": "spacing",
+      "severity": "medium",
+      "explanation": "The inner right gap decreased from 24px to 0px, pushing '15, 10, 5, 1' flush against the right viewport edge where the '1' is slightly clipped and lacks right margin.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 4,
+      "category": "spacing",
+      "severity": "medium",
+      "explanation": "The inner right gap decreased from 24px to 0px, pushing '20, 15, 10, 5, 1' flush against the right viewport edge where the '1' is slightly clipped and lacks right margin.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 2646,
+    "image_tokens": 4400,
+    "output_tokens": 496,
+    "thinking_tokens": 1428,
+    "total_tokens": 8970
+  }
+}
