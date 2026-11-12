@@ -1,43 +1,14 @@
 {
-  "is_regression": true,
-  "confidence": 0.95,
-  "summary": "Reducing the inner right gap of the question rows from 24px to 0px causes the rightmost points text to clip at the edge of the row.",
-  "regressions": [
-    {
-      "box_id": 1,
-      "category": "overflow",
-      "severity": "medium",
-      "explanation": "Removing the right inner gap causes the points label ('1') to be clipped against the right border of the row.",
-      "violated_rule": "Design for the available space: pages may use narrow panes, scrolling regions, or smaller screens. Avoid fixed dimensions when they would cause content to clip or become unusable."
-    },
-    {
-      "box_id": 2,
-      "category": "overflow",
-      "severity": "medium",
-      "explanation": "Removing the right inner gap causes the points label ('1') to be clipped against the right border of the row.",
-      "violated_rule": "Design for the available space: pages may use narrow panes, scrolling regions, or smaller screens. Avoid fixed dimensions when they would cause content to clip or become unusable."
-    },
-    {
-      "box_id": 3,
-      "category": "overflow",
-      "severity": "medium",
-      "explanation": "Removing the right inner gap causes the points label ('1') to be clipped against the right border of the row.",
-      "violated_rule": "Design for the available space: pages may use narrow panes, scrolling regions, or smaller screens. Avoid fixed dimensions when they would cause content to clip or become unusable."
-    },
-    {
-      "box_id": 4,
-      "category": "overflow",
-      "severity": "medium",
-      "explanation": "Removing the right inner gap causes the points label ('1') to be clipped against the right border of the row.",
-      "violated_rule": "Design for the available space: pages may use narrow panes, scrolling regions, or smaller screens. Avoid fixed dimensions when they would cause content to clip or become unusable."
-    }
-  ],
-  "intended_box_ids": [],
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The spacing changes within the question rows match the design intent without introducing layout or visual defects.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4],
   "usage": {
     "text_tokens": 2064,
     "image_tokens": 4400,
-    "output_tokens": 494,
-    "thinking_tokens": 1102,
-    "total_tokens": 8060
+    "output_tokens": 74,
+    "thinking_tokens": 481,
+    "total_tokens": 7019
   }
 }
