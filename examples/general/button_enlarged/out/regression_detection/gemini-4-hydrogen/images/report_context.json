@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.98,
+  "summary": "The only visual change is the increased size of the 'Learn More' button via added padding, which matches the stated design intent with no layout or styling defects.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 934,
+    "image_tokens": 4320,
+    "output_tokens": 96,
+    "thinking_tokens": 281,
+    "total_tokens": 5631
+  }
+}

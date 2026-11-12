@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.85,
+  "summary": "The button padding increased symmetrically from 8px/16px to 12px/24px while remaining horizontally centered and pushing subsequent content down cleanly, which appears to be an intentional styling update rather than a visual defect.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 945,
+    "image_tokens": 0,
+    "output_tokens": 98,
+    "thinking_tokens": 516,
+    "total_tokens": 1559
+  }
+}

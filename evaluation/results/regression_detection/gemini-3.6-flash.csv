@@ -1,5 +1,5 @@
 variant,mode,case_precision,case_recall,box_precision,box_recall,avg_input_tokens,avg_output_tokens
-all,context,1.000,0.667,1.000,0.429,5723,539
+all,context,1.000,0.667,1.000,0.429,5723,619
 all,baseline,0.667,0.667,0.833,0.714,5100,1000
 boxes,context,1.000,0.667,1.000,0.429,1253,611
 boxes,baseline,0.500,0.333,0.500,0.143,629,747

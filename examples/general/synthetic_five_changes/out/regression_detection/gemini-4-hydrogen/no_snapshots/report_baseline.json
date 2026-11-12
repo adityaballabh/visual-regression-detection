@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.85,
+  "summary": "All detected changes\u2014including the removed navigation link, larger hero heading, recolored Savings Accounts card, added service item, and shifted footer\u2014remain cleanly aligned with no overlapping, clipping, or layout defects.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4, 5, 6],
+  "usage": {
+    "text_tokens": 1452,
+    "image_tokens": 4400,
+    "output_tokens": 107,
+    "thinking_tokens": 2077,
+    "total_tokens": 8036
+  }
+}

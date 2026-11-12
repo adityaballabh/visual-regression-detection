@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The changes to the student courses card\u2014updating its spacing/padding (box 1) and header background color from blue to grey (box 2)\u2014match the stated design intent with no layout, contrast, or visual defects.",
+  "regressions": [],
+  "intended_box_ids": [1, 2],
+  "usage": {
+    "text_tokens": 2018,
+    "image_tokens": 4400,
+    "output_tokens": 113,
+    "thinking_tokens": 949,
+    "total_tokens": 7480
+  }
+}

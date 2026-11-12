@@ -1,0 +1,43 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The right-aligned question metadata (Algebra badge and point values) has shifted to the right across all four rows, losing its right padding and causing the trailing digit to be clipped at the edge of the viewport.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "overflow",
+      "severity": "medium",
+      "explanation": "The Algebra badge and points list (10, 5, 1) shifted right past the container padding, causing the final '1' to be partially clipped at the right edge of the screen.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 2,
+      "category": "overflow",
+      "severity": "medium",
+      "explanation": "The Algebra badge and points list (10, 5, 1) shifted right past the container padding, causing the final '1' to be partially clipped at the right edge of the screen.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 3,
+      "category": "overflow",
+      "severity": "medium",
+      "explanation": "The Algebra badge and points list (15, 10, 5, 1) shifted right past the container padding, causing the final '1' to be partially clipped at the right edge of the screen.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 4,
+      "category": "overflow",
+      "severity": "medium",
+      "explanation": "The Algebra badge and points list (20, 15, 10, 5, 1) shifted right past the container padding, causing the final '1' to be partially clipped at the right edge of the screen.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 809,
+    "image_tokens": 4400,
+    "output_tokens": 471,
+    "thinking_tokens": 679,
+    "total_tokens": 6359
+  }
+}

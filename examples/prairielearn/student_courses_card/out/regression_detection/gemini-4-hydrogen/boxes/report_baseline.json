@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.8,
+  "summary": "Both detected changes are clean, structured styling updates\u2014a spacing reduction from 40px to 24px and a header background switch from Bootstrap primary blue to secondary gray\u2014with no signs of layout breakage, overflow, or visual defects.",
+  "regressions": [],
+  "intended_box_ids": [1, 2],
+  "usage": {
+    "text_tokens": 1046,
+    "image_tokens": 0,
+    "output_tokens": 102,
+    "thinking_tokens": 1077,
+    "total_tokens": 2225
+  }
+}

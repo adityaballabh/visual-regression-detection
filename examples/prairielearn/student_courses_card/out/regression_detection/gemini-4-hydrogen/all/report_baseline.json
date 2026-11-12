@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.9,
+  "summary": "The changes adjust the Courses card header color from blue to gray and reduce the bottom spacing beneath the card from 40px to 24px, both of which appear clean, legible, and intentional.",
+  "regressions": [],
+  "intended_box_ids": [1, 2],
+  "usage": {
+    "text_tokens": 1136,
+    "image_tokens": 4400,
+    "output_tokens": 113,
+    "thinking_tokens": 813,
+    "total_tokens": 6462
+  }
+}

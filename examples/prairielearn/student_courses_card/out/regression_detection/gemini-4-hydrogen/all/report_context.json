@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "Both detected changes directly match the stated design intent of updating the student courses card's padding/spacing and header background color without introducing layout or visual defects.",
+  "regressions": [],
+  "intended_box_ids": [1, 2],
+  "usage": {
+    "text_tokens": 2369,
+    "image_tokens": 4400,
+    "output_tokens": 98,
+    "thinking_tokens": 448,
+    "total_tokens": 7315
+  }
+}

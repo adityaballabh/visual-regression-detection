@@ -1,0 +1,57 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The right-aligned question tags and point values across all four question rows shifted 24px to the right, breaking alignment with the header controls and clipping the trailing text at the right edge of the viewport.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "layout",
+      "severity": "medium",
+      "explanation": "The Algebra badge shifted 24px to the right due to missing right padding or margin on the row, pushing the trailing content off-screen and misaligning it with the Edit button above.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 2,
+      "category": "overflow",
+      "severity": "high",
+      "explanation": "The points text shifted 24px to the right and is clipped at the right edge of the viewport, cutting off the final digit.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 3,
+      "category": "layout",
+      "severity": "medium",
+      "explanation": "The Algebra badge shifted 24px to the right due to missing right padding or margin on the row, pushing the trailing content off-screen.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 4,
+      "category": "overflow",
+      "severity": "high",
+      "explanation": "The points text shifted 24px to the right and is clipped at the right edge of the viewport, cutting off the final digit.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 5,
+      "category": "overflow",
+      "severity": "high",
+      "explanation": "The Algebra badge and points list shifted 24px to the right, causing the trailing digit of the points text to be clipped at the right edge of the viewport.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 6,
+      "category": "overflow",
+      "severity": "high",
+      "explanation": "The Algebra badge and points list shifted 24px to the right, causing the trailing digit of the points text to be clipped at the right edge of the viewport.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 1510,
+    "image_tokens": 4400,
+    "output_tokens": 476,
+    "thinking_tokens": 1039,
+    "total_tokens": 7425
+  }
+}

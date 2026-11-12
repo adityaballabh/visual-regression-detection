@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.85,
+  "summary": "The 'Open an Account' button was styled to be taller and red, and the sections below it shifted down cleanly by 24px in normal document flow without any layout defects, overlaps, or clipping.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 1162,
+    "image_tokens": 4400,
+    "output_tokens": 112,
+    "thinking_tokens": 665,
+    "total_tokens": 6339
+  }
+}

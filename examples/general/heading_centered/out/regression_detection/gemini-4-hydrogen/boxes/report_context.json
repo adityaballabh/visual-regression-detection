@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.98,
+  "summary": "The only detected change is the text alignment change to center in the specified section, which directly matches the stated design intent.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 1037,
+    "image_tokens": 0,
+    "output_tokens": 75,
+    "thinking_tokens": 212,
+    "total_tokens": 1324
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "Right-side padding was lost in all four question rows, shifting the tags and point lists flush against the right edge of the viewport and clipping the final digit.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "spacing",
+      "severity": "medium",
+      "explanation": "The 24px right padding was removed, shifting the 'Algebra' badge and points list flush to the right edge so the trailing '1' is clipped and misaligned with the controls above.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 2,
+      "category": "spacing",
+      "severity": "medium",
+      "explanation": "The 24px right padding was removed, shifting the 'Algebra' badge and points list flush to the right edge so the trailing '1' is clipped and misaligned with the controls above.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 3,
+      "category": "spacing",
+      "severity": "medium",
+      "explanation": "The 24px right padding was removed, shifting the 'Algebra' badge and points list flush to the right edge so the trailing '1' is clipped and misaligned with the controls above.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 4,
+      "category": "spacing",
+      "severity": "medium",
+      "explanation": "The 24px right padding was removed, shifting the 'Algebra' badge and points list flush to the right edge so the trailing '1' is clipped and misaligned with the controls above.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 1425,
+    "image_tokens": 4400,
+    "output_tokens": 364,
+    "thinking_tokens": 771,
+    "total_tokens": 6960
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "is_regression": true,
+  "confidence": 0.96,
+  "summary": "Changing the spacing for question rows removed the right-side padding, shifting the right-aligned topic badges and point values 24 pixels to the right and clipping the points text against the right edge of the viewport.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "spacing",
+      "severity": "medium",
+      "explanation": "The 'Algebra' badge in the first question row shifted 24 pixels to the right due to missing right-side row spacing, misaligning it with the container's right margin.",
+      "violated_rule": "Design for the available space: pages may use narrow panes, scrolling regions, or smaller screens. Avoid fixed dimensions when they would cause content to clip or become unusable."
+    },
+    {
+      "box_id": 2,
+      "category": "overflow",
+      "severity": "high",
+      "explanation": "The points text ('10, 5, 1') in the first question row shifted 24 pixels to the right with zero right padding, causing the final digit to clip at the right edge of the viewport.",
+      "violated_rule": "Design for the available space: pages may use narrow panes, scrolling regions, or smaller screens. Avoid fixed dimensions when they would cause content to clip or become unusable."
+    },
+    {
+      "box_id": 3,
+      "category": "spacing",
+      "severity": "medium",
+      "explanation": "The 'Algebra' badge in the second question row shifted 24 pixels to the right due to missing right-side row spacing, misaligning it with the container's right margin.",
+      "violated_rule": "Design for the available space: pages may use narrow panes, scrolling regions, or smaller screens. Avoid fixed dimensions when they would cause content to clip or become unusable."
+    },
+    {
+      "box_id": 4,
+      "category": "overflow",
+      "severity": "high",
+      "explanation": "The points text ('10, 5, 1') in the second question row shifted 24 pixels to the right with zero right padding, causing the final digit to clip at the right edge of the viewport.",
+      "violated_rule": "Design for the available space: pages may use narrow panes, scrolling regions, or smaller screens. Avoid fixed dimensions when they would cause content to clip or become unusable."
+    },
+    {
+      "box_id": 5,
+      "category": "overflow",
+      "severity": "high",
+      "explanation": "The 'Algebra' badge and points text ('15, 10, 5, 1') in the third question row shifted 24 pixels to the right, removing right padding and clipping the final digit at the right edge of the viewport.",
+      "violated_rule": "Design for the available space: pages may use narrow panes, scrolling regions, or smaller screens. Avoid fixed dimensions when they would cause content to clip or become unusable."
+    },
+    {
+      "box_id": 6,
+      "category": "overflow",
+      "severity": "high",
+      "explanation": "The 'Algebra' badge and points text ('20, 15, 10, 5, 1') in the fourth question row shifted 24 pixels to the right, removing right padding and clipping the final digit at the right edge of the viewport.",
+      "violated_rule": "Design for the available space: pages may use narrow panes, scrolling regions, or smaller screens. Avoid fixed dimensions when they would cause content to clip or become unusable."
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 2731,
+    "image_tokens": 4400,
+    "output_tokens": 864,
+    "thinking_tokens": 1970,
+    "total_tokens": 9965
+  }
+}

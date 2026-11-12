@@ -1,0 +1,29 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "Unintended color changes were introduced to the Courses card header and the Add course button, which contradict the design intent of only updating text and degrade contrast.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "The Courses card header background unexpectedly changed from primary blue (rgb(13, 110, 253)) to secondary gray (rgb(108, 117, 125)), which is unrelated to updating text and reduces contrast for the white header text below 4.5:1.",
+      "violated_rule": "Updated the text for administrator courses card; Check text and control contrast against their actual backgrounds"
+    },
+    {
+      "box_id": 2,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "The 'Add course' button unexpectedly changed from a light button (rgb(248, 249, 250) background with black text) to a dark button (rgb(33, 37, 41) background with white text), which does not match the stated text-only design intent.",
+      "violated_rule": "Updated the text for administrator courses card; Prefer familiar, consistent interactions"
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 3210,
+    "image_tokens": 4400,
+    "output_tokens": 359,
+    "thinking_tokens": 2150,
+    "total_tokens": 10119
+  }
+}

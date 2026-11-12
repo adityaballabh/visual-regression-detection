@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.98,
+  "summary": "All visual changes match the stated design intent: the 'Open an Account' button is taller and red, and the sections below shift downward cleanly by 24px without overlap or layout defects.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 1323,
+    "image_tokens": 4400,
+    "output_tokens": 109,
+    "thinking_tokens": 615,
+    "total_tokens": 6447
+  }
+}

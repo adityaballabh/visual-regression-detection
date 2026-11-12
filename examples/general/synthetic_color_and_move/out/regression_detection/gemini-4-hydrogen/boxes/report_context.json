@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.98,
+  "summary": "The color and padding changes on the 'Open an Account' button exactly match the stated design intent, and no unintended visual defects were detected.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 1105,
+    "image_tokens": 0,
+    "output_tokens": 92,
+    "thinking_tokens": 542,
+    "total_tokens": 1739
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.85,
+  "summary": "The Courses card header background changed cleanly from blue to dark gray while keeping white text, good contrast, and intact card styling, which appears to be an intentional styling change rather than a defect.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 936,
+    "image_tokens": 4400,
+    "output_tokens": 89,
+    "thinking_tokens": 839,
+    "total_tokens": 6264
+  }
+}

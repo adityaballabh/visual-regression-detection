@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.9,
+  "summary": "The only detected change is a slight increase in the size and padding of the 'Learn More' button (box 1), which remains properly centered and does not cause any layout or visual defects.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 809,
+    "image_tokens": 4320,
+    "output_tokens": 89,
+    "thinking_tokens": 314,
+    "total_tokens": 5532
+  }
+}

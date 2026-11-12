@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.85,
+  "summary": "The hero heading and introductory paragraph were changed from left-aligned to center-aligned, which renders cleanly without layout or readability defects and appears to be an intentional design change.",
+  "regressions": [],
+  "intended_box_ids": [1],
+  "usage": {
+    "text_tokens": 809,
+    "image_tokens": 4400,
+    "output_tokens": 98,
+    "thinking_tokens": 503,
+    "total_tokens": 5810
+  }
+}
