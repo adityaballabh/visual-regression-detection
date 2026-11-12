@@ -85,6 +85,10 @@ def reports_folder(case_folder: Path, model: str, variant: str) -> Path:
     return case_folder / "out" / "regression_detection" / model / variant
 
 
+def tests_folder(case_folder: Path, generator: Path, detection_model: str, detection_variant: str) -> Path:
+    return case_folder / "out" / "test_generation" / generator / f"detection-{detection_model}" / detection_variant
+
+
 def prepare_case(case_folder: Path):
     captures_folder = case_folder / "captures"
     html_folder = case_folder / "html"
