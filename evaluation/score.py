@@ -12,6 +12,12 @@ from regression_detection.gemini_processor import ReportWithUsage
 _EXAMPLES = Path(__file__).resolve().parent.parent / "examples"
 _RESULTS = Path(__file__).parent / "results" / "regression_detection"
 _MODES = ("context", "baseline")
+# Prices as of Nov 2026
+_PRICES_PER_MTOK = {
+    "gemini-3.5-flash-lite": {"input": 0.30, "output": 2.50},
+    "gemini-3.6-flash": {"input": 0.75, "output": 3.75},
+    "gemini-4-hydrogen": {"input": 1.50, "output": 7.50},
+}
 _COLUMNS = [
     "variant",
     "mode",
@@ -21,6 +27,7 @@ _COLUMNS = [
     "box_recall",
     "avg_input_tokens",
     "avg_output_tokens",
+    "avg_cost_usd",
 ]
 
 
@@ -52,6 +59,11 @@ def _precision_recall(truth: list[bool], predicted: list[bool]) -> tuple[float, 
     return precision, recall
 
 
+def _cost_usd(model: str, input_tokens: float, output_tokens: float) -> float:
+    prices = _PRICES_PER_MTOK[model]
+    return (input_tokens * prices["input"] + output_tokens * prices["output"]) / 1_000_000
+
+
 def summarize(run: str, mode: str) -> dict[str, str | float]:
     case_truth = []
     case_predicted = []
@@ -80,6 +92,9 @@ def summarize(run: str, mode: str) -> dict[str, str | float]:
                 box_predicted.append(box_id in flagged_ids)
     case_precision, case_recall = _precision_recall(case_truth, case_predicted)
     box_precision, box_recall = _precision_recall(box_truth, box_predicted)
+    avg_input_tokens = np.mean(input_tokens)
+    avg_output_tokens = np.mean(output_tokens)
+    avg_cost = _cost_usd(Path(run).parent.name, avg_input_tokens, avg_output_tokens)
     return {
         "variant": variant,
         "mode": mode,
@@ -87,8 +102,10 @@ def summarize(run: str, mode: str) -> dict[str, str | float]:
         "case_recall": case_recall,
         "box_precision": box_precision,
         "box_recall": box_recall,
-        "avg_input_tokens": round(np.mean(input_tokens)),
-        "avg_output_tokens": round(np.mean(output_tokens)),
+        "avg_input_tokens": round(avg_input_tokens),
+        "avg_output_tokens": round(avg_output_tokens),
+        # Use 5 decimals since most calls cost under a cent
+        "avg_cost_usd": f"{avg_cost:.5f}",
     }
 
 
