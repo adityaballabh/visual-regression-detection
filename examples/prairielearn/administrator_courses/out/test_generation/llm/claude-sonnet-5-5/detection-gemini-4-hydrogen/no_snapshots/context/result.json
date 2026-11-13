@@ -1,0 +1,48 @@
+{
+  "status": "error",
+  "reason": "the agent did not write the test file",
+  "case": "examples/prairielearn/administrator_courses",
+  "detection_model": "gemini-4-hydrogen",
+  "detection_variant": "no_snapshots",
+  "detection_mode": "context",
+  "flagged_box_ids": [1],
+  "cli": {
+    "name": "claude-code",
+    "version": "2.1.288 (Claude Code)",
+    "model": "claude-sonnet-5-5"
+  },
+  "code": {
+    "kind": "pull_request",
+    "pr_url": "https://github.com/bzamansky/PrairieLearn/pull/13",
+    "head_sha": "0cdcc808c87e8d5a516e0c30a8d24ac7f31532a8",
+    "code_dir": "~/.cache/visual-regression-detection/checkouts/bzamansky__PrairieLearn-pr13-0cdcc808",
+    "diff_file": "examples/prairielearn/administrator_courses/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-4-hydrogen/no_snapshots/context/code_changes.diff"
+  },
+  "test_file": null,
+  "attempts": [
+    {
+      "usage": {
+        "input_tokens": 18,
+        "cache_creation_input_tokens": 33502,
+        "cache_read_input_tokens": 454093,
+        "output_tokens": 2749,
+        "total_cost_usd": 0.2523526,
+        "num_turns": 11,
+        "duration_ms": 29390
+      },
+      "session_id": "5f8454f2-5912-4e34-9a74-e91c89d1294c",
+      "error": "the agent did not write the test file",
+      "validation": null
+    }
+  ],
+  "usage": {
+    "input_tokens": 18,
+    "cache_creation_input_tokens": 33502,
+    "cache_read_input_tokens": 454093,
+    "output_tokens": 2749,
+    "total_cost_usd": 0.2523526,
+    "num_turns": 11,
+    "duration_ms": 29390
+  },
+  "created_at": "2026-11-13T19:04:10+00:00"
+}

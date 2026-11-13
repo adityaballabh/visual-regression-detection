@@ -15,6 +15,7 @@ from test_generation.llm.generate import (
     _flagged_boxes,
     _load_report,
     _portable_path,
+    _portable_text,
     validate_test,
 )
 from test_generation.scripted.snapshot_assertions import ElementTarget, StyleTarget
@@ -252,7 +253,7 @@ def _save_result(
     tests.mkdir(parents=True, exist_ok=True)
     # Drop the LLM-only fields since a script has no CLI, code context or token usage
     llm_only = {"cli": True, "code": True, "usage": True, "attempts": {"__all__": {"usage", "session_id", "error"}}}
-    (tests / "result.json").write_text(REPORT_FORMATTER.serialize(result.model_dump(exclude=llm_only)))
+    (tests / "result.json").write_text(_portable_text(REPORT_FORMATTER.serialize(result.model_dump(exclude=llm_only))))
     return result
 
 

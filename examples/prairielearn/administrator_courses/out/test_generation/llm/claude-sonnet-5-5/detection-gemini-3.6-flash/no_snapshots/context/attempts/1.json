@@ -1,0 +1,121 @@
+{
+  "duration_api_ms": 36240,
+  "stop_reason": "end_turn",
+  "session_id": "8384aac5-aaee-4021-8a60-bedf8928cb1d",
+  "total_cost_usd": 0.31248180000000003,
+  "usage": {
+    "input_tokens": 24,
+    "cache_creation_input_tokens": 36747,
+    "cache_read_input_tokens": 631329,
+    "output_tokens": 3918,
+    "output_tokens_details": {"thinking_tokens": 391},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 36747, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 243,
+        "cache_read_input_tokens": 58829,
+        "cache_creation_input_tokens": 967,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 967},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 24,
+      "outputTokens": 3918,
+      "cacheReadInputTokens": 631329,
+      "cacheCreationInputTokens": 36747,
+      "webSearchRequests": 0,
+      "costUSD": 0.31248180000000003,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 391,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01MDKtkAMyx9XpMn5KpGmUyf",
+      "tool_input": {
+        "command": "cd examples/prairielearn/administrator_courses/captures && .venv/bin/python - <<'E'\nimport sys\nsys.path.insert(0,'~/Desktop/uiuc/courses/fall-27/cs-527/project')\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\nfor n in ('before','after'):\n    s=load_snapshot(Path(f'{n}_snapshot.json'))\n    for e in s.elements:\n        if e.box.x1==13 and e.box.y1==123 and e.box.width>1200:\n            print(n,e.frames,e.selector,e.tag,e.attributes.get('class'),e.styles.get('background-color'),e.own_text)\nE"
+      }
+    },
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01KGhKF1ewXDEdCdH3MjaUTz",
+      "tool_input": {
+        "command": "grep -o '.\\{0,250\\}card-header.\\{0,250\\}' examples/prairielearn/administrator_courses/captures/before_snapshot.json | head -c 3000"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 15,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I wrote `test_generated_regression.py`. It finds the `.card-header` inside `#courses` and asserts its `background-color` is `rgb(13, 110, 253)`, the primary blue in the before snapshot.\n\nIt passes on the before snapshot. It fails on the after snapshot with an assertion naming the selector, the expected `rgb(13, 110, 253)` and the actual `rgb(108, 117, 125)` (grey). The change behind it is `bg-primary` becoming `bg-secondary` in `administratorCourses.html.tsx`.\n\nI guessed `rgb(13, 110, 253)` from Bootstrap's default blue, not from the snapshot. The passing run on the before snapshot confirms it matches.",
+  "ttft_ms": 2464,
+  "type": "result",
+  "duration_ms": 39239,
+  "uuid": "5dd1d8ed-4922-4522-83bb-c8f02885727b",
+  "ttft_stream_ms": 1823,
+  "time_to_request_ms": 53,
+  "time_to_request_phases_ms": {
+    "other": 6,
+    "system_prompt": 4,
+    "resume_other": 0,
+    "process_user_input": 1,
+    "input_attachments": 10,
+    "input_hooks": 23,
+    "tool_pool_refresh": 0,
+    "init_message": 2,
+    "engine_pickup": 0,
+    "message_prep": 0,
+    "model_config_wait": 0,
+    "autocompact": 1,
+    "query_setup": 0,
+    "model_gates": 0,
+    "tool_schema_build": 2,
+    "message_normalization": 0,
+    "client_creation": 2,
+    "request_build": 2
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 2,
+  "time_to_request_cpu_ms": 56,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "at_mentioned_files",
+    "slowest_producer_ms": 4,
+    "cpu_ms": 17,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 1824,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

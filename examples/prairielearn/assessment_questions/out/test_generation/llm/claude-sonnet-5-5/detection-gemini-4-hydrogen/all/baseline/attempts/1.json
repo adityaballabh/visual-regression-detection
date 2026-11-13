@@ -1,0 +1,114 @@
+{
+  "duration_api_ms": 12838,
+  "stop_reason": "end_turn",
+  "session_id": "9fc31d24-ff9b-461b-b0ca-56a36fd586be",
+  "total_cost_usd": 0.19740600000000003,
+  "usage": {
+    "input_tokens": 8,
+    "cache_creation_input_tokens": 35289,
+    "cache_read_input_tokens": 190720,
+    "output_tokens": 1809,
+    "output_tokens_details": {"thinking_tokens": 149},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 35289, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 199,
+        "cache_read_input_tokens": 57064,
+        "cache_creation_input_tokens": 1274,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 1274},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 8,
+      "outputTokens": 1809,
+      "cacheReadInputTokens": 190720,
+      "cacheCreationInputTokens": 35289,
+      "webSearchRequests": 0,
+      "costUSD": 0.19740600000000003,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 149,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01157mrUv4ghDSE2QH6u64WC",
+      "tool_input": {
+        "command": "cd ~/Desktop/uiuc/courses/fall-27/cs-527/project && .venv/bin/python -c \"\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\ns=load_snapshot(Path('examples/prairielearn/assessment_questions/captures/before_snapshot.json'))\nfor e in s.elements:\n    if e.attributes.get('class','').startswith('tree-row') and 'padding-right' in e.attributes.get('style',''):\n        print(e.selector[-60:], e.frames, e.styles['padding-right'], e.box.width)\n\""
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 4,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I wrote `test_generated_regression.py`, but I couldn't run either verification command. Bash was denied in this session, so the test hasn't been run against the before or after snapshot.\n\nThe test checks that each of the four flagged question rows has computed `padding-right` of `24px`, the value in the before snapshot. The diff shows `paddingRight: '1.5rem'` commented out in `TreeQuestionRow.tsx`, so the after snapshot should read `0px` and fail. I built the four selectors from the flagged elements' selectors. Each failure message names the selector, the property, the expected value and the actual value.",
+  "ttft_ms": 2072,
+  "type": "result",
+  "duration_ms": 14693,
+  "uuid": "fc4d6151-384d-4a89-a029-7c430866d964",
+  "ttft_stream_ms": 1564,
+  "time_to_request_ms": 56,
+  "time_to_request_phases_ms": {
+    "other": 6,
+    "system_prompt": 5,
+    "resume_other": 0,
+    "process_user_input": 0,
+    "input_attachments": 11,
+    "input_hooks": 24,
+    "tool_pool_refresh": 1,
+    "init_message": 1,
+    "engine_pickup": 1,
+    "message_prep": 0,
+    "model_config_wait": 0,
+    "autocompact": 1,
+    "query_setup": 0,
+    "model_gates": 0,
+    "tool_schema_build": 2,
+    "message_normalization": 0,
+    "client_creation": 3,
+    "request_build": 1
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 5,
+  "time_to_request_cpu_ms": 77,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "at_mentioned_files",
+    "slowest_producer_ms": 4,
+    "cpu_ms": 16,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 1565,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

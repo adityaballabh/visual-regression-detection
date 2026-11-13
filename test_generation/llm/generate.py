@@ -215,6 +215,12 @@ def _portable_path(path: Path) -> str:
     return str(path)
 
 
+def _portable_text(text: str) -> str:
+    # Same rules as _portable_path, for paths inside saved prompts and outputs
+    text = text.replace(f"{REPO_ROOT}/", "").replace(str(REPO_ROOT), ".")
+    return text.replace(f"{Path.home()}/", "~/")
+
+
 def _portable_code(code: CodeContext) -> CodeContext:
     paths = {}
     for name in ("code_dir", "diff_file"):
@@ -498,9 +504,9 @@ def _run_agent(prompt: str, command: list[str], out_folder: Path, attempt: int) 
         output = json.loads(done.stdout)
     except json.JSONDecodeError:
         # Keep the raw output since it is not JSON when the agent crashes
-        attempt_file.write_text(done.stdout)
+        attempt_file.write_text(_portable_text(done.stdout))
         return Attempt(usage=Usage(), error=f"agent exited {done.returncode}: {(done.stderr or done.stdout)[-500:]}")
-    attempt_file.write_text(REPORT_FORMATTER.serialize(output))
+    attempt_file.write_text(_portable_text(REPORT_FORMATTER.serialize(output)))
     error = None
     if done.returncode != 0 or output.get("is_error"):
         error = f"{output.get('subtype', 'error')}: {str(output.get('result', ''))[-500:]}"
@@ -524,8 +530,7 @@ def _run_test(out_folder: Path, snapshot: Path) -> tuple[int, str]:
         )
     except subprocess.TimeoutExpired:
         return 1, f"timed out after {TEST_TIMEOUT_SECONDS}s"
-    # Keep tracebacks repo-relative so result.json has no local paths
-    return done.returncode, (done.stdout + done.stderr).replace(f"{REPO_ROOT}/", "")
+    return done.returncode, done.stdout + done.stderr
 
 
 def _names_flagged_element(output: str, flagged: list[dict]) -> bool | None:
@@ -615,11 +620,12 @@ def generate_test(
 
     def save(outcome: GenerationResult) -> GenerationResult:
         out_folder.mkdir(parents=True, exist_ok=True)
-        (out_folder / "result.json").write_text(REPORT_FORMATTER.serialize(outcome.model_dump()))
+        (out_folder / "result.json").write_text(_portable_text(REPORT_FORMATTER.serialize(outcome.model_dump())))
         return outcome
 
     if not report.is_regression:
-        # No regression, no test
+        # No regression, no test, so clear files from an earlier run that found one
+        shutil.rmtree(out_folder, ignore_errors=True)
         return save(result("skipped", reason="the detection report found no regression"))
 
     flagged = _flagged_boxes(case_folder, detection_variant, report)
@@ -635,7 +641,7 @@ def generate_test(
     if shutil.which(claude_bin) is None:
         raise SystemExit(f"{claude_bin} not found, install Claude Code or pass --claude-bin")
 
-    (out_folder / "prompt.md").write_text(prompt)
+    (out_folder / "prompt.md").write_text(_portable_text(prompt))
     test_file = out_folder / TEST_FILE
     test_file.unlink(missing_ok=True)
     attempts: list[Attempt] = []

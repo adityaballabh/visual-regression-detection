@@ -1,0 +1,15 @@
+diff --git a/apps/prairielearn/src/pages/administratorCourses/administratorCourses.html.tsx b/apps/prairielearn/src/pages/administratorCourses/administratorCourses.html.tsx
+@@ -101,11 +101,11 @@ function CoursesCard({
+ 
+   return (
+     <div id="courses" className="card mb-4">
+-      <div className="card-header bg-primary text-white d-flex align-items-center">
++      <div className="card-header bg-secondary text-white d-flex align-items-center">
+         <h2>Courses</h2>
+         <button
+           type="button"
+-          className="btn btn-sm btn-light ms-auto"
++          className="btn btn-sm btn-dark ms-auto"
+           aria-label="Add course"
+           onClick={() => setShowAddCourseModal(true)}
+         >
