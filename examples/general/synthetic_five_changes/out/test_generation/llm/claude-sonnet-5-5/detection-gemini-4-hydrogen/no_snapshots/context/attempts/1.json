@@ -1,0 +1,114 @@
+{
+  "duration_api_ms": 27629,
+  "stop_reason": "end_turn",
+  "session_id": "636a1416-aee1-4abd-a3b6-5e0b77094d36",
+  "total_cost_usd": 0.373441,
+  "usage": {
+    "input_tokens": 20,
+    "cache_creation_input_tokens": 53254,
+    "cache_read_input_tokens": 619125,
+    "output_tokens": 3656,
+    "output_tokens_details": {"thinking_tokens": 740},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 53254, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 246,
+        "cache_read_input_tokens": 75177,
+        "cache_creation_input_tokens": 1126,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 1126},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 20,
+      "outputTokens": 3656,
+      "cacheReadInputTokens": 619125,
+      "cacheCreationInputTokens": 53254,
+      "webSearchRequests": 0,
+      "costUSD": 0.373441,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 740,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01QDL2UGM9yYzYSmmFfaH6Mx",
+      "tool_input": {
+        "command": "cd examples/general/synthetic_five_changes/captures; .venv/bin/python -c \"\nimport sys\nsys.path.insert(0,'~/Desktop/uiuc/courses/fall-27/cs-527/project')\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\nfor n in ('before','after'):\n    s=load_snapshot(Path(n+'_snapshot.json'))\n    for e in s.elements:\n        if 'Savings' in e.own_text or e.box.y1>290 and e.box.y1<420 and e.box.width>1000:\n            print(n,e.frames,e.selector,e.tag,e.attributes,e.own_text[:30],e.box.y1,e.box.height,e.styles.get('background-color'))\n\""
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 13,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "The test passes on the before snapshot and fails on the after snapshot with an assertion error. The failure message names the card's selector, `background-color`, expected `rgb(220, 252, 231)` and got `rgb(254, 202, 202)`.\n\nIt finds the `<h3>` with the text \"Savings Accounts\", takes its parent card, and asserts the card's `background-color` is the before value `rgb(220, 252, 231)`. I located the card by that heading text instead of a positional selector, which the snapshot loader generates and I couldn't print. The test is in `test_generated_regression.py` in the context folder.\n\nPartway through I ran a `cd` that left the shell in the wrong folder. I `cd`'d back in a separate call before running the two commands as written.",
+  "ttft_ms": 1985,
+  "type": "result",
+  "duration_ms": 29676,
+  "uuid": "463feab4-db45-4e2d-94d7-66ecbf7ace7a",
+  "ttft_stream_ms": 1162,
+  "time_to_request_ms": 61,
+  "time_to_request_phases_ms": {
+    "other": 5,
+    "system_prompt": 4,
+    "resume_other": 1,
+    "process_user_input": 0,
+    "input_attachments": 20,
+    "input_hooks": 22,
+    "tool_pool_refresh": 1,
+    "init_message": 1,
+    "engine_pickup": 0,
+    "message_prep": 1,
+    "model_config_wait": 0,
+    "autocompact": 0,
+    "query_setup": 0,
+    "model_gates": 1,
+    "tool_schema_build": 1,
+    "message_normalization": 1,
+    "client_creation": 1,
+    "request_build": 2
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 11,
+  "time_to_request_cpu_ms": 85,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "at_mentioned_files",
+    "slowest_producer_ms": 14,
+    "cpu_ms": 35,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 1162,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

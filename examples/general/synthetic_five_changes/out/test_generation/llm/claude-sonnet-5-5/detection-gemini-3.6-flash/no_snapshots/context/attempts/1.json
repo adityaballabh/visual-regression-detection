@@ -1,0 +1,114 @@
+{
+  "duration_api_ms": 25318,
+  "stop_reason": "end_turn",
+  "session_id": "2f06b2bb-eb29-43d0-a1ee-b8d473f68061",
+  "total_cost_usd": 0.25766,
+  "usage": {
+    "input_tokens": 18,
+    "cache_creation_input_tokens": 34417,
+    "cache_read_input_tokens": 450430,
+    "output_tokens": 2987,
+    "output_tokens_details": {"thinking_tokens": 263},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 34417, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 186,
+        "cache_read_input_tokens": 56549,
+        "cache_creation_input_tokens": 917,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 917},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 18,
+      "outputTokens": 2987,
+      "cacheReadInputTokens": 450430,
+      "cacheCreationInputTokens": 34417,
+      "webSearchRequests": 0,
+      "costUSD": 0.25766,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 263,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01RUmEF7cSE4gj6nxEpj4mTu",
+      "tool_input": {
+        "command": "cd ~/Desktop/uiuc/courses/fall-27/cs-527/project && .venv/bin/python -c \"\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\nfor n in ['before','after']:\n    s=load_snapshot(Path('examples/general/synthetic_five_changes/captures/%s_snapshot.json'%n))\n    for e in s.elements:\n        if e.tag in('div','section') : print(n,e.frames,e.selector,e.styles.get('background-color'),e.own_text,e.box.width)\n\""
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 11,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "The test passes on the before snapshot and fails on the after snapshot with an assertion error. It asserts that the Savings Accounts card (`html:nth-child(1) > body:nth-child(2) > section:nth-child(3) > div:nth-child(2)`) has `background-color` `rgb(220, 252, 231)`, the light green from the before snapshot. On the after snapshot the card is `rgb(254, 202, 202)`.\n\nI picked that selector from the parser's selector scheme and the HTML structure, then confirmed it by running the test on both snapshots.",
+  "ttft_ms": 3745,
+  "type": "result",
+  "duration_ms": 27784,
+  "uuid": "f745f8a1-88b0-48e0-acb4-581fdea0a749",
+  "ttft_stream_ms": 2966,
+  "time_to_request_ms": 55,
+  "time_to_request_phases_ms": {
+    "other": 6,
+    "system_prompt": 4,
+    "resume_other": 0,
+    "process_user_input": 1,
+    "input_attachments": 11,
+    "input_hooks": 25,
+    "tool_pool_refresh": 1,
+    "init_message": 1,
+    "engine_pickup": 0,
+    "message_prep": 1,
+    "model_config_wait": 0,
+    "autocompact": 0,
+    "query_setup": 0,
+    "model_gates": 0,
+    "tool_schema_build": 2,
+    "message_normalization": 1,
+    "client_creation": 1,
+    "request_build": 1
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 4,
+  "time_to_request_cpu_ms": 76,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "at_mentioned_files",
+    "slowest_producer_ms": 5,
+    "cpu_ms": 18,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 2967,
+  "queued_turn_count": 0,
+  "result_index": 0
+}
