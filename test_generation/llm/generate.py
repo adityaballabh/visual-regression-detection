@@ -6,7 +6,7 @@ the after snapshot, on the elements the detector flagged. The agent also gets th
 PrairieLearn PR checkout or the case's HTML) so it can inspect it, run the test and pick sturdy assertions.
 
 The script then checks the test itself against both snapshots, and writes the test and a `result.json` (validity,
-token usage and cost) to `<case_folder>/out/test_generation/llm/<cli model>/detection-<detection model>/<detection variant>/`.
+token usage and cost) to `<case_folder>/out/test_generation/llm/<cli model>/detection-<detection model>/<detection variant>/<detection mode>/`.
 
 Usage, from the repository root:
     python -m test_generation.llm.generate CASE_FOLDER [--detection-model MODEL]
@@ -597,7 +597,7 @@ def generate_test(
     # The agent runs in the output folder, so every path it is given has to be absolute
     case_folder = case_folder.resolve()
     report = _load_report(case_folder, detection_model, detection_variant, detection_mode)
-    out_folder = tests_folder(case_folder, Path("llm", cli_model), detection_model, detection_variant)
+    out_folder = tests_folder(case_folder, Path("llm", cli_model), detection_model, detection_variant, detection_mode)
 
     def result(status: str, **fields) -> GenerationResult:
         base = {
