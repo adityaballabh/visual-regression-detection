@@ -1,40 +1,42 @@
-"""Generate a unittest that compares a captured DOM snapshot to before or after."""
+"""Generate a unittest that compares a captured DOM snapshot to before."""
 
 import argparse
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 
 from image_diff.dom.parse import load_snapshot
 from image_diff.model import Snapshot
 from pipeline import diff_folder, reports_folder, tests_folder
-from regression_detection.gemini_processor import DEFAULT_MODEL
+from regression_detection.gemini_processor import DEFAULT_MODEL, REPORT_FORMATTER, RegressionReport
+from test_generation.llm.generate import (
+    Attempt,
+    GenerationResult,
+    _flagged_boxes,
+    _load_report,
+    _portable_path,
+    validate_test,
+)
 from test_generation.scripted.snapshot_assertions import ElementTarget, StyleTarget
 
 ReportTarget = tuple[int, ElementTarget, str]
 
 
-def _report_targets(report_path: Path, boxes_path: Path) -> tuple[str, tuple[ReportTarget, ...]]:
+def _report_targets(report_path: Path, boxes_path: Path) -> tuple[ReportTarget, ...]:
     report = json.loads(report_path.read_text(encoding="utf-8"))
     if not isinstance(report, dict) or not isinstance(report.get("is_regression"), bool):
         raise TypeError(f"Regression report must contain a boolean 'is_regression': {report_path}")
+    if not report["is_regression"]:
+        return ()
 
-    if report["is_regression"]:
-        regressions = report.get("regressions")
-        if not isinstance(regressions, list):
-            raise TypeError("A regression report must contain a 'regressions' list")
-        box_ids = [item.get("box_id") for item in regressions if isinstance(item, dict)]
-        if len(box_ids) != len(regressions):
-            raise ValueError("Each regression report entry must contain a box_id")
-        side = "before"
-    else:
-        box_ids = report.get("intended_box_ids")
-        if not isinstance(box_ids, list):
-            raise TypeError("A non-regression report must contain an 'intended_box_ids' list")
-        side = "after"
-
+    regressions = report.get("regressions")
+    if not isinstance(regressions, list):
+        raise TypeError("A regression report must contain a 'regressions' list")
+    box_ids = [item.get("box_id") for item in regressions if isinstance(item, dict)]
+    if len(box_ids) != len(regressions):
+        raise ValueError("Each regression report entry must contain a box_id")
     if not box_ids:
-        field = "regressions" if side == "before" else "intended_box_ids"
-        raise ValueError(f"The report has no target box ids in '{field}'; cannot generate a focused snapshot test")
+        raise ValueError("The report has no target box ids in 'regressions'; cannot generate a focused snapshot test")
     if any(not isinstance(box_id, int) or isinstance(box_id, bool) for box_id in box_ids):
         raise TypeError("Report target box ids must be integers")
 
@@ -66,7 +68,7 @@ def _report_targets(report_path: Path, boxes_path: Path) -> tuple[str, tuple[Rep
             raise TypeError(f"Target box {box_id} has invalid frame selectors in {boxes_path}")
         targets.append((box_id, (tuple(frames), selector), detail))
 
-    return side, tuple(targets)
+    return tuple(targets)
 
 
 def _reported_style_targets(
@@ -154,11 +156,14 @@ def generate_test(
     output: Path,
     *,
     force: bool = False,
-) -> Path:
+) -> Path | None:
     if not output.name.startswith("test_") or output.suffix != ".py":
         raise ValueError("Output filename must start with 'test_' and end with '.py'.")
 
-    side, targets = _report_targets(report, boxes)
+    targets = _report_targets(report, boxes)
+    # Skip since a test of the after state would lock in any regression detection missed
+    if not targets:
+        return None
 
     # Validate snapshots and ensure every report target has a report-relevant style change.
     before_snapshot = load_snapshot(before)
@@ -169,13 +174,12 @@ def generate_test(
         raise FileExistsError(f"Generated output already exists: {output}. Use --force to replace it.")
 
     output.parent.mkdir(parents=True, exist_ok=True)
-    expected_snapshot = before if side == "before" else after
     # Point at the case's captures instead of copying them next to the test
-    expected_relative = json.dumps(_relative_to_test(expected_snapshot, output))
+    expected_relative = json.dumps(_relative_to_test(before, output))
     actual_relative = json.dumps(_relative_to_test(after, output))
     style_targets_literal = _style_targets_literal(style_targets)
     output.write_text(
-        f'''"""Generated DOM snapshot test; expected page state: {side}."""
+        f'''"""Generated DOM snapshot test; expected page state: before."""
 
 import os
 import unittest
@@ -189,7 +193,7 @@ STYLE_TARGETS = {style_targets_literal}
 
 
 class GeneratedSnapshotTest(unittest.TestCase):
-    def test_dom_matches_{side}_snapshot(self):
+    def test_dom_matches_before_snapshot(self):
         actual_path = os.environ.get("ACTUAL_SNAPSHOT")
         actual_snapshot = Path(actual_path) if actual_path else DEFAULT_ACTUAL_SNAPSHOT
         assert_snapshot_matches(EXPECTED_SNAPSHOT, actual_snapshot, style_targets=STYLE_TARGETS)
@@ -201,6 +205,55 @@ if __name__ == "__main__":
         encoding="utf-8",
     )
     return output
+
+
+def _validate(
+    case_folder: Path, detection_variant: str, report: RegressionReport, tests: Path
+) -> tuple[str, str | None, Attempt]:
+    flagged = _flagged_boxes(case_folder, detection_variant, report)
+    validation = validate_test(tests, case_folder.resolve(), flagged)
+    attempt = Attempt(validation=validation)
+    if validation.valid:
+        return "generated", None, attempt
+    return "invalid", "the test did not pass on the before snapshot and fail on the after snapshot", attempt
+
+
+def _save_result(
+    case_folder: Path,
+    detection_model: str,
+    detection_variant: str,
+    detection_mode: str,
+    tests: Path,
+    test_file: Path | None,
+    error: str | None = None,
+) -> GenerationResult:
+    report = _load_report(case_folder, detection_model, detection_variant, detection_mode)
+    attempts = []
+    if error:
+        status, reason = "error", error
+    elif test_file is None:
+        status, reason = "skipped", "the detection report found no regression"
+    else:
+        status, reason, attempt = _validate(case_folder, detection_variant, report, tests)
+        attempts.append(attempt)
+    # Same schema as the LLM generator so evaluation reads both alike
+    result = GenerationResult(
+        status=status,
+        reason=reason,
+        case=_portable_path(case_folder.resolve()),
+        detection_model=detection_model,
+        detection_variant=detection_variant,
+        detection_mode=detection_mode,
+        flagged_box_ids=[regression.box_id for regression in report.regressions],
+        test_file=_portable_path(test_file.resolve()) if test_file else None,
+        attempts=attempts,
+        created_at=datetime.now(UTC).isoformat(timespec="seconds"),
+    )
+    tests.mkdir(parents=True, exist_ok=True)
+    # Drop the LLM-only fields since a script has no CLI, code context or token usage
+    llm_only = {"cli": True, "code": True, "usage": True, "attempts": {"__all__": {"usage", "session_id", "error"}}}
+    (tests / "result.json").write_text(REPORT_FORMATTER.serialize(result.model_dump(exclude=llm_only)))
+    return result
 
 
 def main():
@@ -218,6 +271,8 @@ def main():
     case_folder = args.case_folder
     reports = reports_folder(case_folder, args.detection_model, args.detection_variant)
     tests = tests_folder(case_folder, Path("scripted"), args.detection_model, args.detection_variant)
+    output = None
+    error = None
     try:
         output = generate_test(
             case_folder / "captures" / "before_snapshot.json",
@@ -227,9 +282,16 @@ def main():
             tests / "test_generated_regression.py",
             force=args.force,
         )
-    except (OSError, TypeError, ValueError, json.JSONDecodeError) as error:
-        parser.error(str(error))
-    print(f"Generated {output}")
+    # A missing or unreadable input means an earlier pipeline step did not run
+    except (OSError, json.JSONDecodeError) as exception:
+        parser.error(str(exception))
+    # Record why no test could be built so evaluation still counts the case
+    except (TypeError, ValueError) as exception:
+        error = str(exception)
+    result = _save_result(
+        case_folder, args.detection_model, args.detection_variant, args.detection_mode, tests, output, error
+    )
+    print(f"{result.status}: {result.reason or result.test_file}")
 
 
 if __name__ == "__main__":

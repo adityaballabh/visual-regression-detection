@@ -163,12 +163,12 @@ Each report ends with a `usage` block with the text, image, output, thinking and
 
 ### Generate a DOM snapshot test
 
-[`test_generation/scripted/generate.py`](test_generation/scripted/generate.py) writes a `unittest` from a case's regression report and `out/dom/boxes.json`. If the report found a regression, the test expects the before snapshot on the regressed boxes. Otherwise it expects the after snapshot on the intended boxes. It only checks the CSS properties that changed on those elements:
+[`test_generation/scripted/generate.py`](test_generation/scripted/generate.py) writes a `unittest` from a case's regression report and `out/dom/boxes.json`. If the report found a regression, the test expects the before snapshot on the regressed boxes, checking only the CSS properties that changed on those elements. If it found none, the script skips writing a test:
 ```bash
 python -m test_generation.scripted.generate <case_folder> [--detection-model MODEL] [--detection-variant all|images|boxes] [--detection-mode context|baseline] [--force]
 ```
 
-The test goes in `out/test_generation/scripted/detection-<model>/<variant>/` and reads the snapshots from the case's `captures/`. To check a new capture, set `ACTUAL_SNAPSHOT` to its path. `no_snapshots` isn't supported since pixel boxes have no selectors. Generation fails if a target has no changed CSS property, and `--force` replaces an existing test.
+The test goes in `out/test_generation/scripted/detection-<model>/<variant>/` and reads the snapshots from the case's `captures/`. Next to it, `result.json` uses the same format as the Claude Code generator's, minus the CLI, code and usage fields. To check a new capture, set `ACTUAL_SNAPSHOT` to its path. `no_snapshots` isn't supported since pixel boxes have no selectors. If a target has no changed CSS property, the script writes no test and records an `error` in `result.json`. `--force` replaces an existing test.
 
 
 ## Evaluation
@@ -229,11 +229,11 @@ Note: if an regression is introduced, the pipeline must be ran to update the res
 For a json result, look under the test, for example, for the test ```synthetic_five_changes```, results can be found in the folder: 
 
 ```
-examples/general/synthetic_five_changes/out/test_generation/llm/sonnet/detection-gemini-3.5-flash-lite/all/
+examples/general/synthetic_five_changes/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-3.5-flash-lite/all/
 ```
 
 What is inside: 
-- <code>result.json</code>: the status (generated, skipped, invalid or agent_error), whether the test passed on the before snapshot and failed on the after snapshot, and token usage and cost.
+- <code>result.json</code>: the status (generated, skipped, invalid or error), whether the test passed on the before snapshot and failed on the after snapshot, and token usage and cost.
 - <code>test_generated_regression.py</code>: the generated test. It should pass on the before snapshot and fail on an assertion on the after snapshot.
 
 Note: if no regression is found, you should not be seeing a <code>test_generated_regression.py</code> file. 

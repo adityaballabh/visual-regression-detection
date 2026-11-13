@@ -11,7 +11,7 @@ token usage and cost) to `<case_folder>/out/test_generation/llm/<cli model>/dete
 Usage, from the repository root:
     python -m test_generation.llm.generate CASE_FOLDER [--detection-model MODEL]
         [--detection-variant all|images|boxes|no_snapshots] [--detection-mode context|baseline]
-        [--cli-model sonnet] [--max-budget-usd 2.0] [--retries 1] [--cache-dir DIR] [--run-detection] [--dry-run]
+        [--cli-model claude-sonnet-5-5] [--max-budget-usd 2.0] [--retries 1] [--cache-dir DIR] [--run-detection] [--dry-run]
 
 `--run-detection` first runs the earlier pipeline steps (capture, image diff, regression detection) on the case.
 `--dry-run` prints the prompt and the Claude Code command without running the agent.
@@ -34,9 +34,15 @@ from pydantic import BaseModel
 
 from image_diff.dom.parse import load_snapshot
 from pipeline import _pr_repo, detect_regressions, diff_folder, prepare_case, reports_folder, tests_folder
-from regression_detection.gemini_processor import DEFAULT_MODEL, REPO_ROOT, VARIANTS, RegressionReport
+from regression_detection.gemini_processor import (
+    DEFAULT_MODEL,
+    REPO_ROOT,
+    REPORT_FORMATTER,
+    VARIANTS,
+    RegressionReport,
+)
 
-DEFAULT_CLI_MODEL = "sonnet"
+DEFAULT_CLI_MODEL = "claude-sonnet-5-5"
 DEFAULT_MAX_BUDGET_USD = 2.0
 DEFAULT_CACHE_DIR = Path.home() / ".cache" / "visual-regression-detection"
 TEST_MODULE = "test_generated_regression"
@@ -79,7 +85,7 @@ class Validation(BaseModel):
 
 
 class Attempt(BaseModel):
-    usage: Usage
+    usage: Usage = Usage()
     session_id: str | None = None
     error: str | None = None
     validation: Validation | None = None
@@ -94,15 +100,15 @@ class CodeContext(BaseModel):
 
 
 class GenerationResult(BaseModel):
-    status: Literal["generated", "skipped", "invalid", "agent_error"]
+    status: Literal["generated", "skipped", "invalid", "error"]
     reason: str | None = None
     case: str
     detection_model: str
     detection_variant: str
     detection_mode: str
     flagged_box_ids: list[int]
-    cli: dict[str, str]
-    code: CodeContext
+    cli: dict[str, str] | None = None
+    code: CodeContext | None = None
     test_file: str | None = None
     attempts: list[Attempt] = []
     usage: Usage = Usage()
@@ -485,11 +491,16 @@ def _run_agent(prompt: str, command: list[str], out_folder: Path, attempt: int) 
         )
     except subprocess.TimeoutExpired:
         return Attempt(usage=Usage(), error=f"agent timed out after {AGENT_TIMEOUT_SECONDS}s")
-    (out_folder / f"agent_{attempt}.json").write_text(done.stdout)
+    attempts_folder = out_folder / "attempts"
+    attempts_folder.mkdir(exist_ok=True)
+    attempt_file = attempts_folder / f"{attempt}.json"
     try:
         output = json.loads(done.stdout)
     except json.JSONDecodeError:
+        # Keep the raw output since it is not JSON when the agent crashes
+        attempt_file.write_text(done.stdout)
         return Attempt(usage=Usage(), error=f"agent exited {done.returncode}: {(done.stderr or done.stdout)[-500:]}")
+    attempt_file.write_text(REPORT_FORMATTER.serialize(output))
     error = None
     if done.returncode != 0 or output.get("is_error"):
         error = f"{output.get('subtype', 'error')}: {str(output.get('result', ''))[-500:]}"
@@ -513,7 +524,8 @@ def _run_test(out_folder: Path, snapshot: Path) -> tuple[int, str]:
         )
     except subprocess.TimeoutExpired:
         return 1, f"timed out after {TEST_TIMEOUT_SECONDS}s"
-    return done.returncode, done.stdout + done.stderr
+    # Keep tracebacks repo-relative so result.json has no local paths
+    return done.returncode, (done.stdout + done.stderr).replace(f"{REPO_ROOT}/", "")
 
 
 def _names_flagged_element(output: str, flagged: list[dict]) -> bool | None:
@@ -603,7 +615,7 @@ def generate_test(
 
     def save(outcome: GenerationResult) -> GenerationResult:
         out_folder.mkdir(parents=True, exist_ok=True)
-        (out_folder / "result.json").write_text(outcome.model_dump_json(indent=2))
+        (out_folder / "result.json").write_text(REPORT_FORMATTER.serialize(outcome.model_dump()))
         return outcome
 
     if not report.is_regression:
@@ -653,7 +665,7 @@ def generate_test(
     if final.validation and final.validation.valid:
         status, reason = "generated", None
     elif final.error:
-        status, reason = "agent_error", final.error
+        status, reason = "error", final.error
     else:
         status, reason = "invalid", "the test did not pass on the before snapshot and fail on the after snapshot"
     return save(

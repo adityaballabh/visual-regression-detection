@@ -1,0 +1,12 @@
+{
+  "status": "skipped",
+  "reason": "the detection report found no regression",
+  "case": "examples/prairielearn/assessment_questions",
+  "detection_model": "gemini-3.6-flash",
+  "detection_variant": "all",
+  "detection_mode": "context",
+  "flagged_box_ids": [],
+  "test_file": null,
+  "attempts": [],
+  "created_at": "2026-11-13T18:11:39+00:00"
+}
