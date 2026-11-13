@@ -1,0 +1,23 @@
+{
+  "status": "generated",
+  "reason": null,
+  "case": "examples/prairielearn/student_courses_card",
+  "detection_model": "gemini-3.5-flash-lite",
+  "detection_variant": "boxes",
+  "detection_mode": "baseline",
+  "flagged_box_ids": [2],
+  "test_file": "examples/prairielearn/student_courses_card/out/test_generation/scripted/detection-gemini-3.5-flash-lite/boxes/baseline/test_generated_regression.py",
+  "attempts": [
+    {
+      "validation": {
+        "passes_on_before": true,
+        "fails_on_after": true,
+        "fails_by_assertion": true,
+        "names_flagged_element": true,
+        "before_output": ".\n----------------------------------------------------------------------\nRan 1 test in 0.004s\n\nOK\n",
+        "after_output": "F\n======================================================================\nFAIL: test_dom_matches_before_snapshot (test_generated_regression.GeneratedSnapshotTest.test_dom_matches_before_snapshot)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"examples/prairielearn/student_courses_card/out/test_generation/scripted/detection-gemini-3.5-flash-lite/boxes/baseline/test_generated_regression.py\", line 26, in test_dom_matches_before_snapshot\n    assert_snapshot_matches(EXPECTED_SNAPSHOT, actual_snapshot, style_targets=STYLE_TARGETS)\n    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"test_generation/scripted/snapshot_assertions.py\", line 117, in assert_snapshot_matches\n    raise AssertionError(f\"DOM snapshot differs from expected {expected_path}:\\n{difference}\")\nAssertionError: DOM snapshot differs from expected examples/prairielearn/student_courses_card/out/test_generation/scripted/detection-gemini-3.5-flash-lite/boxes/baseline/../../../../../../captures/before_snapshot.json:\nelement html:nth-child(1) > body:nth-child(2) > div:nth-child(1) > div:nth-child(2) > div:nth-child(1) > main:nth-child(1) > div:nth-child(1) > div:nth-child(5) > div:nth-child(1) > div:nth-child(1): style background-color: expected 'rgb(13, 110, 253)', got 'rgb(108, 117, 125)'\n\n----------------------------------------------------------------------\nRan 1 test in 0.004s\n\nFAILED (failures=1)\n"
+      }
+    }
+  ],
+  "created_at": "2026-11-13T18:35:24+00:00"
+}
