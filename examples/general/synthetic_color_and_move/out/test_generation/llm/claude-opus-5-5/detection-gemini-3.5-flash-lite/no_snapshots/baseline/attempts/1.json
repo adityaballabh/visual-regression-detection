@@ -1,0 +1,115 @@
+{
+  "duration_api_ms": 52854,
+  "stop_reason": "end_turn",
+  "session_id": "60857262-2b24-498b-8941-ff62fc646830",
+  "total_cost_usd": 0.4708821999999999,
+  "usage": {
+    "input_tokens": 18,
+    "cache_creation_input_tokens": 34928,
+    "cache_read_input_tokens": 444531,
+    "output_tokens": 5124,
+    "output_tokens_details": {"thinking_tokens": 1085},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 34928, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 456,
+        "cache_read_input_tokens": 56277,
+        "cache_creation_input_tokens": 1700,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 1700},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 18,
+      "outputTokens": 5124,
+      "cacheReadInputTokens": 444531,
+      "cacheCreationInputTokens": 34928,
+      "webSearchRequests": 0,
+      "costUSD": 0.4708821999999999,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1085,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01N6j2Fzk6x6bByAuK4uWwBf",
+      "tool_input": {
+        "command": "cd . && for f in before after; do .venv/bin/python -c \"\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\ns=load_snapshot(Path('examples/general/synthetic_color_and_move/captures/${f}_snapshot.json'))\nfor e in s.elements:\n    if e.tag in ('button','section','h2','h3'): print(e.frames,e.selector,e.tag,e.attributes.get('id'),e.box.x1,e.box.y1,e.box.x2,e.box.y2,e.styles.get('background-color'))\n\"; done",
+        "description": "Print button and section boxes from both snapshots"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 12,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "The test passes on the before snapshot and **also passes on the after snapshot**, so it doesn't meet the \"must fail on after\" requirement. I left it that way on purpose, because no test can meet every rule here.\n\nThe diff is one line: the button's padding went from `12px 24px` to `24px 24px` and its background from `#2563eb` to `#dc2626`. The design intent says both changes were intended. The three flagged boxes come entirely from that line:\n- **Box 1** is the intended color and height change.\n- **Boxes 2 and 3** are the cards and the \"Our Services\" section moving down 24px, which is what a taller button causes.\n\nAny test that fails on the after snapshot would have to assert the old blue color, the old height or the old positions. That breaks rule 4 (don't assert on intended changes). So this detection is a false positive.\n\nWhat the test does assert is the part that should stay the same. It takes the expected values from the before snapshot, with 1px tolerance:\n- The cards section starts 40px below the button's bottom edge.\n- The features section starts right where the cards end (0px gap).\n\nThese checks would catch the content shifting for some reason other than the button getting taller.\n\nIf you'd rather have a test that fails on after anyway (for example, one pinning the button's background to `rgb(37, 99, 235)`), I can write that. It would go against the stated design intent.",
+  "ttft_ms": 3145,
+  "type": "result",
+  "duration_ms": 55630,
+  "uuid": "252d0a22-57aa-4296-9469-f47b3f908fa9",
+  "ttft_stream_ms": 1385,
+  "time_to_request_ms": 58,
+  "time_to_request_phases_ms": {
+    "other": 7,
+    "system_prompt": 4,
+    "resume_other": 0,
+    "process_user_input": 1,
+    "input_attachments": 11,
+    "input_hooks": 26,
+    "tool_pool_refresh": 1,
+    "init_message": 1,
+    "engine_pickup": 1,
+    "message_prep": 0,
+    "model_config_wait": 0,
+    "autocompact": 1,
+    "query_setup": 0,
+    "model_gates": 0,
+    "tool_schema_build": 2,
+    "message_normalization": 0,
+    "client_creation": 2,
+    "request_build": 1
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 7,
+  "time_to_request_cpu_ms": 62,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "nested_memory",
+    "slowest_producer_ms": 5,
+    "cpu_ms": 21,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 1385,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

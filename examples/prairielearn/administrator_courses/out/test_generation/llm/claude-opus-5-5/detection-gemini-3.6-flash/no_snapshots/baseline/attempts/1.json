@@ -1,0 +1,115 @@
+{
+  "duration_api_ms": 38066,
+  "stop_reason": "end_turn",
+  "session_id": "3719059a-47b3-46bd-9750-11c1a4d7bf13",
+  "total_cost_usd": 0.4346268000000001,
+  "usage": {
+    "input_tokens": 18,
+    "cache_creation_input_tokens": 34117,
+    "cache_read_input_tokens": 446994,
+    "output_tokens": 3611,
+    "output_tokens_details": {"thinking_tokens": 424},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 34117, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 423,
+        "cache_read_input_tokens": 55389,
+        "cache_creation_input_tokens": 1777,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 1777},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 18,
+      "outputTokens": 3611,
+      "cacheReadInputTokens": 446994,
+      "cacheCreationInputTokens": 34117,
+      "webSearchRequests": 0,
+      "costUSD": 0.4346268000000001,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 424,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01KQt9qrNkG3AaEeCZLTY4Wr",
+      "tool_input": {
+        "command": "cat code_changes.diff | head -80; cd . && PYTHONPATH=. .venv/bin/python -c \"\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\nfor n in ['before','after']:\n    s=load_snapshot(Path('examples/prairielearn/administrator_courses/captures/%s_snapshot.json'%n))\n    for e in s.elements:\n        b=e.box\n        if b and abs(b.y1-123)<3 and b.width>1200:\n            print(n,e.frames,e.selector,e.tag,e.attributes.get('class'),e.styles.get('background-color'),e.styles.get('color'),b.x1,b.y1,b.width,b.height)\n\"",
+        "description": "Show diff and find flagged element in snapshots"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 11,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I wrote `test_generated_regression.py`. It passes on the before snapshot and fails on the after snapshot with an assertion about the flagged header.\n\n**What it checks:** it finds the `.card-header` directly inside `#courses` and asserts its `background-color` is `rgb(13, 110, 253)`, the primary blue value from the before snapshot. On the after snapshot it fails because the header is `rgb(108, 117, 125)`, the grey from `bg-secondary`. The failure message names the header's selector.\n\n**Cause:** in `administratorCourses.html.tsx`, the `CoursesCard` header class changed from `bg-primary` to `bg-secondary`.\n\n**How it finds the element:** it looks it up by the `courses` id and the `card-header` class instead of the long positional selector. Both are in the code and in both snapshots, so the test should survive layout shifts elsewhere on the page.\n\n**What it skips:** the same diff also changed the Add course button from `btn-light` to `btn-dark`. The detector didn't flag that, so the test doesn't check it.",
+  "ttft_ms": 3962,
+  "type": "result",
+  "duration_ms": 39561,
+  "uuid": "2e98c3bf-d851-462d-85a9-1eae3b43ed66",
+  "ttft_stream_ms": 1621,
+  "time_to_request_ms": 79,
+  "time_to_request_phases_ms": {
+    "other": 8,
+    "system_prompt": 7,
+    "resume_other": 0,
+    "process_user_input": 1,
+    "input_attachments": 16,
+    "input_hooks": 34,
+    "tool_pool_refresh": 1,
+    "init_message": 2,
+    "engine_pickup": 1,
+    "message_prep": 0,
+    "model_config_wait": 1,
+    "autocompact": 0,
+    "query_setup": 0,
+    "model_gates": 1,
+    "tool_schema_build": 2,
+    "message_normalization": 0,
+    "client_creation": 2,
+    "request_build": 3
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 1,
+  "time_to_request_cpu_ms": 82,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "nested_memory",
+    "slowest_producer_ms": 7,
+    "cpu_ms": 24,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 1621,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

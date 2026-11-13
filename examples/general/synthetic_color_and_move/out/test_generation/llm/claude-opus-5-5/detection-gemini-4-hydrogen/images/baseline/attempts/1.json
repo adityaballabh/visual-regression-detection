@@ -1,0 +1,115 @@
+{
+  "duration_api_ms": 33638,
+  "stop_reason": "end_turn",
+  "session_id": "4ead6ef5-03d1-43a7-a238-3062a8c14e22",
+  "total_cost_usd": 0.39405539999999994,
+  "usage": {
+    "input_tokens": 12,
+    "cache_creation_input_tokens": 33604,
+    "cache_read_input_tokens": 285477,
+    "output_tokens": 3404,
+    "output_tokens_details": {"thinking_tokens": 550},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 33604, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 356,
+        "cache_read_input_tokens": 55072,
+        "cache_creation_input_tokens": 1581,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 1581},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 12,
+      "outputTokens": 3404,
+      "cacheReadInputTokens": 285477,
+      "cacheCreationInputTokens": 33604,
+      "webSearchRequests": 0,
+      "costUSD": 0.39405539999999994,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 550,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01SVBJZhSDREg3kke1sv9D26",
+      "tool_input": {
+        "command": "cd . && .venv/bin/python -c \"\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\ns=load_snapshot(Path('examples/general/synthetic_color_and_move/captures/before_snapshot.json'))\nfor e in s.elements:\n    if e.tag in ('section','button'): print(e.selector, e.frames, e.attributes.get('id'), e.parent, e.id, e.box)\n\"",
+        "description": "Inspect section and button elements in before snapshot"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 10,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "Your usage limit was reached, but the test was already done and both checks behave as required. Nothing is left to do.\n\nI wrote `test_generated_regression.py`. It finds the \"Open an Account\" button by its selector, with no enclosing frames. It checks that the button's `background-color` is `rgb(37, 99, 235)`, `padding-top` and `padding-bottom` are `12px`, and height is 42px within 1px. All four values come from the before snapshot.\n\n- **Before snapshot:** passes.\n- **After snapshot:** fails on the button's `background-color`, which was `rgb(220, 38, 38)` instead of the expected `rgb(37, 99, 235)`.\n\n**Conflict in the prompt:** the only change in the diff is the button going blue to red and getting taller, and the design intent says that change was intended. So rule 4 (don't assert on intended changes) can't be followed while also failing on the after snapshot. I followed the detector and the pass/fail requirement, which means this test treats an intended change as a regression.",
+  "ttft_ms": 3409,
+  "type": "result",
+  "duration_ms": 35146,
+  "uuid": "611ce84f-a356-46ce-a845-c1da4fa85524",
+  "ttft_stream_ms": 1291,
+  "time_to_request_ms": 79,
+  "time_to_request_phases_ms": {
+    "other": 7,
+    "system_prompt": 7,
+    "resume_other": 0,
+    "process_user_input": 1,
+    "input_attachments": 11,
+    "input_hooks": 40,
+    "tool_pool_refresh": 1,
+    "init_message": 2,
+    "engine_pickup": 0,
+    "message_prep": 1,
+    "model_config_wait": 0,
+    "autocompact": 1,
+    "query_setup": 0,
+    "model_gates": 0,
+    "tool_schema_build": 2,
+    "message_normalization": 1,
+    "client_creation": 2,
+    "request_build": 3
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 8,
+  "time_to_request_cpu_ms": 116,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "nested_memory",
+    "slowest_producer_ms": 5,
+    "cpu_ms": 16,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 1292,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

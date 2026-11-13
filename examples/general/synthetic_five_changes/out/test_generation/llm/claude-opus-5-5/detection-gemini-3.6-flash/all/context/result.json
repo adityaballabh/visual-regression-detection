@@ -1,0 +1,55 @@
+{
+  "status": "generated",
+  "reason": null,
+  "case": "examples/general/synthetic_five_changes",
+  "detection_model": "gemini-3.6-flash",
+  "detection_variant": "all",
+  "detection_mode": "context",
+  "flagged_box_ids": [3],
+  "cli": {
+    "name": "claude-code",
+    "version": "2.1.288 (Claude Code)",
+    "model": "claude-opus-5-5"
+  },
+  "code": {
+    "kind": "html",
+    "pr_url": null,
+    "head_sha": null,
+    "code_dir": "examples/general/synthetic_five_changes/html",
+    "diff_file": "examples/general/synthetic_five_changes/out/test_generation/llm/claude-opus-5-5/detection-gemini-3.6-flash/all/context/code_changes.diff"
+  },
+  "test_file": "examples/general/synthetic_five_changes/out/test_generation/llm/claude-opus-5-5/detection-gemini-3.6-flash/all/context/test_generated_regression.py",
+  "attempts": [
+    {
+      "usage": {
+        "input_tokens": 8,
+        "cache_creation_input_tokens": 30089,
+        "cache_read_input_tokens": 174066,
+        "output_tokens": 1701,
+        "total_cost_usd": 0.3095772,
+        "num_turns": 5,
+        "duration_ms": 17871
+      },
+      "session_id": "deb91a8e-e0b7-4eb8-936e-124de66337a5",
+      "error": null,
+      "validation": {
+        "passes_on_before": true,
+        "fails_on_after": true,
+        "fails_by_assertion": true,
+        "names_flagged_element": true,
+        "before_output": ".\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nOK\n",
+        "after_output": "F\n======================================================================\nFAIL: test_savings_card_background_unchanged (test_generated_regression.GeneratedRegressionTest.test_savings_card_background_unchanged)\nGuards the Savings Accounts card background, which the change turned from #dcfce7 green to #fecaca red in its inline style.\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"examples/general/synthetic_five_changes/out/test_generation/llm/claude-opus-5-5/detection-gemini-3.6-flash/all/context/test_generated_regression.py\", line 28, in test_savings_card_background_unchanged\n    self.assertEqual(\n    ~~~~~~~~~~~~~~~~^\n        actual,\n        ^^^^^^^\n        SAVINGS_CARD_BACKGROUND,\n        ^^^^^^^^^^^^^^^^^^^^^^^^\n        f\"{SAVINGS_CARD_SELECTOR}: background-color expected {SAVINGS_CARD_BACKGROUND}, got {actual}\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: 'rgb(254, 202, 202)' != 'rgb(220, 252, 231)'\n- rgb(254, 202, 202)\n+ rgb(220, 252, 231)\n : html:nth-child(1) > body:nth-child(2) > section:nth-child(3) > div:nth-child(2): background-color expected rgb(220, 252, 231), got rgb(254, 202, 202)\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (failures=1)\n"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 8,
+    "cache_creation_input_tokens": 30089,
+    "cache_read_input_tokens": 174066,
+    "output_tokens": 1701,
+    "total_cost_usd": 0.3095772,
+    "num_turns": 5,
+    "duration_ms": 17871
+  },
+  "created_at": "2026-11-13T19:19:30+00:00"
+}
