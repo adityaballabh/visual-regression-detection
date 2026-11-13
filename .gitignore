@@ -15,3 +15,7 @@ image_diff/out/
 
 *.egg-info/
 .python-version
+
+# rebuilt on every run
+examples/**/out/test_generation/**/prompt.md
+examples/**/out/test_generation/**/code_changes.diff

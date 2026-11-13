@@ -1,0 +1,115 @@
+{
+  "duration_api_ms": 29700,
+  "stop_reason": "end_turn",
+  "session_id": "3801d5c7-912c-4056-9ad5-5483007ecc7e",
+  "total_cost_usd": 0.40798819999999997,
+  "usage": {
+    "input_tokens": 14,
+    "cache_creation_input_tokens": 35414,
+    "cache_read_input_tokens": 340101,
+    "output_tokens": 2830,
+    "output_tokens_details": {"thinking_tokens": 396},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 35414, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 319,
+        "cache_read_input_tokens": 57206,
+        "cache_creation_input_tokens": 1257,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 1257},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 14,
+      "outputTokens": 2830,
+      "cacheReadInputTokens": 340101,
+      "cacheCreationInputTokens": 35414,
+      "webSearchRequests": 0,
+      "costUSD": 0.40798819999999997,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 396,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_013xyMZPTm8J9MBS5QW7U5EB",
+      "tool_input": {
+        "command": "cd . && .venv/bin/python -c \"\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\nfor name in ['before','after']:\n    s=load_snapshot(Path('examples/general/synthetic_five_changes/captures/%s_snapshot.json'%name))\n    for e in s.elements:\n        if e.tag=='div' or e.own_text=='Savings Accounts':\n            print(name,e.frames,e.selector,e.tag,repr(e.own_text),e.box,e.styles.get('background-color'))\n\"",
+        "description": "Inspect card elements in both snapshots"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 9,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I wrote `test_generated_regression.py`. It finds the Savings Accounts card at `html:nth-child(1) > body:nth-child(2) > section:nth-child(3) > div:nth-child(2)` and checks that its computed `background-color` is `rgb(220, 252, 231)`, the light green from the before snapshot.\n\nI ran both commands:\n- **Before snapshot:** the test passes.\n- **After snapshot:** the test fails with an assertion on that selector: expected `rgb(220, 252, 231)`, got `rgb(254, 202, 202)`. That pink comes from the diff changing the card's inline `background:#dcfce7` to `#fecaca`.\n\nThe test doesn't check the card's size, because the flag was about its color.\n\nMy first command to inspect the snapshots with Python was blocked by permissions. I read the before color from the raw snapshot file instead and picked the selector from the page's structure. The passing run confirmed the selector finds the card.",
+  "ttft_ms": 2309,
+  "type": "result",
+  "duration_ms": 32484,
+  "uuid": "04813bf5-9213-4c6d-898d-06f47d0e35b2",
+  "ttft_stream_ms": 1260,
+  "time_to_request_ms": 60,
+  "time_to_request_phases_ms": {
+    "other": 6,
+    "system_prompt": 4,
+    "resume_other": 0,
+    "process_user_input": 1,
+    "input_attachments": 11,
+    "input_hooks": 30,
+    "tool_pool_refresh": 0,
+    "init_message": 2,
+    "engine_pickup": 0,
+    "message_prep": 0,
+    "model_config_wait": 0,
+    "autocompact": 1,
+    "query_setup": 0,
+    "model_gates": 0,
+    "tool_schema_build": 2,
+    "message_normalization": 0,
+    "client_creation": 1,
+    "request_build": 2
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 9,
+  "time_to_request_cpu_ms": 77,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "at_mentioned_files",
+    "slowest_producer_ms": 5,
+    "cpu_ms": 19,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 1260,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

@@ -1,0 +1,115 @@
+{
+  "duration_api_ms": 22379,
+  "stop_reason": "end_turn",
+  "session_id": "219f1b04-1e65-43eb-b915-b46299bd91c4",
+  "total_cost_usd": 0.4050898,
+  "usage": {
+    "input_tokens": 10,
+    "cache_creation_input_tokens": 38571,
+    "cache_read_input_tokens": 237909,
+    "output_tokens": 2445,
+    "output_tokens_details": {"thinking_tokens": 56},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 38571, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 277,
+        "cache_read_input_tokens": 54880,
+        "cache_creation_input_tokens": 6740,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 6740},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 10,
+      "outputTokens": 2445,
+      "cacheReadInputTokens": 237909,
+      "cacheCreationInputTokens": 38571,
+      "webSearchRequests": 0,
+      "costUSD": 0.4050898,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 56,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Write",
+      "tool_use_id": "toolu_01D5rYEEK9hesWUa83biYdZe",
+      "tool_input": {
+        "file_path": "examples/prairielearn/administrator_courses/out/test_generated_regression.py.tmp",
+        "content": ""
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 7,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I wrote `test_generated_regression.py`. It passes on the before snapshot and fails on the after snapshot with 7 color assertion errors, none of them import errors or crashes. One empty write to a wrong path was blocked, so nothing stray was created.\n\nThe test checks the card header colors on the administrator courses page, using values taken from the before snapshot:\n- **Card header:** its `background-color` must stay `rgb(13, 110, 253)` (blue).\n- **\"Add course\" button:** its background and four border colors must stay `rgb(248, 249, 250)` (light), and its text `color` must stay `rgb(0, 0, 0)`.\n\nThe breaking change is in `administratorCourses.html.tsx`, which swapped the header's `bg-primary` for `bg-secondary` and the button's `btn-light` for `btn-dark`.",
+  "ttft_ms": 1316,
+  "type": "result",
+  "duration_ms": 24816,
+  "uuid": "143a988d-01a4-4598-8e72-cd797016b018",
+  "ttft_stream_ms": 1168,
+  "time_to_request_ms": 59,
+  "time_to_request_phases_ms": {
+    "other": 5,
+    "system_prompt": 4,
+    "resume_other": 1,
+    "process_user_input": 0,
+    "input_attachments": 17,
+    "input_hooks": 23,
+    "tool_pool_refresh": 1,
+    "init_message": 1,
+    "engine_pickup": 0,
+    "message_prep": 1,
+    "model_config_wait": 0,
+    "autocompact": 0,
+    "query_setup": 0,
+    "model_gates": 0,
+    "tool_schema_build": 2,
+    "message_normalization": 1,
+    "client_creation": 1,
+    "request_build": 2
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 9,
+  "time_to_request_cpu_ms": 67,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "nested_memory",
+    "slowest_producer_ms": 12,
+    "cpu_ms": 28,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 1168,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

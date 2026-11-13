@@ -1,0 +1,55 @@
+{
+  "status": "generated",
+  "reason": null,
+  "case": "examples/general/synthetic_color_and_move",
+  "detection_model": "gemini-3.6-flash",
+  "detection_variant": "boxes",
+  "detection_mode": "baseline",
+  "flagged_box_ids": [1],
+  "cli": {
+    "name": "claude-code",
+    "version": "2.1.288 (Claude Code)",
+    "model": "claude-opus-5-5"
+  },
+  "code": {
+    "kind": "html",
+    "pr_url": null,
+    "head_sha": null,
+    "code_dir": "examples/general/synthetic_color_and_move/html",
+    "diff_file": "examples/general/synthetic_color_and_move/out/test_generation/llm/claude-opus-5-5/detection-gemini-3.6-flash/boxes/baseline/code_changes.diff"
+  },
+  "test_file": "examples/general/synthetic_color_and_move/out/test_generation/llm/claude-opus-5-5/detection-gemini-3.6-flash/boxes/baseline/test_generated_regression.py",
+  "attempts": [
+    {
+      "usage": {
+        "input_tokens": 12,
+        "cache_creation_input_tokens": 33175,
+        "cache_read_input_tokens": 285086,
+        "output_tokens": 3018,
+        "total_cost_usd": 0.38282520000000003,
+        "num_turns": 9,
+        "duration_ms": 30651
+      },
+      "session_id": "9acf1804-a7c4-4de6-8afe-69d5452ba352",
+      "error": null,
+      "validation": {
+        "passes_on_before": true,
+        "fails_on_after": true,
+        "fails_by_assertion": true,
+        "names_flagged_element": true,
+        "before_output": ".\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nOK\n",
+        "after_output": "F\n======================================================================\nFAIL: test_open_account_button_stays_blue_and_compact (test_generated_regression.GeneratedRegressionTest.test_open_account_button_stays_blue_and_compact)\nGuards the 'Open an Account' hero button, which before.html -> after.html turned red\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"examples/general/synthetic_color_and_move/out/test_generation/llm/claude-opus-5-5/detection-gemini-3.6-flash/boxes/baseline/test_generated_regression.py\", line 38, in test_open_account_button_stays_blue_and_compact\n    self.assertEqual(actual, expected, f\"{BUTTON_SELECTOR}: {name} expected {expected}, got {actual}\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'rgb(220, 38, 38)' != 'rgb(37, 99, 235)'\n- rgb(220, 38, 38)\n+ rgb(37, 99, 235)\n : html:nth-child(1) > body:nth-child(2) > section:nth-child(2) > button:nth-child(3): background-color expected rgb(37, 99, 235), got rgb(220, 38, 38)\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (failures=1)\n"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 12,
+    "cache_creation_input_tokens": 33175,
+    "cache_read_input_tokens": 285086,
+    "output_tokens": 3018,
+    "total_cost_usd": 0.38282520000000003,
+    "num_turns": 9,
+    "duration_ms": 30651
+  },
+  "created_at": "2026-11-13T19:19:57+00:00"
+}
