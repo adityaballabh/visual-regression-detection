@@ -270,7 +270,9 @@ def main():
 
     case_folder = args.case_folder
     reports = reports_folder(case_folder, args.detection_model, args.detection_variant)
-    tests = tests_folder(case_folder, Path("scripted"), args.detection_model, args.detection_variant)
+    tests = tests_folder(
+        case_folder, Path("scripted"), args.detection_model, args.detection_variant, args.detection_mode
+    )
     output = None
     error = None
     try:
