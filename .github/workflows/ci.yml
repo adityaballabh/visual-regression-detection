@@ -28,3 +28,4 @@ jobs:
           cache-dependency-path: pyproject.toml
       - run: pip install -e .
       - run: python -m unittest discover -s image_diff/tests -t .
+      - run: python -m unittest discover -s test_generation -t .

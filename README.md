@@ -40,7 +40,7 @@ A case folder holds one change:
 | `captures/` | `before.png`, `after.png` and their `_snapshot.json` files. If missing, they're generated from `html/` or `pr.txt` |
 | `design/` | `design_intent.md` and `design_language.md` (optional, pulled from `pr.txt` if missing) |
 | `label.json` | Ground truth for evaluation: `regression`, `dom_boxes` and `pixel_boxes` (optional) |
-| `out/` | Written by the pipeline: `dom/` and `pixel/` for the image diff, `regression_detection/<model>/<variant>/` for the reports |
+| `out/` | Written by the pipeline: `dom/` and `pixel/` for the image diff, `regression_detection/<model>/<variant>/` for the reports, `test_generation/` for the generated tests |
 
 If `captures/` is incomplete, the pipeline fills it. For a PrairieLearn change, put the link to the PR made by the [PrairieLearn screenshot capture](#prairielearn-screenshot-capture) in `pr.txt`, and the pipeline downloads the captures committed in that PR. Missing design files come from the PR too: the intent from its description and the design language from the PrairieLearn fork's `docs/design-standards.md`. For any other page, put the before and after HTML in `html/`, and the pipeline captures them itself.
 
@@ -163,45 +163,12 @@ Each report ends with a `usage` block with the text, image, output, thinking and
 
 ### Generate a DOM snapshot test
 
-Generate a focused `unittest` from the regression report and the matching DOM
-`boxes.json`. A detected regression uses the before snapshot and the report's
-regression boxes; a non-regression uses the after snapshot and the report's
-intended box ids. The test compares only those target elements:
+[`test_generation/scripted/generate.py`](test_generation/scripted/generate.py) writes a `unittest` from a case's regression report and `out/dom/boxes.json`. If the report found a regression, the test expects the before snapshot on the regressed boxes, checking only the CSS properties that changed on those elements. If it found none, the script skips writing a test:
 ```bash
-python -m image_diff.generate_snapshot_test \
-  captures/before_snapshot.json captures/after_snapshot.json \
-  --report out/regression_detection/gemini-3.5-flash-lite/all/report_context.json \
-  --boxes out/dom/boxes.json \
-  --output tests/generated/test_capture.py
+python -m test_generation.scripted.generate <case_folder> [--detection-model MODEL] [--detection-variant all|images|boxes] [--detection-mode context|baseline] [--force]
 ```
 
-Alternatively, pass a PR URL and the visual-regression repository root. The
-generator finds the case whose `pr.txt` matches the PR, then uses its snapshots,
-`out/dom/boxes.json`, and most recently modified report under
-`out/regression_detection/` (excluding `no_snapshots`, whose box ids are
-pixel-based):
-```bash
-python -m image_diff.generate_snapshot_test \
-  --pr https://github.com/org/repo/pull/123 \
-  --repo /path/to/visual-regression-detection \
-  --output tests/generated/test_capture.py
-```
-The PR lookup reports an error if it finds no matching case, multiple matching
-cases, or the matching case is missing its snapshots, DOM boxes, or report.
-
-The command writes `test_capture.expected.json` and `test_capture.actual.json`
-beside the test. The actual fixture defaults to the supplied after snapshot, so
-the test runs without extra environment variables. To compare a fresh capture,
-set `ACTUAL_SNAPSHOT` to its path. Reported boxes must include DOM selectors,
-so use the `out/dom` boxes file rather than pixel-only boxes:
-```bash
-python -m unittest discover -s tests/generated -p 'test_capture.py'
-```
-The generated assertion checks only the changed CSS properties on the report's
-target elements; unrelated styles and other element changes are ignored.
-Generation errors if a reported target has no identifiable changed CSS
-property. Volatile raw CDP node identifiers are not compared. `--force` replaces
-generated files with the same names.
+The test goes in `out/test_generation/scripted/detection-<model>/<variant>/` and reads the snapshots from the case's `captures/`. Next to it, `result.json` uses the same format as the Claude Code generator's, minus the CLI, code and usage fields. To check a new capture, set `ACTUAL_SNAPSHOT` to its path. `no_snapshots` isn't supported since pixel boxes have no selectors. If a target has no changed CSS property, the script writes no test and records an `error` in `result.json`. `--force` replaces an existing test.
 
 
 ## Evaluation
@@ -234,23 +201,23 @@ To date I have not yet figured out how to share my claude subscription.
 
 ### Run
 
-['test_generation/llm_test_generation.py'](test_generation/llm_test_generation.py) generates a test written by Claude Code if regression is found from a existing report, otherwise, no tests are generated. 
+['test_generation/llm/generate.py'](test_generation/llm/generate.py) generates a test written by Claude Code if regression is found from a existing report, otherwise, no tests are generated. 
 
 To run on a specific folder (test): 
 ```bash
-python -m test_generation.llm_test_generation examples/general/synthetic_five_changes
+python -m test_generation.llm.generate examples/general/synthetic_five_changes
 ```
 
 To do a dry run: 
 
 ```bash
-python -m test_generation.llm_test_generation examples/general/synthetic_five_changes --dry-run
+python -m test_generation.llm.generate examples/general/synthetic_five_changes --dry-run
 ```
 
 To run an example entire folder 
 
 ```bash
-for d in examples/general/*/; do python -m test_generation.llm_test_generation "$d" --run-detection; done
+for d in examples/general/*/; do python -m test_generation.llm.generate "$d" --run-detection; done
 ```
 
 Note: if an regression is introduced, the pipeline must be ran to update the results that this script relies on. Else, old results will be fed into the script. 
@@ -262,11 +229,11 @@ Note: if an regression is introduced, the pipeline must be ran to update the res
 For a json result, look under the test, for example, for the test ```synthetic_five_changes```, results can be found in the folder: 
 
 ```
-examples/general/synthetic_five_changes/out/test_generation/gemini-3.5-flash-lite/all/sonnet/
+examples/general/synthetic_five_changes/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-3.5-flash-lite/all/
 ```
 
 What is inside: 
-- <code>result.json</code>: the status (generated, skipped, invalid or agent_error), whether the test passed on the before snapshot and failed on the after snapshot, and token usage and cost.
+- <code>result.json</code>: the status (generated, skipped, invalid or error), whether the test passed on the before snapshot and failed on the after snapshot, and token usage and cost.
 - <code>test_generated_regression.py</code>: the generated test. It should pass on the before snapshot and fail on an assertion on the after snapshot.
 
 Note: if no regression is found, you should not be seeing a <code>test_generated_regression.py</code> file. 

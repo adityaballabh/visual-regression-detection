@@ -28,4 +28,4 @@ build-backend = "setuptools.build_meta"
 py-modules = ["pipeline"]
 
 [tool.setuptools.packages.find]
-include = ["image_diff*", "regression_detection*", "evaluation*", "prairielearn_capture*"]
+include = ["image_diff*", "regression_detection*", "evaluation*", "prairielearn_capture*", "test_generation*"]
