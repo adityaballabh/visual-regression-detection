@@ -174,4 +174,4 @@ The script writes `<model>.csv` to [`evaluation/results/regression_detection/`](
 python -m evaluation.score_test_generation
 ```
 
-It writes `<generator>.csv` to [`evaluation/results/test_generation/`](evaluation/results/test_generation/), with a row for each detection model, variant and mode. `valid_rate` is the share of regressions that got a test passing on the before snapshot and failing on the after snapshot. `relevant_rate` only counts valid tests whose failure names a regressed element from `dom_boxes`, so tests built on false positives don't count. Cost is Claude Code's estimate at API list prices.
+It writes `<generator>.csv` to [`evaluation/results/test_generation/`](evaluation/results/test_generation/), with a row for each detection model, variant and mode. `valid_rate` is the share of regressions that got a test passing on the before snapshot and failing on the after snapshot. `relevant_rate` only counts valid tests whose failure names a regressed element from `dom_boxes`, so tests built on false positives don't count. The LLM generators also get `avg_cost_usd`, Claude Code's estimate at API list prices, and `avg_attempts`.
