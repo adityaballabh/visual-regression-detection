@@ -29,3 +29,6 @@ py-modules = ["cases", "pipeline"]
 
 [tool.setuptools.packages.find]
 include = ["image_diff*", "regression_detection*", "evaluation*", "prairielearn_capture*", "test_generation*"]
+
+[tool.ruff]
+line-length = 120

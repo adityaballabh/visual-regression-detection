@@ -545,7 +545,7 @@ def _format_test(test_file: Path) -> None:
     for command in (["ruff"], [sys.executable, "-m", "ruff"]):
         try:
             done = subprocess.run(
-                [*command, "format", "--config", str(REPO_ROOT / "ruff.toml"), str(test_file)],
+                [*command, "format", "--config", str(REPO_ROOT / "pyproject.toml"), str(test_file)],
                 capture_output=True,
                 stdin=subprocess.DEVNULL,
                 check=False,
