@@ -1,0 +1,23 @@
+{
+  "status": "generated",
+  "reason": null,
+  "case": "examples/prairielearn/administrator_courses",
+  "detection_model": "gemini-4-hydrogen",
+  "detection_variant": "boxes",
+  "detection_mode": "context",
+  "flagged_box_ids": [1, 2],
+  "test_file": "examples/prairielearn/administrator_courses/out/test_generation/scripted/detection-gemini-4-hydrogen/boxes/context/test_generated_regression.py",
+  "attempts": [
+    {
+      "validation": {
+        "passes_on_before": true,
+        "fails_on_after": true,
+        "fails_by_assertion": true,
+        "names_flagged_element": true,
+        "before_output": ".\n----------------------------------------------------------------------\nRan 1 test in 0.005s\n\nOK\n",
+        "after_output": "F\n======================================================================\nFAIL: test_dom_matches_before_snapshot (test_generated_regression.GeneratedSnapshotTest.test_dom_matches_before_snapshot)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"examples/prairielearn/administrator_courses/out/test_generation/scripted/detection-gemini-4-hydrogen/boxes/context/test_generated_regression.py\", line 40, in test_dom_matches_before_snapshot\n    assert_snapshot_matches(EXPECTED_SNAPSHOT, actual_snapshot, style_targets=STYLE_TARGETS)\n    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"test_generation/scripted/snapshot_assertions.py\", line 117, in assert_snapshot_matches\n    raise AssertionError(f\"DOM snapshot differs from expected {expected_path}:\\n{difference}\")\nAssertionError: DOM snapshot differs from expected examples/prairielearn/administrator_courses/out/test_generation/scripted/detection-gemini-4-hydrogen/boxes/context/../../../../../../captures/before_snapshot.json:\nelement html:nth-child(1) > body:nth-child(2) > div:nth-child(1) > div:nth-child(2) > div:nth-child(1) > main:nth-child(2) > div:nth-child(3) > div:nth-child(2) > div:nth-child(1): style background-color: expected 'rgb(13, 110, 253)', got 'rgb(108, 117, 125)'\n\n----------------------------------------------------------------------\nRan 1 test in 0.006s\n\nFAILED (failures=1)\n"
+      }
+    }
+  ],
+  "created_at": "2026-11-13T18:35:08+00:00"
+}

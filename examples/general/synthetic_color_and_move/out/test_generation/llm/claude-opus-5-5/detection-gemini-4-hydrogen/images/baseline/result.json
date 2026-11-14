@@ -1,0 +1,55 @@
+{
+  "status": "generated",
+  "reason": null,
+  "case": "examples/general/synthetic_color_and_move",
+  "detection_model": "gemini-4-hydrogen",
+  "detection_variant": "images",
+  "detection_mode": "baseline",
+  "flagged_box_ids": [1],
+  "cli": {
+    "name": "claude-code",
+    "version": "2.1.288 (Claude Code)",
+    "model": "claude-opus-5-5"
+  },
+  "code": {
+    "kind": "html",
+    "pr_url": null,
+    "head_sha": null,
+    "code_dir": "examples/general/synthetic_color_and_move/html",
+    "diff_file": "examples/general/synthetic_color_and_move/out/test_generation/llm/claude-opus-5-5/detection-gemini-4-hydrogen/images/baseline/code_changes.diff"
+  },
+  "test_file": "examples/general/synthetic_color_and_move/out/test_generation/llm/claude-opus-5-5/detection-gemini-4-hydrogen/images/baseline/test_generated_regression.py",
+  "attempts": [
+    {
+      "usage": {
+        "input_tokens": 12,
+        "cache_creation_input_tokens": 33604,
+        "cache_read_input_tokens": 285477,
+        "output_tokens": 3404,
+        "total_cost_usd": 0.39405539999999994,
+        "num_turns": 10,
+        "duration_ms": 35146
+      },
+      "session_id": "4ead6ef5-03d1-43a7-a238-3062a8c14e22",
+      "error": null,
+      "validation": {
+        "passes_on_before": true,
+        "fails_on_after": true,
+        "fails_by_assertion": true,
+        "names_flagged_element": true,
+        "before_output": ".\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nOK\n",
+        "after_output": "F\n======================================================================\nFAIL: test_open_account_button_style (test_generated_regression.GeneratedRegressionTest.test_open_account_button_style)\nGuards the hero 'Open an Account' CTA, which turned red and grew taller when its\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"examples/general/synthetic_color_and_move/out/test_generation/llm/claude-opus-5-5/detection-gemini-4-hydrogen/images/baseline/test_generated_regression.py\", line 35, in test_open_account_button_style\n    self.assertEqual(\n    ~~~~~~~~~~~~~~~~^\n        actual,\n        ^^^^^^^\n        expected,\n        ^^^^^^^^^\n        f\"{BUTTON_SELECTOR}: {name} expected {expected}, got {actual}\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: 'rgb(220, 38, 38)' != 'rgb(37, 99, 235)'\n- rgb(220, 38, 38)\n+ rgb(37, 99, 235)\n : html:nth-child(1) > body:nth-child(2) > section:nth-child(2) > button:nth-child(3): background-color expected rgb(37, 99, 235), got rgb(220, 38, 38)\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (failures=1)\n"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 12,
+    "cache_creation_input_tokens": 33604,
+    "cache_read_input_tokens": 285477,
+    "output_tokens": 3404,
+    "total_cost_usd": 0.39405539999999994,
+    "num_turns": 10,
+    "duration_ms": 35146
+  },
+  "created_at": "2026-11-13T19:21:12+00:00"
+}

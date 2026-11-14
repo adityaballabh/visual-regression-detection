@@ -1,0 +1,55 @@
+{
+  "status": "generated",
+  "reason": null,
+  "case": "examples/general/synthetic_color_and_move",
+  "detection_model": "gemini-4-hydrogen",
+  "detection_variant": "all",
+  "detection_mode": "baseline",
+  "flagged_box_ids": [1],
+  "cli": {
+    "name": "claude-code",
+    "version": "2.1.288 (Claude Code)",
+    "model": "claude-sonnet-5-5"
+  },
+  "code": {
+    "kind": "html",
+    "pr_url": null,
+    "head_sha": null,
+    "code_dir": "examples/general/synthetic_color_and_move/html",
+    "diff_file": "examples/general/synthetic_color_and_move/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-4-hydrogen/all/baseline/code_changes.diff"
+  },
+  "test_file": "examples/general/synthetic_color_and_move/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-4-hydrogen/all/baseline/test_generated_regression.py",
+  "attempts": [
+    {
+      "usage": {
+        "input_tokens": 4,
+        "cache_creation_input_tokens": 30722,
+        "cache_read_input_tokens": 72396,
+        "output_tokens": 1677,
+        "total_cost_usd": 0.15414519999999998,
+        "num_turns": 4,
+        "duration_ms": 13388
+      },
+      "session_id": "6336fd22-8720-4011-b250-869fb63a073a",
+      "error": null,
+      "validation": {
+        "passes_on_before": true,
+        "fails_on_after": true,
+        "fails_by_assertion": true,
+        "names_flagged_element": true,
+        "before_output": ".\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nOK\n",
+        "after_output": "F\n======================================================================\nFAIL: test_open_account_button_keeps_primary_blue_and_height (test_generated_regression.GeneratedRegressionTest.test_open_account_button_keeps_primary_blue_and_height)\nGuards the 'Open an Account' primary button staying blue and 42px tall.\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"examples/general/synthetic_color_and_move/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-4-hydrogen/all/baseline/test_generated_regression.py\", line 36, in test_open_account_button_keeps_primary_blue_and_height\n    self.assertEqual(\n    ~~~~~~~~~~~~~~~~^\n        background,\n        ^^^^^^^^^^^\n        EXPECTED_BACKGROUND,\n        ^^^^^^^^^^^^^^^^^^^^\n        f\"{BUTTON_SELECTOR}: background-color expected {EXPECTED_BACKGROUND}, got {background}\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: 'rgb(220, 38, 38)' != 'rgb(37, 99, 235)'\n- rgb(220, 38, 38)\n+ rgb(37, 99, 235)\n : html:nth-child(1) > body:nth-child(2) > section:nth-child(2) > button:nth-child(3): background-color expected rgb(37, 99, 235), got rgb(220, 38, 38)\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (failures=1)\n"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 4,
+    "cache_creation_input_tokens": 30722,
+    "cache_read_input_tokens": 72396,
+    "output_tokens": 1677,
+    "total_cost_usd": 0.15414519999999998,
+    "num_turns": 4,
+    "duration_ms": 13388
+  },
+  "created_at": "2026-11-13T18:56:58+00:00"
+}

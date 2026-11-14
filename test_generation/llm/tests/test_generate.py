@@ -119,6 +119,14 @@ class TestGeneration(unittest.TestCase):
         self.assertIsNone(result.test_file)
         self.assertFalse((self.folder / "calls").exists())
 
+    def test_skip_clears_files_from_an_earlier_regression_run(self):
+        test_file = Path(self._generate([_GOOD_TEST], retries=0).test_file)
+        report_file = self.case / _REPORT
+        report = json.loads(report_file.read_text()) | {"is_regression": False, "regressions": []}
+        report_file.write_text(json.dumps(report))
+        self.assertEqual(self._generate([_GOOD_TEST]).status, "skipped")
+        self.assertEqual([path.name for path in test_file.parent.iterdir()], ["result.json"])
+
 
 if __name__ == "__main__":
     unittest.main()

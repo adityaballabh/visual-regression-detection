@@ -1,0 +1,55 @@
+{
+  "status": "generated",
+  "reason": null,
+  "case": "examples/prairielearn/student_courses_card",
+  "detection_model": "gemini-3.5-flash-lite",
+  "detection_variant": "boxes",
+  "detection_mode": "baseline",
+  "flagged_box_ids": [2],
+  "cli": {
+    "name": "claude-code",
+    "version": "2.1.288 (Claude Code)",
+    "model": "claude-sonnet-5-5"
+  },
+  "code": {
+    "kind": "pull_request",
+    "pr_url": "https://github.com/bzamansky/PrairieLearn/pull/12",
+    "head_sha": "f0344ae3d0bb9123d5fe6ce80ec4ed60cd3c903f",
+    "code_dir": "~/.cache/visual-regression-detection/checkouts/bzamansky__PrairieLearn-pr12-f0344ae3",
+    "diff_file": "examples/prairielearn/student_courses_card/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-3.5-flash-lite/boxes/baseline/code_changes.diff"
+  },
+  "test_file": "examples/prairielearn/student_courses_card/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-3.5-flash-lite/boxes/baseline/test_generated_regression.py",
+  "attempts": [
+    {
+      "usage": {
+        "input_tokens": 6,
+        "cache_creation_input_tokens": 32447,
+        "cache_read_input_tokens": 127060,
+        "output_tokens": 1655,
+        "total_cost_usd": 0.17176200000000003,
+        "num_turns": 5,
+        "duration_ms": 15700
+      },
+      "session_id": "8c7d7462-5d0a-45ce-a2f5-b6208f009ccd",
+      "error": null,
+      "validation": {
+        "passes_on_before": true,
+        "fails_on_after": true,
+        "fails_by_assertion": true,
+        "names_flagged_element": true,
+        "before_output": ".\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nOK\n",
+        "after_output": "F\n======================================================================\nFAIL: test_courses_card_header_is_primary_blue (test_generated_regression.GeneratedRegressionTest.test_courses_card_header_is_primary_blue)\nGuards the student courses card header background.\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"examples/prairielearn/student_courses_card/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-3.5-flash-lite/boxes/baseline/test_generated_regression.py\", line 32, in test_courses_card_header_is_primary_blue\n    self.assertEqual(\n    ~~~~~~~~~~~~~~~~^\n        actual,\n        ^^^^^^^\n        EXPECTED_BACKGROUND,\n        ^^^^^^^^^^^^^^^^^^^^\n        f\"{SELECTOR}: background-color expected {EXPECTED_BACKGROUND!r}, got {actual!r}\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: 'rgb(108, 117, 125)' != 'rgb(13, 110, 253)'\n- rgb(108, 117, 125)\n?      ^^    ^  -\n+ rgb(13, 110, 253)\n?      ^    ^    +\n : html:nth-child(1) > body:nth-child(2) > div:nth-child(1) > div:nth-child(2) > div:nth-child(1) > main:nth-child(1) > div:nth-child(1) > div:nth-child(5) > div:nth-child(1) > div:nth-child(1): background-color expected 'rgb(13, 110, 253)', got 'rgb(108, 117, 125)'\n\n----------------------------------------------------------------------\nRan 1 test in 0.002s\n\nFAILED (failures=1)\n"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 6,
+    "cache_creation_input_tokens": 32447,
+    "cache_read_input_tokens": 127060,
+    "output_tokens": 1655,
+    "total_cost_usd": 0.17176200000000003,
+    "num_turns": 5,
+    "duration_ms": 15700
+  },
+  "created_at": "2026-11-13T18:56:04+00:00"
+}

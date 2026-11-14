@@ -1,0 +1,123 @@
+{
+  "duration_api_ms": 49446,
+  "stop_reason": "end_turn",
+  "session_id": "47e69aa6-1071-4c5f-a5c3-e1ad0cf627af",
+  "total_cost_usd": 0.5306476,
+  "usage": {
+    "input_tokens": 22,
+    "cache_creation_input_tokens": 38835,
+    "cache_read_input_tokens": 572298,
+    "output_tokens": 5271,
+    "output_tokens_details": {"thinking_tokens": 409},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 38835, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 355,
+        "cache_read_input_tokens": 59330,
+        "cache_creation_input_tokens": 2554,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 2554},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 22,
+      "outputTokens": 5271,
+      "cacheReadInputTokens": 572298,
+      "cacheCreationInputTokens": 38835,
+      "webSearchRequests": 0,
+      "costUSD": 0.5306476,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 409,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01UuXAyriDrBpTxoVqLzWRLG",
+      "tool_input": {
+        "command": "cd . && PYTHONPATH=. .venv/bin/python -c \"\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\nfor n in ['before','after']:\n    s=load_snapshot(Path('examples/prairielearn/administrator_courses/captures/'+n+'_snapshot.json'))\n    for e in s.elements:\n        if e.attributes.get('id')=='courses' or (e.parent and e.parent.attributes.get('id')=='courses' and 'card-header' in e.attributes.get('class','')) or e.attributes.get('aria-label')=='Add course':\n            print(n,e.frames,e.selector,e.attributes.get('class'),e.box.y1,e.styles.get('background-color'),e.styles.get('color'),e.styles.get('border-color'))\n\"",
+        "description": "Inspect courses card header and button in both snapshots"
+      }
+    },
+    {
+      "tool_name": "Write",
+      "tool_use_id": "toolu_01XMmAYKqdWThqjzxca81xCA",
+      "tool_input": {
+        "file_path": "examples/prairielearn/administrator_courses/out/test_generated_regression.py.tmp",
+        "content": ""
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 16,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I wrote the test, and it passes on the before snapshot and fails on the after snapshot with an assertion about the flagged header (gray `rgb(108, 117, 125)` instead of blue).\n\nThe test finds the Courses card by its `id=\"courses\"` and takes the card header as its first child. It finds the button by `aria-label=\"Add course\"`. It then checks three colors against the values in the before snapshot:\n\n- **Header background:** must be the primary blue `rgb(13, 110, 253)`.\n- **Button background:** must be the light `rgb(248, 249, 250)`.\n- **Button text:** must be black `rgb(0, 0, 0)`.\n\nThe cause was in `administratorCourses.html.tsx`: the change swapped the header from `bg-primary` to `bg-secondary` and the button from `btn-light` to `btn-dark`. That turned the header gray and the button dark, even though the intent was only to update the text.\n\nWhile working, I also mistakenly tried to create a stray `test_generated_regression.py.tmp` one folder up. That write was blocked, so nothing was created there.",
+  "ttft_ms": 2314,
+  "type": "result",
+  "duration_ms": 52655,
+  "uuid": "2fee02e8-e9ea-46e6-9a23-813b38763607",
+  "ttft_stream_ms": 1268,
+  "time_to_request_ms": 51,
+  "time_to_request_phases_ms": {
+    "other": 5,
+    "system_prompt": 4,
+    "resume_other": 0,
+    "process_user_input": 1,
+    "input_attachments": 11,
+    "input_hooks": 21,
+    "tool_pool_refresh": 1,
+    "init_message": 1,
+    "engine_pickup": 1,
+    "message_prep": 0,
+    "model_config_wait": 0,
+    "autocompact": 0,
+    "query_setup": 1,
+    "model_gates": 0,
+    "tool_schema_build": 1,
+    "message_normalization": 1,
+    "client_creation": 1,
+    "request_build": 2
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 1,
+  "time_to_request_cpu_ms": 74,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "at_mentioned_files",
+    "slowest_producer_ms": 5,
+    "cpu_ms": 20,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 1269,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

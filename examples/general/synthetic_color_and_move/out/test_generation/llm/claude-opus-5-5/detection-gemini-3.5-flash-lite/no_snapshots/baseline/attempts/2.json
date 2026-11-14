@@ -1,0 +1,115 @@
+{
+  "duration_api_ms": 35223,
+  "stop_reason": "end_turn",
+  "session_id": "2bed5d6b-0831-4660-baef-7ff45923d08b",
+  "total_cost_usd": 0.403002,
+  "usage": {
+    "input_tokens": 16,
+    "cache_creation_input_tokens": 32341,
+    "cache_read_input_tokens": 391950,
+    "output_tokens": 3291,
+    "output_tokens_details": {"thinking_tokens": 650},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 32341, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 368,
+        "cache_read_input_tokens": 54266,
+        "cache_creation_input_tokens": 1124,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 1124},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 16,
+      "outputTokens": 3291,
+      "cacheReadInputTokens": 391950,
+      "cacheCreationInputTokens": 32341,
+      "webSearchRequests": 0,
+      "costUSD": 0.403002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 650,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_015yfwdEypZPYF9YMGn6uvCM",
+      "tool_input": {
+        "command": "cat examples/general/synthetic_color_and_move/out/test_generation/llm/claude-opus-5-5/detection-gemini-3.5-flash-lite/no_snapshots/baseline/code_changes.diff; .venv/bin/python -c \"\nimport sys;sys.path.insert(0,'.')\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\nfor f in ['before','after']:\n  s=load_snapshot(Path('examples/general/synthetic_color_and_move/captures/'+f+'_snapshot.json'))\n  for e in s.elements:\n    if e.tag in('button','section','footer','main'): print(f,e.selector,e.attributes,e.box.y1,e.box.y2,e.box.height)\n\"",
+        "description": "Show diff and element boxes in both snapshots"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 9,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I wrote the new test, but I couldn't run either check because Bash is blocked in this session. Whether it passes on before and fails on after is unconfirmed.\n\nThe test asserts that the `#cards` section's top is at 269px and the `#features` (\"Our Services\") section's top is at 414px, within 1px. On the after snapshot, the button's taller padding (12px to 24px) pushes both sections down 24px, so the test should fail there. The last attempt passed on both because it only checked the gaps between sections, and those gaps don't change when everything moves down together.\n\nTwo things to know:\n- **Where 269 and 414 came from:** I took them from the comments in the last attempt. I couldn't decode them from the snapshot myself, so check them when you run it.\n- **It conflicts with the design intent:** The intent says the taller padding was deliberate, and the shift follows directly from it. The only way to fail on after is to pin the sections' absolute positions, which treats that shift as the regression.",
+  "ttft_ms": 3705,
+  "type": "result",
+  "duration_ms": 37323,
+  "uuid": "58ec137d-bd3e-4fc9-b114-0535e2a50405",
+  "ttft_stream_ms": 1325,
+  "time_to_request_ms": 53,
+  "time_to_request_phases_ms": {
+    "other": 5,
+    "system_prompt": 4,
+    "resume_other": 0,
+    "process_user_input": 1,
+    "input_attachments": 12,
+    "input_hooks": 22,
+    "tool_pool_refresh": 1,
+    "init_message": 1,
+    "engine_pickup": 1,
+    "message_prep": 0,
+    "model_config_wait": 0,
+    "autocompact": 0,
+    "query_setup": 1,
+    "model_gates": 0,
+    "tool_schema_build": 1,
+    "message_normalization": 1,
+    "client_creation": 1,
+    "request_build": 2
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 2,
+  "time_to_request_cpu_ms": 77,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "at_mentioned_files",
+    "slowest_producer_ms": 7,
+    "cpu_ms": 19,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 1325,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

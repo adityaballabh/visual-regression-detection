@@ -168,7 +168,7 @@ Each report ends with a `usage` block with the text, image, output, thinking and
 python -m test_generation.scripted.generate <case_folder> [--detection-model MODEL] [--detection-variant all|images|boxes] [--detection-mode context|baseline] [--force]
 ```
 
-The test goes in `out/test_generation/scripted/detection-<model>/<variant>/` and reads the snapshots from the case's `captures/`. Next to it, `result.json` uses the same format as the Claude Code generator's, minus the CLI, code and usage fields. To check a new capture, set `ACTUAL_SNAPSHOT` to its path. `no_snapshots` isn't supported since pixel boxes have no selectors. If a target has no changed CSS property, the script writes no test and records an `error` in `result.json`. `--force` replaces an existing test.
+The test goes in `out/test_generation/scripted/detection-<model>/<variant>/<mode>/` and reads the snapshots from the case's `captures/`. Next to it, `result.json` uses the same format as the Claude Code generator's, minus the CLI, code and usage fields. To check a new capture, set `ACTUAL_SNAPSHOT` to its path. `no_snapshots` isn't supported since pixel boxes have no selectors. If a target has no changed CSS property, the script writes no test and records an `error` in `result.json`. `--force` replaces an existing test.
 
 
 ## Evaluation
@@ -229,7 +229,7 @@ Note: if an regression is introduced, the pipeline must be ran to update the res
 For a json result, look under the test, for example, for the test ```synthetic_five_changes```, results can be found in the folder: 
 
 ```
-examples/general/synthetic_five_changes/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-3.5-flash-lite/all/
+examples/general/synthetic_five_changes/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-3.5-flash-lite/all/context/
 ```
 
 What is inside: 

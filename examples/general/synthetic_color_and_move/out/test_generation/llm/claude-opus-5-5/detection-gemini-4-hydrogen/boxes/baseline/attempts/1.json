@@ -1,0 +1,115 @@
+{
+  "duration_api_ms": 33244,
+  "stop_reason": "end_turn",
+  "session_id": "eaedab45-86ed-4b78-9bf8-92a63337e6b6",
+  "total_cost_usd": 0.4163888,
+  "usage": {
+    "input_tokens": 14,
+    "cache_creation_input_tokens": 35549,
+    "cache_read_input_tokens": 342404,
+    "output_tokens": 3173,
+    "output_tokens_details": {"thinking_tokens": 917},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 35549, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 322,
+        "cache_read_input_tokens": 55905,
+        "cache_creation_input_tokens": 898,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 898},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 14,
+      "outputTokens": 3173,
+      "cacheReadInputTokens": 342404,
+      "cacheCreationInputTokens": 35549,
+      "webSearchRequests": 0,
+      "costUSD": 0.4163888,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 917,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01Uz7q278brMz5uK1r5qVkT9",
+      "tool_input": {
+        "command": "PYTHONPATH=. .venv/bin/python -c \"\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\ns=load_snapshot(Path('examples/general/synthetic_color_and_move/captures/before_snapshot.json'))\nfor e in s.elements:\n    if e.tag=='button': print(e.selector,e.frames,e.attributes,e.box,e.styles['background-color'],e.styles['padding-top'],e.styles['padding-bottom'],e.styles['height'])\n\"",
+        "description": "Inspect the button in the before snapshot"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 7,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I wrote the test and checked it both ways: it passes on the before snapshot and fails on the after snapshot. The failure says `background-color expected rgb(37, 99, 235), got rgb(220, 38, 38)`.\n\nIt finds the \"Open an Account\" button by its flagged selector, with no enclosing iframes. It checks that the button's `background-color` is `rgb(37, 99, 235)`, its `padding-top` and `padding-bottom` are `12px`, and its height is 42px give or take 1 px. All of those values come from the before snapshot.\n\n**This test breaks rule 4 of the prompt.** The design intent says the change from blue to red and the taller padding were deliberate, and those are the only changes in the diff. So any test that fails on the after snapshot has to check something the intent says was intended. I chose to meet the pass/fail requirement over rule 4. If the intent is right, this detection is a false positive and the test shouldn't exist.",
+  "ttft_ms": 4130,
+  "type": "result",
+  "duration_ms": 36362,
+  "uuid": "eb7cffe6-70a4-4e6a-8417-9b262107a6fa",
+  "ttft_stream_ms": 1147,
+  "time_to_request_ms": 86,
+  "time_to_request_phases_ms": {
+    "other": 14,
+    "system_prompt": 7,
+    "resume_other": 0,
+    "process_user_input": 2,
+    "input_attachments": 20,
+    "input_hooks": 25,
+    "tool_pool_refresh": 1,
+    "init_message": 1,
+    "engine_pickup": 1,
+    "message_prep": 0,
+    "model_config_wait": 1,
+    "autocompact": 1,
+    "query_setup": 0,
+    "model_gates": 0,
+    "tool_schema_build": 2,
+    "message_normalization": 1,
+    "client_creation": 8,
+    "request_build": 2
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 1,
+  "time_to_request_cpu_ms": 95,
+  "time_to_request_major_faults": 186,
+  "input_attachments_detail": {
+    "slowest_producer": "at_mentioned_files",
+    "slowest_producer_ms": 14,
+    "cpu_ms": 34,
+    "major_faults": 26
+  },
+  "first_content_frame_ms": 1148,
+  "queued_turn_count": 0,
+  "result_index": 0
+}
