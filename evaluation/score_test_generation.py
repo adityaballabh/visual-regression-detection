@@ -1,17 +1,19 @@
 import csv
+import json
 from collections import defaultdict
 from pathlib import Path
 
 import numpy as np
 
 from evaluation.score import format_cell
-from test_generation.llm.generate import GenerationResult
+from pipeline import diff_folder
+from test_generation.llm.generate import GenerationResult, names_box_element
 
 _EXAMPLES = Path(__file__).resolve().parent.parent / "examples"
 _RESULTS = Path(__file__).parent / "results" / "test_generation"
 _VARIANTS = ("all", "images", "boxes", "no_snapshots")
 _MODES = ("context", "baseline")
-_COLUMNS = ["detection_model", "variant", "mode", "regressions", "valid_tests", "valid_rate", "avg_cost_usd"]
+_COLUMNS = ["detection_model", "variant", "mode", "regression_count", "valid_rate", "relevant_rate", "avg_cost_usd"]
 
 Condition = tuple[str, str, str]
 
@@ -27,10 +29,24 @@ def _read_results() -> dict[str, dict[Condition, list[GenerationResult]]]:
     return results
 
 
+def _true_boxes(case_folder: Path) -> list[dict]:
+    label = json.loads((case_folder / "label.json").read_text())
+    # Use DOM boxes for every variant since pixel boxes have no selector to look for in the output
+    boxes = json.loads((diff_folder(case_folder, "all") / "boxes.json").read_text())
+    return [box for box in boxes if box["id"] in label["dom_boxes"]]
+
+
+def _is_relevant(result: GenerationResult) -> bool:
+    true_boxes = _true_boxes(_EXAMPLES.parent / result.case)
+    # A relevant test fails on the after snapshot because of a labeled regression
+    return bool(names_box_element(result.attempts[-1].validation.after_output, true_boxes))
+
+
 def summarize(condition: Condition, results: list[GenerationResult]) -> dict[str, str | int | float]:
     # Skipped reports found no regression, so there was no test to write
     regressions = [result for result in results if result.status != "skipped"]
-    valid_tests = sum(result.status == "generated" for result in regressions)
+    valid_tests = [result for result in regressions if result.status == "generated"]
+    relevant_tests = sum(_is_relevant(result) for result in valid_tests)
     # Scripted results have no usage, so their cost reads as 0
     costs = [result.usage.total_cost_usd for result in regressions]
     detection_model, variant, mode = condition
@@ -38,9 +54,9 @@ def summarize(condition: Condition, results: list[GenerationResult]) -> dict[str
         "detection_model": detection_model,
         "variant": variant,
         "mode": mode,
-        "regressions": len(regressions),
-        "valid_tests": valid_tests,
-        "valid_rate": valid_tests / len(regressions) if regressions else np.nan,
+        "regression_count": len(regressions),
+        "valid_rate": len(valid_tests) / len(regressions) if regressions else np.nan,
+        "relevant_rate": relevant_tests / len(regressions) if regressions else np.nan,
         "avg_cost_usd": np.mean(costs) if regressions else np.nan,
     }
 

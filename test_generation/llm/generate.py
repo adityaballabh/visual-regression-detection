@@ -533,8 +533,8 @@ def _run_test(out_folder: Path, snapshot: Path) -> tuple[int, str]:
     return done.returncode, done.stdout + done.stderr
 
 
-def _names_flagged_element(output: str, flagged: list[dict]) -> bool | None:
-    selectors = [box["selector"] for box in flagged if box.get("selector")]
+def names_box_element(output: str, boxes: list[dict]) -> bool | None:
+    selectors = [box["selector"] for box in boxes if box.get("selector")]
     if not selectors:
         return None
     # The last steps are enough, a test may print a shortened selector
@@ -568,7 +568,7 @@ def validate_test(out_folder: Path, case_folder: Path, flagged: list[dict]) -> V
         passes_on_before=before_code == 0,
         fails_on_after=after_code != 0,
         fails_by_assertion=assertion_only,
-        names_flagged_element=_names_flagged_element(after_output, flagged) if after_code != 0 else None,
+        names_flagged_element=names_box_element(after_output, flagged) if after_code != 0 else None,
         before_output=before_output,
         after_output=after_output,
     )
