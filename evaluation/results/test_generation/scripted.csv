@@ -1,4 +1,4 @@
-detection_model,variant,mode,regression_count,valid_rate,relevant_rate
+detection_model,variant,mode,regression_count,valid_test_rate,relevant_test_rate
 gemini-3.5-flash-lite,all,context,1,1.000,1.000
 gemini-3.5-flash-lite,all,baseline,0,NaN,NaN
 gemini-3.5-flash-lite,images,context,1,1.000,1.000

@@ -5,9 +5,9 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
-from cases import diff_folder, reports_folder, tests_folder
 from image_diff.dom.parse import load_snapshot
 from image_diff.model import Snapshot
+from pipeline.cases import diff_folder, reports_folder, tests_folder
 from regression_detection.gemini_processor import DEFAULT_MODEL, REPORT_FORMATTER, RegressionReport
 from test_generation.llm.generate import (
     Attempt,
@@ -166,7 +166,7 @@ def generate_test(
     if not targets:
         return None
 
-    # Validate snapshots and ensure every report target has a report-relevant style change.
+    # Validate snapshots and ensure every report target has a report-relevant style change
     before_snapshot = load_snapshot(before)
     after_snapshot = load_snapshot(after)
     style_targets = _reported_style_targets(targets, before_snapshot, after_snapshot)

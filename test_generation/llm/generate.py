@@ -31,8 +31,8 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from cases import diff_folder, pr_repo, reports_folder, tests_folder
 from image_diff.dom.parse import load_snapshot
+from pipeline.cases import diff_folder, pr_repo, reports_folder, tests_folder
 from regression_detection.gemini_processor import (
     DEFAULT_MODEL,
     REPO_ROOT,
@@ -71,7 +71,7 @@ class Usage(BaseModel):
 class Validation(BaseModel):
     passes_on_before: bool
     fails_on_after: bool
-    # The failure is an assertion, not an import error or a crash in the test
+    # The failure is an assertion, which rules out an import error or a crash in the test
     fails_by_assertion: bool
     # The failure message names a flagged element, None when no flagged box has a selector
     names_flagged_element: bool | None
@@ -536,7 +536,7 @@ def names_box_element(output: str, boxes: list[dict]) -> bool | None:
     selectors = [box["selector"] for box in boxes if box.get("selector")]
     if not selectors:
         return None
-    # The last steps are enough, a test may print a shortened selector
+    # The last steps are enough, a test might print a shortened selector
     return any(" > ".join(selector.split(" > ")[-2:]) in output for selector in selectors)
 
 

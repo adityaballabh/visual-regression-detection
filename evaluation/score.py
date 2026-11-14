@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 from sklearn.metrics import precision_score, recall_score
 
-from cases import diff_folder
+from pipeline.cases import diff_folder
 from regression_detection.gemini_processor import ReportWithUsage
 
 _EXAMPLES = Path(__file__).resolve().parent.parent / "examples"

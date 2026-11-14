@@ -5,8 +5,8 @@ from pathlib import Path
 
 import numpy as np
 
-from cases import diff_folder
 from evaluation.score import format_cell
+from pipeline.cases import diff_folder
 from test_generation.llm.generate import GenerationResult, names_box_element
 
 _EXAMPLES = Path(__file__).resolve().parent.parent / "examples"
@@ -52,8 +52,8 @@ def summarize(condition: Condition, results: list[GenerationResult]) -> dict[str
         "variant": variant,
         "mode": mode,
         "regression_count": len(regressions),
-        "valid_rate": len(valid_tests) / len(regressions) if regressions else np.nan,
-        "relevant_rate": relevant_tests / len(regressions) if regressions else np.nan,
+        "valid_test_rate": len(valid_tests) / len(regressions) if regressions else np.nan,
+        "relevant_test_rate": relevant_tests / len(regressions) if regressions else np.nan,
     }
     # Only the LLM generator records attempts and cost
     if results[0].cli:

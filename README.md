@@ -7,7 +7,7 @@ Detects UI regressions from a code change and generates a failing test that repr
 2. Capture before and after screenshots
 3. Image-diff to produce candidate bounding boxes
 4. Classify regression vs. intended change through a stateless LLM API call
-5. If a regression is detected, a CLI agent inspects the codebase and generates a failing test
+5. If a regression is detected, generate a test that passes on the before snapshot and fails on the after snapshot
 
 ## Setup
 ```bash
@@ -22,9 +22,12 @@ Copy [`.env.example`](.env.example) to `.env` and add your Gemini API key.
 Run all commands from the repository root.
 
 ## Run
-[`pipeline.py`](pipeline.py) runs all 5 steps on one case folder:
+[`pipeline`](pipeline/) runs all 5 steps on one case folder:
 ```bash
-python pipeline.py <case_folder> [--detection-variant all|images|boxes|no_snapshots] [--detection-model MODEL] [--detection-mode context|baseline|both] [--detection-dry-run] [--test-generator llm|scripted] [--cli-model MODEL]
+python -m pipeline <case_folder> \
+  [--detection-variant all|images|boxes|no_snapshots] [--detection-model MODEL] \
+  [--detection-mode context|baseline|both] [--detection-dry-run] \
+  [--test-generator llm|scripted] [--cli-model MODEL]
 ```
 
 It generates a test for each report detection writes, with the [Claude Code generator](#llm) by default or the [scripted generator](#scripted) with `--test-generator scripted`. The scripted generator doesn't support `no_snapshots`.
@@ -55,12 +58,6 @@ Each folder in [`examples/general/`](examples/general/) and [`examples/prairiele
 
 The pages in `examples/general/` are re-rendered from [WUICC](https://huggingface.co/datasets/zhangsan11111122/WUICC), which is built on [WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight), and the synthetic ones use text from WUICC pages. WUICC and WebSight are both [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
-Note: for synthetic_five_changes, the case introduces intentional regression. The deliberate design_intent.md is: 
-
-the "Savings Accounts" card was not changed at all. 
-
-But in the actual code, the Savings Accounts is changed from green to red. 
-
 ## PrairieLearn screenshot capture
 
 [`prairielearn_capture/capture_screenshots.sh`](prairielearn_capture/capture_screenshots.sh) accepts a PrairieLearn checkout and one of
@@ -86,21 +83,16 @@ animations, and serialize computed styles in the normalized format consumed by
 ./prairielearn_capture/capture_screenshots.sh /path/to/PrairieLearn pr
 ```
 
-Screenshot and snapshot artifacts are saved under `.artifacts/` next to the
-script. New specs are kept in
-`apps/prairielearn/src/tests/e2e/generated-captures/` in the PrairieLearn
-checkout. `before` creates a new spec each time it is run; use the same
-`--name` on `after` and `pr` that was used for `before`. Use distinct names
-when capturing multiple components with the same filename. The `pr` command
-requires a pushed non-`master` branch and `gh` authentication. Capturing
-requires GitHub Copilot CLI with authentication configured, Node.js 24+, pnpm
-(or Corepack), and the normal local PrairieLearn E2E prerequisites.
+Screenshot and snapshot artifacts are saved under `.artifacts/` next to the script. New specs are kept in `apps/prairielearn/src/tests/e2e/generated-captures/` in the PrairieLearn checkout. `before` creates a new spec each time it is run; use the same `--name` on `after` and `pr` that was used for `before`. Use distinct names when capturing multiple components with the same filename.
+
+The `pr` command requires a pushed non-`master` branch and `gh` authentication. Capturing requires GitHub Copilot CLI with authentication configured, Node.js 24+, pnpm (or Corepack), and the normal local PrairieLearn E2E prerequisites.
 
 ## Image diff
 
 ### Run
 ```bash
-python -m image_diff <before_image> <after_image> --out <path> --before-snapshot <before_snapshot> --after-snapshot <after_snapshot>
+python -m image_diff <before_image> <after_image> --out <path> \
+  --before-snapshot <before_snapshot> --after-snapshot <after_snapshot>
 ```
 
 ### Approach
@@ -121,10 +113,12 @@ A simple pixel diff boxes everything a change moves, so if an element grows, eve
 
 [`regression_detection/gemini_processor.py`](regression_detection/gemini_processor.py) asks Gemini whether a change is a regression and which boxes regressed. It reads a case's image diff folder, `<case_folder>/out/dom`, or `<case_folder>/out/pixel` for `no_snapshots`, which holds `before_color.png`, `after_color.png`, `before_shape.png`, `after_shape.png` and `boxes.json`:
 ```bash
-python -m regression_detection.gemini_processor run <diff_folder> [--mode context|baseline|both] [--variant all|images|boxes|no_snapshots] [--model MODEL] [--out DIR] [--dry-run]
+python -m regression_detection.gemini_processor run <diff_folder> \
+  [--mode context|baseline|both] [--variant all|images|boxes|no_snapshots] \
+  [--model MODEL] [--out DIR] [--dry-run]
 ```
 
-`--mode` picks the prompt, `context` by default. Baseline gets the 4 images and `boxes.json`, and context also gets the design intent and design language. `pipeline.py` passes those from the case's `design/` folder, but run on its own the script reads them from the diff folder. `--variant` works like `--detection-variant` above. The script prints each report, and `--out` also saves it as `report_<mode>.json`. `--dry-run` prints the prompts without calling Gemini.
+`--mode` picks the prompt, `context` by default. Baseline gets the 4 images and `boxes.json`, and context also gets the design intent and design language. The pipeline passes those from the case's `design/` folder, but run on its own the script reads them from the diff folder. `--variant` works like `--detection-variant` above. The script prints each report, and `--out` also saves it as `report_<mode>.json`. `--dry-run` prints the prompts without calling Gemini.
 
 Each report ends with a `usage` block containing the text, image, output, thinking and total token counts from the API response.
 
@@ -132,12 +126,15 @@ Each report ends with a `usage` block containing the text, image, output, thinki
 
 ### LLM
 
-[`test_generation/llm/generate.py`](test_generation/llm/generate.py) requires [Claude Code](https://code.claude.com/docs/en/quickstart) to write the test. It writes a `unittest` that passes on the before snapshot and fails on the after snapshot. If the report found no regression, the script skips writing a test:
+[`test_generation/llm/generate.py`](test_generation/llm/generate.py) requires Claude Code to write the test. It writes a `unittest` that passes on the before snapshot and fails on the after snapshot. If the report found no regression, the script skips writing a test:
 ```bash
-python -m test_generation.llm.generate <case_folder> [--detection-model MODEL] [--detection-variant all|images|boxes|no_snapshots] [--detection-mode context|baseline] [--cli-model MODEL] [--retries N] [--max-budget-usd USD] [--dry-run]
+python -m test_generation.llm.generate <case_folder> \
+  [--detection-model MODEL] [--detection-variant all|images|boxes|no_snapshots] \
+  [--detection-mode context|baseline] \
+  [--cli-model MODEL] [--retries N] [--max-budget-usd USD] [--dry-run]
 ```
 
-The script runs the test on both snapshots itself. If the test isn't valid, the agent gets the output and tries again, up to `--retries` times (1 by default). `--cli-model` picks the Claude model (`claude-sonnet-5-5` by default) and `--max-budget-usd` caps each attempt ($2 by default). `--dry-run` prints the prompt and the Claude Code command without running the agent. The script reads the saved report, so rerun `pipeline.py` after a detection change.
+The script runs the test on both snapshots itself. If the test isn't valid, the agent gets the output and tries again, up to `--retries` times (1 by default). `--cli-model` picks the Claude model (`claude-sonnet-5-5` by default) and `--max-budget-usd` caps each attempt ($2 by default). `--dry-run` prints the prompt and the Claude Code command without running the agent. The script reads the saved report, so rerun the pipeline after a detection change.
 
 Output goes in `out/test_generation/llm/<cli model>/detection-<model>/<variant>/<mode>/`:
 - `test_generated_regression.py`: the test
@@ -148,12 +145,18 @@ Output goes in `out/test_generation/llm/<cli model>/detection-<model>/<variant>/
 
 [`test_generation/scripted/generate.py`](test_generation/scripted/generate.py) writes a `unittest` from a case's regression report and `out/dom/boxes.json`. If the report found a regression, the test expects the before snapshot on the regressed boxes, checking only the CSS properties that changed on those elements. If it found none, the script skips writing a test:
 ```bash
-python -m test_generation.scripted.generate <case_folder> [--detection-model MODEL] [--detection-variant all|images|boxes] [--detection-mode context|baseline] [--force]
+python -m test_generation.scripted.generate <case_folder> \
+  [--detection-model MODEL] [--detection-variant all|images|boxes] \
+  [--detection-mode context|baseline] [--force]
 ```
 
-The test goes in `out/test_generation/scripted/detection-<model>/<variant>/<mode>/` and reads the snapshots from the case's `captures/`. `result.json` uses the same format as the Claude Code generator's, without the CLI, code and usage fields. To check a new capture, set `ACTUAL_SNAPSHOT` to its path. `no_snapshots` isn't supported since pixel boxes have no selectors. If a target has no changed CSS property, the script writes no test and records an `error` in `result.json`. `--force` replaces an existing test.
+The test goes in `out/test_generation/scripted/detection-<model>/<variant>/<mode>/` and reads the snapshots from the case's `captures/`. `result.json` uses the same format as the Claude Code generator's, without the `code`, `usage` and `cli` fields. To check a new capture, set `ACTUAL_SNAPSHOT` to its path.
+
+`no_snapshots` isn't supported since pixel boxes have no selectors. If a target has no changed CSS property, the script writes no test and records an `error` in `result.json`. Use `--force` to replace an existing test.
 
 ## Evaluation
+
+All models run at their default thinking level.
 
 [`evaluation/score.py`](evaluation/score.py) compares the saved reports with the manual ground-truth labels:
 ```bash
@@ -167,11 +170,11 @@ The label for a case goes in `label.json` in its folder:
 
 `regression` says whether the case is a regression. `dom_boxes` and `pixel_boxes` (both optional) list the regressed box ids in `out/dom/boxes.json` and `out/pixel/boxes.json`, which number boxes differently. The `no_snapshots` variant is scored on `pixel_boxes`.
 
-The script writes `<model>.csv` to [`evaluation/results/regression_detection/`](evaluation/results/regression_detection/), with case and box precision and recall for each variant and mode. `NaN` means the run flagged nothing, so precision is undefined. `avg_input_tokens` and `avg_output_tokens` are averages per call and output includes thinking tokens.
+The script writes `<model>.csv` to [`evaluation/results/regression_detection/`](evaluation/results/regression_detection/), with case and box precision and recall for each variant and mode. `NaN` here indicates the run flagged nothing, so precision is undefined. `avg_input_tokens` and `avg_output_tokens` are averages per call and output includes thinking tokens.
 
 [`evaluation/score_test_generation.py`](evaluation/score_test_generation.py) scores the generated tests against the same labels:
 ```bash
 python -m evaluation.score_test_generation
 ```
 
-It writes `<generator>.csv` to [`evaluation/results/test_generation/`](evaluation/results/test_generation/), with a row for each detection model, variant and mode. `valid_rate` is the share of regressions that got a test passing on the before snapshot and failing on the after snapshot. `relevant_rate` only counts valid tests whose failure names a regressed element from `dom_boxes`, so tests built on false positives don't count. The LLM generators also get `avg_cost_usd`, Claude Code's estimate at API list prices, and `avg_attempts`.
+It writes `<generator>.csv` to [`evaluation/results/test_generation/`](evaluation/results/test_generation/), with a row for each detection model, variant and mode. `valid_test_rate` is the share of regressions that got a test passing on the before snapshot and failing on the after snapshot. `relevant_test_rate` only counts valid tests whose failure names a regressed element from `dom_boxes`, so tests built on false positives don't count. The LLM generators also get `avg_cost_usd`, Claude Code's estimate at API list prices, and `avg_attempts`.

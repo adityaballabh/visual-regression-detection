@@ -3,10 +3,10 @@ import urllib.request
 from collections import defaultdict
 from pathlib import Path, PurePosixPath
 
-from cases import diff_folder, pr_repo, reports_folder
 from image_diff.capture import capture_html_pair
 from image_diff.diff import diff_files
 from image_diff.model import Side
+from pipeline.cases import diff_folder, pr_repo, reports_folder
 from regression_detection.gemini_processor import DEFAULT_MODEL, VARIANTS, Case, RegressionReport, load_env, run_case
 from test_generation.llm.generate import DEFAULT_CLI_MODEL, GenerationResult
 from test_generation.llm.generate import generate_test as generate_llm_test
