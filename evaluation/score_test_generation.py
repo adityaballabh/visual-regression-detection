@@ -5,8 +5,8 @@ from pathlib import Path
 
 import numpy as np
 
+from cases import diff_folder
 from evaluation.score import format_cell
-from pipeline import diff_folder
 from test_generation.llm.generate import GenerationResult, names_box_element
 
 _EXAMPLES = Path(__file__).resolve().parent.parent / "examples"

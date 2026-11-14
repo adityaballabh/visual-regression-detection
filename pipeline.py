@@ -2,15 +2,15 @@ import argparse
 import urllib.request
 from collections import defaultdict
 from pathlib import Path, PurePosixPath
-from urllib.parse import urlparse
 
-from github import Github
-from github.Repository import Repository
-
+from cases import diff_folder, pr_repo, reports_folder
 from image_diff.capture import capture_html_pair
 from image_diff.diff import diff_files
 from image_diff.model import Side
 from regression_detection.gemini_processor import DEFAULT_MODEL, VARIANTS, Case, RegressionReport, load_env, run_case
+from test_generation.llm.generate import DEFAULT_CLI_MODEL, GenerationResult
+from test_generation.llm.generate import generate_test as generate_llm_test
+from test_generation.scripted.generate import generate_case_test as generate_scripted_test
 
 _CAPTURE_NAMES = ("before.png", "before_snapshot.json", "after.png", "after_snapshot.json")
 # Hardcoded to where the PrairieLearn fork stores its design language
@@ -25,13 +25,8 @@ def _has_html_pair(folder: Path) -> bool:
     return all((folder / f"{side}.html").is_file() for side in Side)
 
 
-def _pr_repo(pr_url: str) -> tuple[Repository, int]:
-    owner, repo, _, number = urlparse(pr_url).path.strip("/").split("/")[:4]
-    return Github().get_repo(f"{owner}/{repo}"), int(number)
-
-
 def _download_pr_captures(pr_url: str, captures_folder: Path):
-    repo, number = _pr_repo(pr_url)
+    repo, number = pr_repo(pr_url)
     pull = repo.get_pull(number)
 
     # Group the capture files by their folder under .github/pr-images/
@@ -54,14 +49,14 @@ def _download_pr_captures(pr_url: str, captures_folder: Path):
 
 
 def _download_design_language(pr_url: str, design_language: Path):
-    repo, _ = _pr_repo(pr_url)
+    repo, _ = pr_repo(pr_url)
     content = repo.get_contents(_REPO_DESIGN_LANGUAGE_PATH).decoded_content
     design_language.parent.mkdir(parents=True, exist_ok=True)
     design_language.write_bytes(content)
 
 
 def _download_design_intent(pr_url: str, design_intent: Path):
-    repo, number = _pr_repo(pr_url)
+    repo, number = pr_repo(pr_url)
     description = repo.get_pull(number).body
 
     # The capture script writes the intent under Description, before the screenshots
@@ -75,21 +70,6 @@ def _diff(captures_folder: Path, out_folder: Path):
     snapshot_paths = captures_folder / "before_snapshot.json", captures_folder / "after_snapshot.json"
     diff_files(before_path, after_path, out_folder / "dom", snapshot_paths)
     diff_files(before_path, after_path, out_folder / "pixel")
-
-
-def diff_folder(case_folder: Path, variant: str) -> Path:
-    return case_folder / "out" / ("pixel" if variant == "no_snapshots" else "dom")
-
-
-def reports_folder(case_folder: Path, model: str, variant: str) -> Path:
-    return case_folder / "out" / "regression_detection" / model / variant
-
-
-def tests_folder(
-    case_folder: Path, generator: Path, detection_model: str, detection_variant: str, detection_mode: str
-) -> Path:
-    detection = Path(f"detection-{detection_model}", detection_variant, detection_mode)
-    return case_folder / "out" / "test_generation" / generator / detection
 
 
 def prepare_case(case_folder: Path):
@@ -129,6 +109,26 @@ def detect_regressions(
     return run_case(case, detection_mode, detection_model, out, detection_dry_run)
 
 
+def generate_test(
+    case_folder: Path,
+    detection_model: str,
+    detection_variant: str,
+    detection_mode: str,
+    test_generator: str,
+    cli_model: str,
+) -> GenerationResult:
+    if test_generator == "scripted":
+        # Replace the test from an earlier run since detection just ran again
+        return generate_scripted_test(case_folder, detection_model, detection_variant, detection_mode, force=True)
+    return generate_llm_test(
+        case_folder,
+        detection_model=detection_model,
+        detection_variant=detection_variant,
+        detection_mode=detection_mode,
+        cli_model=cli_model,
+    )
+
+
 def _verdict(report: RegressionReport) -> str:
     if not report.is_regression:
         return "no regression"
@@ -143,7 +143,12 @@ def main():
     parser.add_argument("--detection-model", default=DEFAULT_MODEL)
     parser.add_argument("--detection-mode", choices=["context", "baseline", "both"], default="context")
     parser.add_argument("--detection-dry-run", action="store_true")
+    parser.add_argument("--test-generator", choices=["scripted", "llm"], default="llm")
+    parser.add_argument("--cli-model", default=DEFAULT_CLI_MODEL, help="Claude Code model for the llm generator")
     args = parser.parse_args()
+    # The scripted generator needs selectors, which pixel boxes do not have
+    if args.test_generator == "scripted" and args.detection_variant == "no_snapshots":
+        parser.error("the scripted test generator does not support the no_snapshots variant")
 
     prepare_case(args.case_folder)
     reports = detect_regressions(
@@ -156,6 +161,15 @@ def main():
     out = reports_folder(args.case_folder, args.detection_model, args.detection_variant)
     for mode, report in reports.items():
         print(f"{mode}: {_verdict(report)}, saved to {out / f'report_{mode}.json'}")
+        result = generate_test(
+            args.case_folder,
+            args.detection_model,
+            args.detection_variant,
+            mode,
+            args.test_generator,
+            args.cli_model,
+        )
+        print(f"{mode} test: {result.status}: {result.reason or result.test_file}")
 
 
 if __name__ == "__main__":

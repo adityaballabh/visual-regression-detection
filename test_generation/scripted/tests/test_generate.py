@@ -7,9 +7,9 @@ import unittest
 from dataclasses import replace
 from pathlib import Path
 
+from cases import reports_folder
 from image_diff.dom.parse import load_snapshot
 from image_diff.model import Box
-from pipeline import reports_folder
 from regression_detection.gemini_processor import REPO_ROOT
 from test_generation.llm.generate import GenerationResult
 from test_generation.scripted.generate import _save_result, generate_test

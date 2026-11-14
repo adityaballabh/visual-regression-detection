@@ -11,9 +11,8 @@ token usage and cost) to `<case_folder>/out/test_generation/llm/<cli model>/dete
 Usage, from the repository root:
     python -m test_generation.llm.generate CASE_FOLDER [--detection-model MODEL]
         [--detection-variant all|images|boxes|no_snapshots] [--detection-mode context|baseline]
-        [--cli-model claude-sonnet-5-5] [--max-budget-usd 2.0] [--retries 1] [--cache-dir DIR] [--run-detection] [--dry-run]
+        [--cli-model claude-sonnet-5-5] [--max-budget-usd 2.0] [--retries 1] [--cache-dir DIR] [--dry-run]
 
-`--run-detection` first runs the earlier pipeline steps (capture, image diff, regression detection) on the case.
 `--dry-run` prints the prompt and the Claude Code command without running the agent.
 """
 
@@ -32,8 +31,8 @@ from typing import Literal
 
 from pydantic import BaseModel
 
+from cases import diff_folder, pr_repo, reports_folder, tests_folder
 from image_diff.dom.parse import load_snapshot
-from pipeline import _pr_repo, detect_regressions, diff_folder, prepare_case, reports_folder, tests_folder
 from regression_detection.gemini_processor import (
     DEFAULT_MODEL,
     REPO_ROOT,
@@ -121,7 +120,7 @@ class GenerationResult(BaseModel):
 def load_report(case_folder: Path, model: str, variant: str, mode: str) -> RegressionReport:
     report_file = reports_folder(case_folder, model, variant) / f"report_{mode}.json"
     if not report_file.is_file():
-        raise SystemExit(f"{report_file} not found, run regression detection first (or pass --run-detection)")
+        raise SystemExit(f"{report_file} not found, run regression detection first")
     return RegressionReport.model_validate_json(report_file.read_text())
 
 
@@ -152,7 +151,7 @@ def _git(*args: str, cwd: Path) -> str:
 
 def _pull_request_context(pr_url: str, out_folder: Path, cache_dir: Path, fetch: bool) -> CodeContext:
     """The PR's head checked out once in the cache, plus the PR's diff as a file next to the test."""
-    repo, number = _pr_repo(pr_url)
+    repo, number = pr_repo(pr_url)
     pull = repo.get_pull(number)
     name = repo.full_name.replace("/", "__")
     context = CodeContext(kind="pull_request", pr_url=pr_url, head_sha=pull.head.sha)
@@ -697,18 +696,9 @@ def main():
     parser.add_argument("--max-budget-usd", type=float, default=DEFAULT_MAX_BUDGET_USD, help="limit for one attempt")
     parser.add_argument("--retries", type=int, default=1, help="extra attempts when the test is not valid")
     parser.add_argument("--cache-dir", type=Path, default=DEFAULT_CACHE_DIR)
-    parser.add_argument("--run-detection", action="store_true", help="run capture, image diff and detection first")
     parser.add_argument("--dry-run", action="store_true", help="print the prompt and command, don't run the agent")
     args = parser.parse_args()
 
-    if args.run_detection:
-        prepare_case(args.case_folder)
-        reports = detect_regressions(
-            args.case_folder, args.detection_variant, args.detection_model, args.detection_mode, args.dry_run
-        )
-        for mode, report in reports.items():
-            flagged = ", ".join(str(regression.box_id) for regression in report.regressions)
-            print(f"detection {mode}: {f'regression in boxes {flagged}' if report.is_regression else 'no regression'}")
     outcome = generate_test(
         args.case_folder,
         detection_model=args.detection_model,

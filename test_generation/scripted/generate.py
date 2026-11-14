@@ -5,9 +5,9 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
+from cases import diff_folder, reports_folder, tests_folder
 from image_diff.dom.parse import load_snapshot
 from image_diff.model import Snapshot
-from pipeline import diff_folder, reports_folder, tests_folder
 from regression_detection.gemini_processor import DEFAULT_MODEL, REPORT_FORMATTER, RegressionReport
 from test_generation.llm.generate import (
     Attempt,
@@ -257,6 +257,28 @@ def _save_result(
     return result
 
 
+def generate_case_test(
+    case_folder: Path, detection_model: str, detection_variant: str, detection_mode: str, force: bool = False
+) -> GenerationResult:
+    reports = reports_folder(case_folder, detection_model, detection_variant)
+    tests = tests_folder(case_folder, Path("scripted"), detection_model, detection_variant, detection_mode)
+    output = None
+    error = None
+    try:
+        output = generate_test(
+            case_folder / "captures" / "before_snapshot.json",
+            case_folder / "captures" / "after_snapshot.json",
+            reports / f"report_{detection_mode}.json",
+            diff_folder(case_folder, detection_variant) / "boxes.json",
+            tests / "test_generated_regression.py",
+            force=force,
+        )
+    # Record why no test could be built so evaluation still counts the case
+    except (TypeError, ValueError) as exception:
+        error = str(exception)
+    return _save_result(case_folder, detection_model, detection_variant, detection_mode, tests, output, error)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Generate a focused unittest using the regression report and DOM boxes."
@@ -269,31 +291,13 @@ def main():
     parser.add_argument("--force", action="store_true", help="Replace generated files if they already exist")
     args = parser.parse_args()
 
-    case_folder = args.case_folder
-    reports = reports_folder(case_folder, args.detection_model, args.detection_variant)
-    tests = tests_folder(
-        case_folder, Path("scripted"), args.detection_model, args.detection_variant, args.detection_mode
-    )
-    output = None
-    error = None
     try:
-        output = generate_test(
-            case_folder / "captures" / "before_snapshot.json",
-            case_folder / "captures" / "after_snapshot.json",
-            reports / f"report_{args.detection_mode}.json",
-            diff_folder(case_folder, args.detection_variant) / "boxes.json",
-            tests / "test_generated_regression.py",
-            force=args.force,
+        result = generate_case_test(
+            args.case_folder, args.detection_model, args.detection_variant, args.detection_mode, args.force
         )
     # A missing or unreadable input means an earlier pipeline step did not run
     except (OSError, json.JSONDecodeError) as exception:
         parser.error(str(exception))
-    # Record why no test could be built so evaluation still counts the case
-    except (TypeError, ValueError) as exception:
-        error = str(exception)
-    result = _save_result(
-        case_folder, args.detection_model, args.detection_variant, args.detection_mode, tests, output, error
-    )
     print(f"{result.status}: {result.reason or result.test_file}")
 
 
