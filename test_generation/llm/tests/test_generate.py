@@ -78,7 +78,7 @@ class TestGeneration(unittest.TestCase):
 
     def test_flagged_boxes_keep_the_selector_and_the_reason(self):
         report = RegressionReport.model_validate_json((self.case / _REPORT).read_text())
-        (box,) = generation._flagged_boxes(self.case, "all", report)
+        (box,) = generation.flagged_boxes(self.case, "all", report)
         self.assertEqual((box["id"], box["selector"], box["category"]), (3, _SELECTOR, "color"))
 
     def test_valid_test_is_generated_and_usage_recorded(self):

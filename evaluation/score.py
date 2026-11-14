@@ -116,11 +116,11 @@ def _write_summary(model: str, rows: list[dict[str, str | float]]):
         writer = csv.DictWriter(file, fieldnames=_COLUMNS)
         writer.writeheader()
         for row in rows:
-            writer.writerow({key: _cell(value) for key, value in row.items()})
+            writer.writerow({key: format_cell(value) for key, value in row.items()})
     print(f"wrote {summary_file.relative_to(_EXAMPLES.parent)}")
 
 
-def _cell(value: str | float) -> str:
+def format_cell(value: str | float) -> str:
     if isinstance(value, (str, int)):
         return str(value)
     return "NaN" if np.isnan(value) else f"{value:.3f}"

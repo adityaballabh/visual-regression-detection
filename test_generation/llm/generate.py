@@ -118,14 +118,14 @@ class GenerationResult(BaseModel):
 # ------------------------------------------------------------------ report input
 
 
-def _load_report(case_folder: Path, model: str, variant: str, mode: str) -> RegressionReport:
+def load_report(case_folder: Path, model: str, variant: str, mode: str) -> RegressionReport:
     report_file = reports_folder(case_folder, model, variant) / f"report_{mode}.json"
     if not report_file.is_file():
         raise SystemExit(f"{report_file} not found, run regression detection first (or pass --run-detection)")
     return RegressionReport.model_validate_json(report_file.read_text())
 
 
-def _flagged_boxes(case_folder: Path, variant: str, report: RegressionReport) -> list[dict]:
+def flagged_boxes(case_folder: Path, variant: str, report: RegressionReport) -> list[dict]:
     """The report's regressions joined with their boxes, keeping the selectors for the agent."""
     boxes = {box["id"]: box for box in json.loads((diff_folder(case_folder, variant) / "boxes.json").read_text())}
     flagged = []
@@ -206,7 +206,7 @@ def _code_context(case_folder: Path, out_folder: Path, cache_dir: Path, fetch: b
     return CodeContext(kind="none")
 
 
-def _portable_path(path: Path) -> str:
+def portable_path(path: Path) -> str:
     if path.is_relative_to(REPO_ROOT):
         return str(path.relative_to(REPO_ROOT))
     # Leave the username out of paths like the cached PR checkout
@@ -215,8 +215,8 @@ def _portable_path(path: Path) -> str:
     return str(path)
 
 
-def _portable_text(text: str) -> str:
-    # Same rules as _portable_path, for paths inside saved prompts and outputs
+def portable_text(text: str) -> str:
+    # Same rules as portable_path, for paths inside saved prompts and outputs
     text = text.replace(f"{REPO_ROOT}/", "").replace(str(REPO_ROOT), ".")
     return text.replace(f"{Path.home()}/", "~/")
 
@@ -226,7 +226,7 @@ def _portable_code(code: CodeContext) -> CodeContext:
     for name in ("code_dir", "diff_file"):
         path = getattr(code, name)
         if path:
-            paths[name] = _portable_path(Path(path))
+            paths[name] = portable_path(Path(path))
     return code.model_copy(update=paths)
 
 
@@ -504,9 +504,9 @@ def _run_agent(prompt: str, command: list[str], out_folder: Path, attempt: int) 
         output = json.loads(done.stdout)
     except json.JSONDecodeError:
         # Keep the raw output since it is not JSON when the agent crashes
-        attempt_file.write_text(_portable_text(done.stdout))
+        attempt_file.write_text(portable_text(done.stdout))
         return Attempt(usage=Usage(), error=f"agent exited {done.returncode}: {(done.stderr or done.stdout)[-500:]}")
-    attempt_file.write_text(_portable_text(REPORT_FORMATTER.serialize(output)))
+    attempt_file.write_text(portable_text(REPORT_FORMATTER.serialize(output)))
     error = None
     if done.returncode != 0 or output.get("is_error"):
         error = f"{output.get('subtype', 'error')}: {str(output.get('result', ''))[-500:]}"
@@ -601,13 +601,13 @@ def generate_test(
 ) -> GenerationResult | None:
     # The agent runs in the output folder, so every path it is given has to be absolute
     case_folder = case_folder.resolve()
-    report = _load_report(case_folder, detection_model, detection_variant, detection_mode)
+    report = load_report(case_folder, detection_model, detection_variant, detection_mode)
     out_folder = tests_folder(case_folder, Path("llm", cli_model), detection_model, detection_variant, detection_mode)
 
     def result(status: str, **fields) -> GenerationResult:
         base = {
             "status": status,
-            "case": _portable_path(case_folder),
+            "case": portable_path(case_folder),
             "detection_model": detection_model,
             "detection_variant": detection_variant,
             "detection_mode": detection_mode,
@@ -620,7 +620,7 @@ def generate_test(
 
     def save(outcome: GenerationResult) -> GenerationResult:
         out_folder.mkdir(parents=True, exist_ok=True)
-        (out_folder / "result.json").write_text(_portable_text(REPORT_FORMATTER.serialize(outcome.model_dump())))
+        (out_folder / "result.json").write_text(portable_text(REPORT_FORMATTER.serialize(outcome.model_dump())))
         return outcome
 
     if not report.is_regression:
@@ -628,7 +628,7 @@ def generate_test(
         shutil.rmtree(out_folder, ignore_errors=True)
         return save(result("skipped", reason="the detection report found no regression"))
 
-    flagged = _flagged_boxes(case_folder, detection_variant, report)
+    flagged = flagged_boxes(case_folder, detection_variant, report)
     if not dry_run:
         out_folder.mkdir(parents=True, exist_ok=True)
     code = _code_context(case_folder, out_folder, cache_dir, fetch=not dry_run)
@@ -641,7 +641,7 @@ def generate_test(
     if shutil.which(claude_bin) is None:
         raise SystemExit(f"{claude_bin} not found, install Claude Code or pass --claude-bin")
 
-    (out_folder / "prompt.md").write_text(_portable_text(prompt))
+    (out_folder / "prompt.md").write_text(portable_text(prompt))
     test_file = out_folder / TEST_FILE
     test_file.unlink(missing_ok=True)
     attempts: list[Attempt] = []
@@ -679,7 +679,7 @@ def generate_test(
             status,
             reason=reason,
             code=_portable_code(code),
-            test_file=_portable_path(test_file) if test_file.is_file() else None,
+            test_file=portable_path(test_file) if test_file.is_file() else None,
             attempts=attempts,
             usage=total,
         )

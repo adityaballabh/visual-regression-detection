@@ -12,10 +12,10 @@ from regression_detection.gemini_processor import DEFAULT_MODEL, REPORT_FORMATTE
 from test_generation.llm.generate import (
     Attempt,
     GenerationResult,
-    _flagged_boxes,
-    _load_report,
-    _portable_path,
-    _portable_text,
+    flagged_boxes,
+    load_report,
+    portable_path,
+    portable_text,
     validate_test,
 )
 from test_generation.scripted.snapshot_assertions import ElementTarget, StyleTarget
@@ -211,7 +211,7 @@ if __name__ == "__main__":
 def _validate(
     case_folder: Path, detection_variant: str, report: RegressionReport, tests: Path
 ) -> tuple[str, str | None, Attempt]:
-    flagged = _flagged_boxes(case_folder, detection_variant, report)
+    flagged = flagged_boxes(case_folder, detection_variant, report)
     validation = validate_test(tests, case_folder.resolve(), flagged)
     attempt = Attempt(validation=validation)
     if validation.valid:
@@ -228,7 +228,7 @@ def _save_result(
     test_file: Path | None,
     error: str | None = None,
 ) -> GenerationResult:
-    report = _load_report(case_folder, detection_model, detection_variant, detection_mode)
+    report = load_report(case_folder, detection_model, detection_variant, detection_mode)
     attempts = []
     if error:
         status, reason = "error", error
@@ -241,19 +241,19 @@ def _save_result(
     result = GenerationResult(
         status=status,
         reason=reason,
-        case=_portable_path(case_folder.resolve()),
+        case=portable_path(case_folder.resolve()),
         detection_model=detection_model,
         detection_variant=detection_variant,
         detection_mode=detection_mode,
         flagged_box_ids=[regression.box_id for regression in report.regressions],
-        test_file=_portable_path(test_file.resolve()) if test_file else None,
+        test_file=portable_path(test_file.resolve()) if test_file else None,
         attempts=attempts,
         created_at=datetime.now(UTC).isoformat(timespec="seconds"),
     )
     tests.mkdir(parents=True, exist_ok=True)
     # Drop the LLM-only fields since a script has no CLI, code context or token usage
     llm_only = {"cli": True, "code": True, "usage": True, "attempts": {"__all__": {"usage", "session_id", "error"}}}
-    (tests / "result.json").write_text(_portable_text(REPORT_FORMATTER.serialize(result.model_dump(exclude=llm_only))))
+    (tests / "result.json").write_text(portable_text(REPORT_FORMATTER.serialize(result.model_dump(exclude=llm_only))))
     return result
 
 
