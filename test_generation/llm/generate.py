@@ -11,9 +11,8 @@ token usage and cost) to `<case_folder>/out/test_generation/llm/<cli model>/dete
 Usage, from the repository root:
     python -m test_generation.llm.generate CASE_FOLDER [--detection-model MODEL]
         [--detection-variant all|images|boxes|no_snapshots] [--detection-mode context|baseline]
-        [--cli-model claude-sonnet-5-5] [--max-budget-usd 2.0] [--retries 1] [--cache-dir DIR] [--run-detection] [--dry-run]
+        [--cli-model claude-sonnet-5-5] [--max-budget-usd 2.0] [--retries 1] [--cache-dir DIR] [--dry-run]
 
-`--run-detection` first runs the earlier pipeline steps (capture, image diff, regression detection) on the case.
 `--dry-run` prints the prompt and the Claude Code command without running the agent.
 """
 
@@ -33,7 +32,7 @@ from typing import Literal
 from pydantic import BaseModel
 
 from image_diff.dom.parse import load_snapshot
-from pipeline import _pr_repo, detect_regressions, diff_folder, prepare_case, reports_folder, tests_folder
+from pipeline.cases import diff_folder, pr_repo, reports_folder, tests_folder
 from regression_detection.gemini_processor import (
     DEFAULT_MODEL,
     REPO_ROOT,
@@ -72,7 +71,7 @@ class Usage(BaseModel):
 class Validation(BaseModel):
     passes_on_before: bool
     fails_on_after: bool
-    # The failure is an assertion, not an import error or a crash in the test
+    # The failure is an assertion, which rules out an import error or a crash in the test
     fails_by_assertion: bool
     # The failure message names a flagged element, None when no flagged box has a selector
     names_flagged_element: bool | None
@@ -118,14 +117,14 @@ class GenerationResult(BaseModel):
 # ------------------------------------------------------------------ report input
 
 
-def _load_report(case_folder: Path, model: str, variant: str, mode: str) -> RegressionReport:
+def load_report(case_folder: Path, model: str, variant: str, mode: str) -> RegressionReport:
     report_file = reports_folder(case_folder, model, variant) / f"report_{mode}.json"
     if not report_file.is_file():
-        raise SystemExit(f"{report_file} not found, run regression detection first (or pass --run-detection)")
+        raise SystemExit(f"{report_file} not found, run regression detection first")
     return RegressionReport.model_validate_json(report_file.read_text())
 
 
-def _flagged_boxes(case_folder: Path, variant: str, report: RegressionReport) -> list[dict]:
+def flagged_boxes(case_folder: Path, variant: str, report: RegressionReport) -> list[dict]:
     """The report's regressions joined with their boxes, keeping the selectors for the agent."""
     boxes = {box["id"]: box for box in json.loads((diff_folder(case_folder, variant) / "boxes.json").read_text())}
     flagged = []
@@ -152,7 +151,7 @@ def _git(*args: str, cwd: Path) -> str:
 
 def _pull_request_context(pr_url: str, out_folder: Path, cache_dir: Path, fetch: bool) -> CodeContext:
     """The PR's head checked out once in the cache, plus the PR's diff as a file next to the test."""
-    repo, number = _pr_repo(pr_url)
+    repo, number = pr_repo(pr_url)
     pull = repo.get_pull(number)
     name = repo.full_name.replace("/", "__")
     context = CodeContext(kind="pull_request", pr_url=pr_url, head_sha=pull.head.sha)
@@ -206,7 +205,7 @@ def _code_context(case_folder: Path, out_folder: Path, cache_dir: Path, fetch: b
     return CodeContext(kind="none")
 
 
-def _portable_path(path: Path) -> str:
+def portable_path(path: Path) -> str:
     if path.is_relative_to(REPO_ROOT):
         return str(path.relative_to(REPO_ROOT))
     # Leave the username out of paths like the cached PR checkout
@@ -215,8 +214,8 @@ def _portable_path(path: Path) -> str:
     return str(path)
 
 
-def _portable_text(text: str) -> str:
-    # Same rules as _portable_path, for paths inside saved prompts and outputs
+def portable_text(text: str) -> str:
+    # Same rules as portable_path, for paths inside saved prompts and outputs
     text = text.replace(f"{REPO_ROOT}/", "").replace(str(REPO_ROOT), ".")
     return text.replace(f"{Path.home()}/", "~/")
 
@@ -226,7 +225,7 @@ def _portable_code(code: CodeContext) -> CodeContext:
     for name in ("code_dir", "diff_file"):
         path = getattr(code, name)
         if path:
-            paths[name] = _portable_path(Path(path))
+            paths[name] = portable_path(Path(path))
     return code.model_copy(update=paths)
 
 
@@ -504,9 +503,9 @@ def _run_agent(prompt: str, command: list[str], out_folder: Path, attempt: int) 
         output = json.loads(done.stdout)
     except json.JSONDecodeError:
         # Keep the raw output since it is not JSON when the agent crashes
-        attempt_file.write_text(_portable_text(done.stdout))
+        attempt_file.write_text(portable_text(done.stdout))
         return Attempt(usage=Usage(), error=f"agent exited {done.returncode}: {(done.stderr or done.stdout)[-500:]}")
-    attempt_file.write_text(_portable_text(REPORT_FORMATTER.serialize(output)))
+    attempt_file.write_text(portable_text(REPORT_FORMATTER.serialize(output)))
     error = None
     if done.returncode != 0 or output.get("is_error"):
         error = f"{output.get('subtype', 'error')}: {str(output.get('result', ''))[-500:]}"
@@ -533,11 +532,11 @@ def _run_test(out_folder: Path, snapshot: Path) -> tuple[int, str]:
     return done.returncode, done.stdout + done.stderr
 
 
-def _names_flagged_element(output: str, flagged: list[dict]) -> bool | None:
-    selectors = [box["selector"] for box in flagged if box.get("selector")]
+def names_box_element(output: str, boxes: list[dict]) -> bool | None:
+    selectors = [box["selector"] for box in boxes if box.get("selector")]
     if not selectors:
         return None
-    # The last steps are enough, a test may print a shortened selector
+    # The last steps are enough, a test might print a shortened selector
     return any(" > ".join(selector.split(" > ")[-2:]) in output for selector in selectors)
 
 
@@ -546,7 +545,7 @@ def _format_test(test_file: Path) -> None:
     for command in (["ruff"], [sys.executable, "-m", "ruff"]):
         try:
             done = subprocess.run(
-                [*command, "format", "--config", str(REPO_ROOT / "ruff.toml"), str(test_file)],
+                [*command, "format", "--config", str(REPO_ROOT / "pyproject.toml"), str(test_file)],
                 capture_output=True,
                 stdin=subprocess.DEVNULL,
                 check=False,
@@ -568,7 +567,7 @@ def validate_test(out_folder: Path, case_folder: Path, flagged: list[dict]) -> V
         passes_on_before=before_code == 0,
         fails_on_after=after_code != 0,
         fails_by_assertion=assertion_only,
-        names_flagged_element=_names_flagged_element(after_output, flagged) if after_code != 0 else None,
+        names_flagged_element=names_box_element(after_output, flagged) if after_code != 0 else None,
         before_output=before_output,
         after_output=after_output,
     )
@@ -601,13 +600,13 @@ def generate_test(
 ) -> GenerationResult | None:
     # The agent runs in the output folder, so every path it is given has to be absolute
     case_folder = case_folder.resolve()
-    report = _load_report(case_folder, detection_model, detection_variant, detection_mode)
+    report = load_report(case_folder, detection_model, detection_variant, detection_mode)
     out_folder = tests_folder(case_folder, Path("llm", cli_model), detection_model, detection_variant, detection_mode)
 
     def result(status: str, **fields) -> GenerationResult:
         base = {
             "status": status,
-            "case": _portable_path(case_folder),
+            "case": portable_path(case_folder),
             "detection_model": detection_model,
             "detection_variant": detection_variant,
             "detection_mode": detection_mode,
@@ -620,7 +619,7 @@ def generate_test(
 
     def save(outcome: GenerationResult) -> GenerationResult:
         out_folder.mkdir(parents=True, exist_ok=True)
-        (out_folder / "result.json").write_text(_portable_text(REPORT_FORMATTER.serialize(outcome.model_dump())))
+        (out_folder / "result.json").write_text(portable_text(REPORT_FORMATTER.serialize(outcome.model_dump())))
         return outcome
 
     if not report.is_regression:
@@ -628,7 +627,7 @@ def generate_test(
         shutil.rmtree(out_folder, ignore_errors=True)
         return save(result("skipped", reason="the detection report found no regression"))
 
-    flagged = _flagged_boxes(case_folder, detection_variant, report)
+    flagged = flagged_boxes(case_folder, detection_variant, report)
     if not dry_run:
         out_folder.mkdir(parents=True, exist_ok=True)
     code = _code_context(case_folder, out_folder, cache_dir, fetch=not dry_run)
@@ -641,7 +640,7 @@ def generate_test(
     if shutil.which(claude_bin) is None:
         raise SystemExit(f"{claude_bin} not found, install Claude Code or pass --claude-bin")
 
-    (out_folder / "prompt.md").write_text(_portable_text(prompt))
+    (out_folder / "prompt.md").write_text(portable_text(prompt))
     test_file = out_folder / TEST_FILE
     test_file.unlink(missing_ok=True)
     attempts: list[Attempt] = []
@@ -679,7 +678,7 @@ def generate_test(
             status,
             reason=reason,
             code=_portable_code(code),
-            test_file=_portable_path(test_file) if test_file.is_file() else None,
+            test_file=portable_path(test_file) if test_file.is_file() else None,
             attempts=attempts,
             usage=total,
         )
@@ -697,18 +696,9 @@ def main():
     parser.add_argument("--max-budget-usd", type=float, default=DEFAULT_MAX_BUDGET_USD, help="limit for one attempt")
     parser.add_argument("--retries", type=int, default=1, help="extra attempts when the test is not valid")
     parser.add_argument("--cache-dir", type=Path, default=DEFAULT_CACHE_DIR)
-    parser.add_argument("--run-detection", action="store_true", help="run capture, image diff and detection first")
     parser.add_argument("--dry-run", action="store_true", help="print the prompt and command, don't run the agent")
     args = parser.parse_args()
 
-    if args.run_detection:
-        prepare_case(args.case_folder)
-        reports = detect_regressions(
-            args.case_folder, args.detection_variant, args.detection_model, args.detection_mode, args.dry_run
-        )
-        for mode, report in reports.items():
-            flagged = ", ".join(str(regression.box_id) for regression in report.regressions)
-            print(f"detection {mode}: {f'regression in boxes {flagged}' if report.is_regression else 'no regression'}")
     outcome = generate_test(
         args.case_folder,
         detection_model=args.detection_model,
