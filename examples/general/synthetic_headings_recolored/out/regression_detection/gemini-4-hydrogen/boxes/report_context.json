@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.98,
+  "summary": "The three section headings match the intended color change, but a footer paragraph unexpectedly changed from white to dark blue.",
+  "regressions": [
+    {
+      "box_id": 4,
+      "category": "color",
+      "severity": "high",
+      "explanation": "The contact paragraph text changed from white rgb(255, 255, 255) to dark blue rgb(30, 64, 175). This is an unintended color change that likely leaves dark blue text against the bright blue footer, harming readability and contrast.",
+      "violated_rule": "Only the section headings \"Academic Programs\", \"Faculty\" and \"Faculty Research\" should change from black to dark blue."
+    }
+  ],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 1524,
+    "image_tokens": 0,
+    "output_tokens": 195,
+    "thinking_tokens": 429,
+    "total_tokens": 2148
+  }
+}

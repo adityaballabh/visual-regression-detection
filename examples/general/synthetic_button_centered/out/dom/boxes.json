@@ -1,0 +1,5 @@
+[
+  {"id": 1, "type": "shape", "before": {"x": 56, "y": 398, "width": 274, "height": 16}, "after": {"x": 56, "y": 398, "width": 274, "height": 16}, "element": "<label> 'Username'", "selector": "html:nth-child(1) > body:nth-child(2) > section:nth-child(3) > form:nth-child(2) > div:nth-child(1) > label:nth-child(1)", "frames": [], "detail": "text-align start -> center"},
+  {"id": 2, "type": "shape", "before": {"x": 56, "y": 472, "width": 273, "height": 16}, "after": {"x": 56, "y": 472, "width": 273, "height": 16}, "element": "<label> 'Password'", "selector": "html:nth-child(1) > body:nth-child(2) > section:nth-child(3) > form:nth-child(2) > div:nth-child(2) > label:nth-child(1)", "frames": [], "detail": "text-align start -> center"},
+  {"id": 3, "type": "shape", "before": {"x": 24, "y": 553, "width": 544, "height": 39}, "after": {"x": 24, "y": 553, "width": 544, "height": 39}, "element": "<button> 'Sign Up'", "selector": "html:nth-child(1) > body:nth-child(2) > section:nth-child(3) > form:nth-child(2) > button:nth-child(3)", "frames": [], "detail": "gap right 412px -> 222px; gap left 32px -> 222px"}
+]

@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The section headings were updated to blue as part of an intended color scheme update. However, the footer contact text was also changed to blue, causing severe contrast issues against the blue footer background.",
+  "regressions": [
+    {
+      "box_id": 4,
+      "category": "color",
+      "severity": "high",
+      "explanation": "The footer text color was changed from white to blue on a blue background, resulting in insufficient contrast and poor readability.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 219,
+    "image_tokens": 4400,
+    "output_tokens": 171,
+    "thinking_tokens": 748,
+    "total_tokens": 5538
+  }
+}

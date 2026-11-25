@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The section headings were updated to dark blue as intended, but the footer contact text color was unintentionally changed from white to dark blue.",
+  "regressions": [
+    {
+      "box_id": 4,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "The footer contact text color changed from white to dark blue, which was not part of the design intent to update section headings and causes poor contrast on the bright blue footer background.",
+      "violated_rule": "The section headings 'Academic Programs', 'Faculty' and 'Faculty Research' were changed from black to dark blue."
+    }
+  ],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 943,
+    "image_tokens": 0,
+    "output_tokens": 188,
+    "thinking_tokens": 615,
+    "total_tokens": 1746
+  }
+}

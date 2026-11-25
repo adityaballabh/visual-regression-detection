@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.9,
+  "summary": "Changing the h2 headings to blue appears intentional, but the footer paragraph also changed from white to dark blue, likely causing a contrast defect on a dark background.",
+  "regressions": [
+    {
+      "box_id": 4,
+      "category": "color",
+      "severity": "high",
+      "explanation": "The contact paragraph changed from white rgb(255, 255, 255) to dark blue rgb(30, 64, 175), matching the h2 color change. Because it was white text, it likely sits on a dark footer background where dark blue severely reduces contrast and readability.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 1372,
+    "image_tokens": 0,
+    "output_tokens": 188,
+    "thinking_tokens": 680,
+    "total_tokens": 2240
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The 'Sign Up' button was successfully centered per the design intent, but centering the form field labels introduced unexpected layout misalignments.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "layout",
+      "severity": "low",
+      "explanation": "The 'Username' label text-align was changed to center, causing it to misalign with the left-aligned input field below it.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 2,
+      "category": "layout",
+      "severity": "low",
+      "explanation": "The 'Password' label text-align was changed to center, causing it to misalign with the left-aligned input field below it.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [3],
+  "usage": {
+    "text_tokens": 816,
+    "image_tokens": 4368,
+    "output_tokens": 160,
+    "thinking_tokens": 846,
+    "total_tokens": 6190
+  }
+}

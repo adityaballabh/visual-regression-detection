@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The color update applied to headings was also unintentionally applied to the contact text in the footer, causing severe text contrast issues against the blue background.",
+  "regressions": [
+    {
+      "box_id": 4,
+      "category": "color",
+      "severity": "high",
+      "explanation": "The text color was changed from white to dark blue on a blue background, making it extremely difficult to read due to poor color contrast.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 872,
+    "image_tokens": 4400,
+    "output_tokens": 160,
+    "thinking_tokens": 431,
+    "total_tokens": 5863
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "is_regression": true,
+  "confidence": 0.9,
+  "summary": "Form labels have unexpectedly shifted from left-aligned to center-aligned, and the submit button alignment/positioning has changed.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "typography",
+      "severity": "medium",
+      "explanation": "The Username label text alignment changed from start (left) to center, which breaks standard form labeling conventions.",
+      "violated_rule": "Form labels should be consistently left-aligned."
+    },
+    {
+      "box_id": 2,
+      "category": "typography",
+      "severity": "medium",
+      "explanation": "The Password label text alignment changed from start (left) to center.",
+      "violated_rule": "Form labels should be consistently left-aligned."
+    },
+    {
+      "box_id": 3,
+      "category": "layout",
+      "severity": "low",
+      "explanation": "The Sign Up button gaps have drastically changed, altering its positioning within the container.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 579,
+    "image_tokens": 0,
+    "output_tokens": 283,
+    "thinking_tokens": 0,
+    "total_tokens": 862
+  }
+}

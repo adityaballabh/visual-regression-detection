@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "All changes correctly implement the requested design intent to change section headings to dark blue.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4],
+  "usage": {
+    "text_tokens": 348,
+    "image_tokens": 4400,
+    "output_tokens": 72,
+    "thinking_tokens": 0,
+    "total_tokens": 4820
+  }
+}

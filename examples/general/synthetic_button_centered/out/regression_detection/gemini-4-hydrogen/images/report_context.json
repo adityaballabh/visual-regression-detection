@@ -1,0 +1,29 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The Sign Up button was centered as intended, but the Username and Password form labels were also unintentionally centered.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "layout",
+      "severity": "medium",
+      "explanation": "The 'Username' form label shifted from left-aligned to centered above the input field, which does not match the design intent and misaligns it with the input.",
+      "violated_rule": "The \"Sign Up\" button in the free trial form was centered."
+    },
+    {
+      "box_id": 2,
+      "category": "layout",
+      "severity": "medium",
+      "explanation": "The 'Password' form label shifted from left-aligned to centered above the input field, which does not match the design intent and misaligns it with the input.",
+      "violated_rule": "The \"Sign Up\" button in the free trial form was centered."
+    }
+  ],
+  "intended_box_ids": [3],
+  "usage": {
+    "text_tokens": 939,
+    "image_tokens": 4368,
+    "output_tokens": 282,
+    "thinking_tokens": 355,
+    "total_tokens": 5944
+  }
+}

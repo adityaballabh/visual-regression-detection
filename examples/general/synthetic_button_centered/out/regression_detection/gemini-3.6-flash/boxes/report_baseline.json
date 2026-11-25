@@ -1,0 +1,29 @@
+{
+  "is_regression": true,
+  "confidence": 0.85,
+  "summary": "Form labels ('Username' and 'Password') were shifted from left-aligned to center-aligned, likely due to unintended CSS text-align inheritance.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "typography",
+      "severity": "medium",
+      "explanation": "Center-aligning the 'Username' label breaks alignment with the form input field below it.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 2,
+      "category": "typography",
+      "severity": "medium",
+      "explanation": "Center-aligning the 'Password' label breaks alignment with the form input field below it.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [3],
+  "usage": {
+    "text_tokens": 579,
+    "image_tokens": 0,
+    "output_tokens": 213,
+    "thinking_tokens": 833,
+    "total_tokens": 1625
+  }
+}
