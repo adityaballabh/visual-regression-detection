@@ -1,0 +1,12 @@
+{
+  "status": "error",
+  "reason": "Target box 3 (html:nth-child(1) > body:nth-child(2) > section:nth-child(3) > form:nth-child(2) > button:nth-child(3)) has ambiguous changed CSS styles (display, margin-left, margin-right)",
+  "case": "examples/general/synthetic_button_centered",
+  "detection_model": "gemini-4-hydrogen",
+  "detection_variant": "boxes",
+  "detection_mode": "baseline",
+  "flagged_box_ids": [1, 2, 3],
+  "test_file": null,
+  "attempts": [],
+  "created_at": "2026-11-26T19:54:58+00:00"
+}

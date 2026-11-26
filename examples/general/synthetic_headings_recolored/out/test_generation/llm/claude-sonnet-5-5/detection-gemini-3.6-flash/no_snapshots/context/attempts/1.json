@@ -1,0 +1,114 @@
+{
+  "duration_api_ms": 18640,
+  "stop_reason": "end_turn",
+  "session_id": "7d069df8-c6d8-459f-baf4-4263f9b1ef33",
+  "total_cost_usd": 0.21725399999999997,
+  "usage": {
+    "input_tokens": 12,
+    "cache_creation_input_tokens": 34533,
+    "cache_read_input_tokens": 287490,
+    "output_tokens": 2160,
+    "output_tokens_details": {"thinking_tokens": 286},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 34533, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 211,
+        "cache_read_input_tokens": 56414,
+        "cache_creation_input_tokens": 1168,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 1168},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 12,
+      "outputTokens": 2160,
+      "cacheReadInputTokens": 287490,
+      "cacheCreationInputTokens": 34533,
+      "webSearchRequests": 0,
+      "costUSD": 0.21725399999999997,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 286,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01ULS54kx4toQMsrvqELoFnL",
+      "tool_input": {
+        "command": "cd examples/general/synthetic_headings_recolored/captures; .venv/bin/python - <<'E'\nimport sys;sys.path.insert(0,'.')\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\nfor f in('before','after'):\n    for e in load_snapshot(Path(f+'_snapshot.json')).elements:\n        if e.tag=='p' and 'Contact' in e.own_text: print(f,e.frames,e.selector,e.styles['color'],e.box)\nE"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 7,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I wrote the test but haven't run it. The Bash tool was denied in this session (don't-ask mode), so neither verification command has been executed.\n\nThe test finds the footer paragraph with the text \"Contact us at: info@educationalinstitute.com\". It asserts its computed `color` is `rgb(255, 255, 255)`, which is the white from the before snapshot. The failure message names the selector, the property, and the expected and actual values. I couldn't confirm that exact value in the before snapshot, so I took it from the `color:white` inline style in the diff.\n\nIf you allow Bash, I'll run both commands. The first should pass and the second should fail on the color.",
+  "ttft_ms": 2105,
+  "type": "result",
+  "duration_ms": 21681,
+  "uuid": "07bbad47-7979-4bae-bf79-4d1f20ea4d35",
+  "ttft_stream_ms": 1485,
+  "time_to_request_ms": 58,
+  "time_to_request_phases_ms": {
+    "other": 8,
+    "system_prompt": 6,
+    "resume_other": 0,
+    "process_user_input": 0,
+    "input_attachments": 12,
+    "input_hooks": 23,
+    "tool_pool_refresh": 1,
+    "init_message": 1,
+    "engine_pickup": 0,
+    "message_prep": 0,
+    "model_config_wait": 1,
+    "autocompact": 0,
+    "query_setup": 0,
+    "model_gates": 0,
+    "tool_schema_build": 2,
+    "message_normalization": 1,
+    "client_creation": 1,
+    "request_build": 2
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 7,
+  "time_to_request_cpu_ms": 58,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "nested_memory",
+    "slowest_producer_ms": 5,
+    "cpu_ms": 17,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 1485,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

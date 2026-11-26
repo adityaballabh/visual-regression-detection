@@ -1,0 +1,114 @@
+{
+  "duration_api_ms": 23264,
+  "stop_reason": "end_turn",
+  "session_id": "4b1e0625-4cac-43c2-8fce-9c58eef356fe",
+  "total_cost_usd": 0.30467479999999997,
+  "usage": {
+    "input_tokens": 14,
+    "cache_creation_input_tokens": 49792,
+    "cache_read_input_tokens": 374194,
+    "output_tokens": 3064,
+    "output_tokens_details": {"thinking_tokens": 288},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 49792, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 150,
+        "cache_read_input_tokens": 70671,
+        "cache_creation_input_tokens": 2170,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 2170},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 14,
+      "outputTokens": 3064,
+      "cacheReadInputTokens": 374194,
+      "cacheCreationInputTokens": 49792,
+      "webSearchRequests": 0,
+      "costUSD": 0.30467479999999997,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 288,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_017FcH2a3NkpSV5zu1iEcurd",
+      "tool_input": {
+        "command": "cd examples/general/synthetic_button_centered/captures; .venv/bin/python - <<'E'\nimport sys\nsys.path.insert(0,'.')\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\nfor n in ('before','after'):\n    s=load_snapshot(Path(f'{n}_snapshot.json'))\n    for e in s.elements:\n        if e.tag=='label' or 'Username' in e.own_text or 'Password' in e.own_text:\n            print(n,e.selector,e.frames,e.tag,repr(e.own_text),e.box.x1,e.box.width,e.styles.get('text-align'),e.styles.get('display'))\nE"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 10,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I wrote `test_generated_regression.py`. It passes on the before snapshot and fails on the after snapshot, with an assertion on the Username label.\n\nFor both form labels (found by `for=\"username\"` and `for=\"password\"`), it asserts that `text-align` is `start` or `left`. It also asserts that the label's text starts within 1 px of the left edge of its input.\n\nThe failure message names the selector, the property, and the expected and actual values (`center` instead of `start`).",
+  "ttft_ms": 2308,
+  "type": "result",
+  "duration_ms": 25163,
+  "uuid": "c38f2b19-3fb7-4ca2-a99d-515c1e70df37",
+  "ttft_stream_ms": 1344,
+  "time_to_request_ms": 75,
+  "time_to_request_phases_ms": {
+    "other": 13,
+    "system_prompt": 9,
+    "resume_other": 0,
+    "process_user_input": 1,
+    "input_attachments": 16,
+    "input_hooks": 26,
+    "tool_pool_refresh": 1,
+    "init_message": 1,
+    "engine_pickup": 0,
+    "message_prep": 1,
+    "model_config_wait": 0,
+    "autocompact": 1,
+    "query_setup": 0,
+    "model_gates": 0,
+    "tool_schema_build": 2,
+    "message_normalization": 1,
+    "client_creation": 1,
+    "request_build": 2
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 1,
+  "time_to_request_cpu_ms": 86,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "nested_memory",
+    "slowest_producer_ms": 6,
+    "cpu_ms": 23,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 1345,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

@@ -1,0 +1,55 @@
+{
+  "status": "generated",
+  "reason": null,
+  "case": "examples/general/synthetic_button_centered",
+  "detection_model": "gemini-4-hydrogen",
+  "detection_variant": "no_snapshots",
+  "detection_mode": "context",
+  "flagged_box_ids": [2, 4],
+  "cli": {
+    "name": "claude-code",
+    "version": "2.1.288 (Claude Code)",
+    "model": "claude-sonnet-5-5"
+  },
+  "code": {
+    "kind": "html",
+    "pr_url": null,
+    "head_sha": null,
+    "code_dir": "examples/general/synthetic_button_centered/html",
+    "diff_file": "examples/general/synthetic_button_centered/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-4-hydrogen/no_snapshots/context/code_changes.diff"
+  },
+  "test_file": "examples/general/synthetic_button_centered/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-4-hydrogen/no_snapshots/context/test_generated_regression.py",
+  "attempts": [
+    {
+      "usage": {
+        "input_tokens": 14,
+        "cache_creation_input_tokens": 49792,
+        "cache_read_input_tokens": 374194,
+        "output_tokens": 3064,
+        "total_cost_usd": 0.30467479999999997,
+        "num_turns": 10,
+        "duration_ms": 25163
+      },
+      "session_id": "4b1e0625-4cac-43c2-8fce-9c58eef356fe",
+      "error": null,
+      "validation": {
+        "passes_on_before": true,
+        "fails_on_after": true,
+        "fails_by_assertion": true,
+        "names_flagged_element": null,
+        "before_output": ".\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nOK\n",
+        "after_output": "F\n======================================================================\nFAIL: test_form_labels_stay_left_aligned_with_their_inputs (test_generated_regression.GeneratedRegressionTest.test_form_labels_stay_left_aligned_with_their_inputs)\nGuards the Username and Password labels of the free trial form staying left aligned.\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"examples/general/synthetic_button_centered/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-4-hydrogen/no_snapshots/context/test_generated_regression.py\", line 37, in test_form_labels_stay_left_aligned_with_their_inputs\n    self.assertIn(\n    ~~~~~~~~~~~~~^\n        align,\n        ^^^^^^\n        (\"start\", \"left\"),\n        ^^^^^^^^^^^^^^^^^^\n        f\"{selector} (label for {field}): text-align expected 'start' but got {align!r}\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: 'center' not found in ('start', 'left') : html:nth-child(1) > body:nth-child(2) > section:nth-child(3) > form:nth-child(2) > div:nth-child(1) > label:nth-child(1) (label for username): text-align expected 'start' but got 'center'\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (failures=1)\n"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 14,
+    "cache_creation_input_tokens": 49792,
+    "cache_read_input_tokens": 374194,
+    "output_tokens": 3064,
+    "total_cost_usd": 0.30467479999999997,
+    "num_turns": 10,
+    "duration_ms": 25163
+  },
+  "created_at": "2026-11-26T20:26:32+00:00"
+}

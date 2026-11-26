@@ -1,0 +1,114 @@
+{
+  "duration_api_ms": 21350,
+  "stop_reason": "end_turn",
+  "session_id": "5e7dbcca-3159-46d9-b404-15042d33b3eb",
+  "total_cost_usd": 0.22657080000000002,
+  "usage": {
+    "input_tokens": 14,
+    "cache_creation_input_tokens": 32816,
+    "cache_read_input_tokens": 340144,
+    "output_tokens": 2725,
+    "output_tokens_details": {"thinking_tokens": 205},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 32816, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 273,
+        "cache_read_input_tokens": 54954,
+        "cache_creation_input_tokens": 911,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 911},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 14,
+      "outputTokens": 2725,
+      "cacheReadInputTokens": 340144,
+      "cacheCreationInputTokens": 32816,
+      "webSearchRequests": 0,
+      "costUSD": 0.22657080000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 205,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01QDQwY89x6j6d3peeZdAHyc",
+      "tool_input": {
+        "command": "cd examples/general/synthetic_headings_recolored/captures; for f in before after; do .venv/bin/python -c \"\nimport sys;sys.path.insert(0,'.')\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\nfor e in load_snapshot(Path('${f}_snapshot.json')).elements:\n    if 'Contact' in e.own_text: print(e.frames,e.selector,e.tag,e.styles.get('color'),e.box)\n\"; done"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 9,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "The test passes on the before snapshot. It fails on the after snapshot with `html:nth-child(1) > body:nth-child(2) > footer:nth-child(3) > p:nth-child(3): property 'color' expected rgb(255, 255, 255) but was rgb(30, 64, 175)`.\n\nIt finds the footer `<p>` by tag and its text \"Contact us at: info@educationalinstitute.com\", then asserts its computed `color` is white. The test looks the element up by text, not by selector. I didn't see the selector until the after run printed it.\n\nThe test file is `test_generated_regression.py` in the context directory. I hardcoded `rgb(255, 255, 255)` as the expected value. I took it from the before HTML (`color:white`) and didn't read it out of the before snapshot. The passing before run confirms it matches.",
+  "ttft_ms": 2399,
+  "type": "result",
+  "duration_ms": 23679,
+  "uuid": "ffbc0384-6763-4a3e-9da1-656b0d8ed020",
+  "ttft_stream_ms": 1506,
+  "time_to_request_ms": 62,
+  "time_to_request_phases_ms": {
+    "other": 8,
+    "system_prompt": 6,
+    "resume_other": 0,
+    "process_user_input": 1,
+    "input_attachments": 12,
+    "input_hooks": 26,
+    "tool_pool_refresh": 1,
+    "init_message": 1,
+    "engine_pickup": 0,
+    "message_prep": 1,
+    "model_config_wait": 0,
+    "autocompact": 0,
+    "query_setup": 0,
+    "model_gates": 0,
+    "tool_schema_build": 2,
+    "message_normalization": 1,
+    "client_creation": 1,
+    "request_build": 2
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 11,
+  "time_to_request_cpu_ms": 59,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "nested_memory",
+    "slowest_producer_ms": 5,
+    "cpu_ms": 17,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 1506,
+  "queued_turn_count": 0,
+  "result_index": 0
+}
