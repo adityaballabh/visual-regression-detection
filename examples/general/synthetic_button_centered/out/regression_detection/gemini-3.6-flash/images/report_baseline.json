@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The form labels and sign-up button have been center-aligned within the form container, matching the overall centered layout of the page hero section.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 219,
+    "image_tokens": 4368,
+    "output_tokens": 83,
+    "thinking_tokens": 650,
+    "total_tokens": 5320
+  }
+}

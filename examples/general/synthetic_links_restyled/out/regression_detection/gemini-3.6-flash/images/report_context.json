@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The navigation links were updated to indigo color and bold font weight, which matches the design intent without introducing any visual defects.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4],
+  "usage": {
+    "text_tokens": 347,
+    "image_tokens": 4400,
+    "output_tokens": 78,
+    "thinking_tokens": 228,
+    "total_tokens": 5053
+  }
+}

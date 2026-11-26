@@ -1,0 +1,115 @@
+{
+  "duration_api_ms": 29076,
+  "stop_reason": "end_turn",
+  "session_id": "dd411400-8272-445e-90ee-f2f7f2cd8019",
+  "total_cost_usd": 0.42692459999999993,
+  "usage": {
+    "input_tokens": 14,
+    "cache_creation_input_tokens": 36932,
+    "cache_read_input_tokens": 350563,
+    "output_tokens": 3065,
+    "output_tokens_details": {"thinking_tokens": 400},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 36932, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 381,
+        "cache_read_input_tokens": 58025,
+        "cache_creation_input_tokens": 1956,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 1956},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 14,
+      "outputTokens": 3065,
+      "cacheReadInputTokens": 350563,
+      "cacheCreationInputTokens": 36932,
+      "webSearchRequests": 0,
+      "costUSD": 0.42692459999999993,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 400,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01CohURYEbgvQP3d89aPwq3h",
+      "tool_input": {
+        "command": "cd . && for s in before after; do PYTHONPATH=. .venv/bin/python -c \"\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\ns=load_snapshot(Path('examples/general/synthetic_button_centered/captures/${s}_snapshot.json'))\nfor e in s.elements:\n    if e.tag=='label': print(e.frames,e.selector,e.attributes,e.own_text,e.box,e.styles.get('text-align'),e.text_box)\n\"; done",
+        "description": "Inspect label elements in both snapshots"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 9,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I wrote the test and it does what you asked: it passes on the before snapshot and fails on the after snapshot. The failure is an assertion about both flagged labels (`text-align` expected `'start'`, got `'center'`), not an import error or a crash.\n\nIt finds the Username and Password labels by their `for` attribute, which is in both snapshots. For each label it checks that `text-align` is still `start` and that the text starts at the label's left edge, within 1 px. The expected values, `start` and a 0 px offset, are the before-snapshot values, but I couldn't read them out directly because running Python against the snapshots was blocked. I took them from the code diff, and the test passing on the before snapshot shows they match.\n\nThe test deliberately doesn't check the Sign Up button's position, even though the detector flagged it. The design intent says centering the button was the point of the change, so its position is supposed to differ between before and after. The regression is that the change also added `text-align:center` to both form labels.\n\nThe file is `test_generated_regression.py` in the `no_snapshots/baseline` output folder.",
+  "ttft_ms": 2065,
+  "type": "result",
+  "duration_ms": 31716,
+  "uuid": "527cadcf-1b5e-424e-9226-c3c8260692cc",
+  "ttft_stream_ms": 927,
+  "time_to_request_ms": 57,
+  "time_to_request_phases_ms": {
+    "other": 7,
+    "system_prompt": 4,
+    "resume_other": 1,
+    "process_user_input": 0,
+    "input_attachments": 12,
+    "input_hooks": 25,
+    "tool_pool_refresh": 1,
+    "init_message": 1,
+    "engine_pickup": 0,
+    "message_prep": 0,
+    "model_config_wait": 0,
+    "autocompact": 1,
+    "query_setup": 0,
+    "model_gates": 0,
+    "tool_schema_build": 2,
+    "message_normalization": 0,
+    "client_creation": 1,
+    "request_build": 2
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 7,
+  "time_to_request_cpu_ms": 57,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "nested_memory",
+    "slowest_producer_ms": 6,
+    "cpu_ms": 16,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 927,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

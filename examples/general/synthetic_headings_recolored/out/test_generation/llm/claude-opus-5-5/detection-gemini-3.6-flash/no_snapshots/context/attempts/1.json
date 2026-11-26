@@ -1,0 +1,115 @@
+{
+  "duration_api_ms": 25371,
+  "stop_reason": "end_turn",
+  "session_id": "0e1298cc-0236-4a65-a9cf-3ccb6f4ff924",
+  "total_cost_usd": 0.3812716,
+  "usage": {
+    "input_tokens": 14,
+    "cache_creation_input_tokens": 32624,
+    "cache_read_input_tokens": 338118,
+    "output_tokens": 2630,
+    "output_tokens_details": {"thinking_tokens": 201},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 32624, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 323,
+        "cache_read_input_tokens": 54453,
+        "cache_creation_input_tokens": 1220,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 1220},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 14,
+      "outputTokens": 2630,
+      "cacheReadInputTokens": 338118,
+      "cacheCreationInputTokens": 32624,
+      "webSearchRequests": 0,
+      "costUSD": 0.3812716,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 201,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01AMDfuTSgMd9gTAoeTFTzLK",
+      "tool_input": {
+        "command": ".venv/bin/python -c \"\nimport sys; sys.path.insert(0,'.')\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\nfor n in ['before','after']:\n    s=load_snapshot(Path('examples/general/synthetic_headings_recolored/captures/'+n+'_snapshot.json'))\n    for e in s.elements:\n        if 'Contact' in (e.own_text or ''): print(n, e.frames, e.selector, e.tag, e.box, e.styles.get('color'))\n\"",
+        "description": "Locate contact paragraph in both snapshots"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 8,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I wrote `test_generated_regression.py`. It finds the footer's \"Contact us at: info@educationalinstitute.com\" `<p>` by its tag and text, because the flagged box had no selector. It then checks that the paragraph's computed `color` is still `rgb(255, 255, 255)`, the white it has in the before snapshot.\n\nBoth verification commands behave as required:\n- **Before snapshot:** the test passes.\n- **After snapshot:** it fails on `footer:nth-child(3) > p:nth-child(3)`, which is now `rgb(30, 64, 175)` (the `#1e40af` dark blue) instead of white.\n\nThe heading color changes are intended, so the test doesn't check them.\n\nThe sandbox blocked my direct read of the before snapshot. The expected white comes from `color:white` in `before.html`, and the passing run on the before snapshot confirms it.",
+  "ttft_ms": 2486,
+  "type": "result",
+  "duration_ms": 28007,
+  "uuid": "e65b5662-879a-48cc-b14a-11cd81abe0af",
+  "ttft_stream_ms": 1403,
+  "time_to_request_ms": 246,
+  "time_to_request_phases_ms": {
+    "other": 6,
+    "system_prompt": 3,
+    "resume_other": 0,
+    "process_user_input": 1,
+    "input_attachments": 9,
+    "input_hooks": 19,
+    "tool_pool_refresh": 1,
+    "init_message": 1,
+    "engine_pickup": 0,
+    "message_prep": 0,
+    "model_config_wait": 1,
+    "autocompact": 0,
+    "query_setup": 0,
+    "model_gates": 197,
+    "tool_schema_build": 3,
+    "message_normalization": 1,
+    "client_creation": 2,
+    "request_build": 2
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 1,
+  "time_to_request_cpu_ms": 123,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "at_mentioned_files",
+    "slowest_producer_ms": 4,
+    "cpu_ms": 12,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 1404,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

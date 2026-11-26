@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.98,
+  "summary": "All detected changes correspond directly to making the navigation links bold and indigo as specified in the design intent, with no unintended layout defects.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4],
+  "usage": {
+    "text_tokens": 1419,
+    "image_tokens": 4400,
+    "output_tokens": 86,
+    "thinking_tokens": 298,
+    "total_tokens": 6203
+  }
+}

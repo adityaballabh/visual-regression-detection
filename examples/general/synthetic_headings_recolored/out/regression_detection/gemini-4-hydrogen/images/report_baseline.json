@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The section headings changed to dark blue cleanly, which appears intentional, while the footer contact text also turned dark blue against the blue background, causing severe contrast loss.",
+  "regressions": [
+    {
+      "box_id": 4,
+      "category": "color",
+      "severity": "high",
+      "explanation": "The footer contact text changed from white to dark blue on top of the blue footer background, creating very low contrast and breaking consistency with the remaining white text in the footer.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 809,
+    "image_tokens": 4400,
+    "output_tokens": 186,
+    "thinking_tokens": 563,
+    "total_tokens": 5958
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The 'Sign Up' button was centered as per design intent, but centering the form container also unintentionally centered the form input labels.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "layout",
+      "severity": "low",
+      "explanation": "The 'Username' label became centered above its left-aligned input box, breaking standard form alignment.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 2,
+      "category": "layout",
+      "severity": "low",
+      "explanation": "The 'Password' label became centered above its left-aligned input box, breaking standard form alignment.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [3],
+  "usage": {
+    "text_tokens": 350,
+    "image_tokens": 4368,
+    "output_tokens": 215,
+    "thinking_tokens": 948,
+    "total_tokens": 5881
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The form elements inside the free trial card were successfully centered according to the design intent.",
+  "regressions": [],
+  "intended_box_ids": [2, 4, 6],
+  "usage": {
+    "text_tokens": 782,
+    "image_tokens": 4368,
+    "output_tokens": 76,
+    "thinking_tokens": 0,
+    "total_tokens": 5226
+  }
+}

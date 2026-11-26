@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The section heading color updates (boxes 1, 2, and 3) match the design intent. However, box 4 unintentionally changed the footer contact text color to dark blue, causing poor contrast against the blue background.",
+  "regressions": [
+    {
+      "box_id": 4,
+      "category": "color",
+      "severity": "high",
+      "explanation": "The footer text color changed from white to dark blue, creating a severe low-contrast readability defect on the blue background.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 831,
+    "image_tokens": 4400,
+    "output_tokens": 174,
+    "thinking_tokens": 1168,
+    "total_tokens": 6573
+  }
+}

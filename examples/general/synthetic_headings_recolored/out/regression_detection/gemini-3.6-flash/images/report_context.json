@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The section headings were updated to dark blue as intended. However, the footer contact text was also changed to dark blue, creating poor contrast against the blue background.",
+  "regressions": [
+    {
+      "box_id": 4,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "The footer text 'Contact us at: info@educationalinstitute.com' changed from white to dark blue on a blue background, causing low contrast and poor readability.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 348,
+    "image_tokens": 4400,
+    "output_tokens": 175,
+    "thinking_tokens": 689,
+    "total_tokens": 5612
+  }
+}

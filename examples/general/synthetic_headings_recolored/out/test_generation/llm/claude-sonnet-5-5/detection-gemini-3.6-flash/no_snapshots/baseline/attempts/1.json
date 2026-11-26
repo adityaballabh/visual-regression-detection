@@ -1,0 +1,114 @@
+{
+  "duration_api_ms": 21960,
+  "stop_reason": "end_turn",
+  "session_id": "a15c6160-d7ff-4acf-89a9-78418a02a415",
+  "total_cost_usd": 0.24459560000000002,
+  "usage": {
+    "input_tokens": 16,
+    "cache_creation_input_tokens": 33565,
+    "cache_read_input_tokens": 395068,
+    "output_tokens": 3129,
+    "output_tokens_details": {"thinking_tokens": 100},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 33565, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 265,
+        "cache_read_input_tokens": 55720,
+        "cache_creation_input_tokens": 894,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 894},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 16,
+      "outputTokens": 3129,
+      "cacheReadInputTokens": 395068,
+      "cacheCreationInputTokens": 33565,
+      "webSearchRequests": 0,
+      "costUSD": 0.24459560000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 100,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_013SQx6zhe7i7kHimMYXWfqZ",
+      "tool_input": {
+        "command": "cat examples/general/synthetic_headings_recolored/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-3.6-flash/no_snapshots/baseline/code_changes.diff; cd .; .venv/bin/python - <<'E'\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\nd='examples/general/synthetic_headings_recolored/captures/'\nfor n in('before','after'):\n    s=load_snapshot(Path(d+n+'_snapshot.json'))\n    for e in s.elements:\n        if 'Contact' in e.own_text: print(n,e.frames,e.selector,e.tag,e.box,e.styles.get('color'),e.styles.get('background-color'),e.parent)\nE"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 11,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I wrote `test_generated_regression.py`. It passes on the before snapshot and fails on the after snapshot, with this message: `footer:nth-child(3) > p:nth-child(3): property 'color' expected rgb(255, 255, 255) but was rgb(30, 64, 175)`.\n\nThe test finds the footer `<p>` with the text \"Contact us at: info@educationalinstitute.com\". It asserts that its text color is white, and that its parent footer's background is still blue `rgb(59, 130, 246)`. It doesn't check the heading colors, since that change was intended.\n\nI wasn't sure at first that Bash would run (the first call was denied), so I never checked the footer background assertion on its own. The after snapshot fails on the color check before it reaches that assertion. The before snapshot does pass it.",
+  "ttft_ms": 3137,
+  "type": "result",
+  "duration_ms": 24456,
+  "uuid": "75cf5872-ac37-4a0b-a890-cfad85bdaf43",
+  "ttft_stream_ms": 1504,
+  "time_to_request_ms": 65,
+  "time_to_request_phases_ms": {
+    "other": 8,
+    "system_prompt": 7,
+    "resume_other": 0,
+    "process_user_input": 1,
+    "input_attachments": 12,
+    "input_hooks": 23,
+    "tool_pool_refresh": 1,
+    "init_message": 1,
+    "engine_pickup": 1,
+    "message_prep": 0,
+    "model_config_wait": 0,
+    "autocompact": 1,
+    "query_setup": 0,
+    "model_gates": 0,
+    "tool_schema_build": 2,
+    "message_normalization": 0,
+    "client_creation": 6,
+    "request_build": 2
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 14,
+  "time_to_request_cpu_ms": 75,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "nested_memory",
+    "slowest_producer_ms": 5,
+    "cpu_ms": 18,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 1505,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

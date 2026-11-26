@@ -1,0 +1,114 @@
+{
+  "duration_api_ms": 21553,
+  "stop_reason": "end_turn",
+  "session_id": "200f06a3-b297-41ae-b2f7-e24557cbbef4",
+  "total_cost_usd": 0.2315296,
+  "usage": {
+    "input_tokens": 16,
+    "cache_creation_input_tokens": 32026,
+    "cache_read_input_tokens": 392568,
+    "output_tokens": 2488,
+    "output_tokens_details": {"thinking_tokens": 218},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 32026, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 245,
+        "cache_read_input_tokens": 54002,
+        "cache_creation_input_tokens": 1073,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 1073},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 16,
+      "outputTokens": 2488,
+      "cacheReadInputTokens": 392568,
+      "cacheCreationInputTokens": 32026,
+      "webSearchRequests": 0,
+      "costUSD": 0.2315296,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 218,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01RGiWYuafKb718Bunhxtkya",
+      "tool_input": {
+        "command": "cd . && .venv/bin/python -c \"\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\nfor n in ['before','after']:\n    s=load_snapshot(Path('examples/general/synthetic_headings_recolored/captures/%s_snapshot.json'%n))\n    for e in s.elements:\n        if 'Contact' in e.own_text: print(n,e.frames,e.selector,e.tag,e.styles.get('color'),e.box)\n\""
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 8,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I wrote `test_generated_regression.py`, but I couldn't run either verification command. Bash was denied in this session, so the test is unverified.\n\nThe test finds the `<p>` whose own text is \"Contact us at: info@educationalinstitute.com\" and asserts its computed `color` is `rgb(255, 255, 255)`. That is the white from the before page, taken from the HTML (`color:white`) and not read from the before snapshot. It looks the element up by tag and text and not by selector, because the snapshot JSON is compact and I couldn't read the selector out of it. The failure message includes the element's selector, the property, the expected value and the actual value.\n\nTo check it, run the two commands from your task. The first should pass and the second should fail on the `color` assertion.",
+  "ttft_ms": 2514,
+  "type": "result",
+  "duration_ms": 24248,
+  "uuid": "f68631ed-3d59-491d-b9a9-59f8ae7f5f8d",
+  "ttft_stream_ms": 1462,
+  "time_to_request_ms": 63,
+  "time_to_request_phases_ms": {
+    "other": 8,
+    "system_prompt": 7,
+    "resume_other": 0,
+    "process_user_input": 1,
+    "input_attachments": 12,
+    "input_hooks": 26,
+    "tool_pool_refresh": 0,
+    "init_message": 2,
+    "engine_pickup": 0,
+    "message_prep": 0,
+    "model_config_wait": 1,
+    "autocompact": 0,
+    "query_setup": 0,
+    "model_gates": 0,
+    "tool_schema_build": 2,
+    "message_normalization": 1,
+    "client_creation": 1,
+    "request_build": 2
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 12,
+  "time_to_request_cpu_ms": 63,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "nested_memory",
+    "slowest_producer_ms": 5,
+    "cpu_ms": 18,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 1462,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

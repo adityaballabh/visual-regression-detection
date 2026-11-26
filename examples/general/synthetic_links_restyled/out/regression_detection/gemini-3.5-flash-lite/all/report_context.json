@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "All navigation links correctly changed color to indigo and became bold as specified in the design intent.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4],
+  "usage": {
+    "text_tokens": 1135,
+    "image_tokens": 4400,
+    "output_tokens": 72,
+    "thinking_tokens": 0,
+    "total_tokens": 5607
+  }
+}

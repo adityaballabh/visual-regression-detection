@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "All changes in the navigation bar match the intended design update: navigation links were correctly updated to bold text and an indigo color.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4],
+  "usage": {
+    "text_tokens": 1135,
+    "image_tokens": 4400,
+    "output_tokens": 79,
+    "thinking_tokens": 177,
+    "total_tokens": 5791
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "Boxes 1, 2, and 3 match the intended change of altering section headings to dark blue. Box 4 shows an unintended color change on paragraph text.",
+  "regressions": [
+    {
+      "box_id": 4,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "The paragraph text color changed to dark blue, which is not part of the stated design intent and reduces contrast against the background.",
+      "violated_rule": "Plain sans-serif text with bold headings over plain paragraphs."
+    }
+  ],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 943,
+    "image_tokens": 0,
+    "output_tokens": 175,
+    "thinking_tokens": 0,
+    "total_tokens": 1118
+  }
+}

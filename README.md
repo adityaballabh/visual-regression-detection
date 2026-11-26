@@ -6,7 +6,7 @@ Detects UI regressions from a code change and generates a failing test that repr
 1. Collect design language and design intent for the change
 2. Capture before and after screenshots
 3. Image-diff to produce candidate bounding boxes
-4. Classify regression vs. intended change through a stateless LLM API call
+4. Classify the change as a regression or intended with one Gemini call
 5. If a regression is detected, generate a test that passes on the before snapshot and fails on the after snapshot
 
 ## Setup
@@ -30,7 +30,7 @@ python -m pipeline <case_folder> \
   [--test-generator llm|scripted] [--cli-model MODEL]
 ```
 
-It generates a test for each report detection writes, with the [Claude Code generator](#llm) by default or the [scripted generator](#scripted) with `--test-generator scripted`. The scripted generator doesn't support `no_snapshots`.
+It then generates a test for each detection report, with the [Claude Code generator](#llm) by default or the [scripted generator](#scripted) with `--test-generator scripted`. The scripted generator doesn't support `no_snapshots`.
 
 A case folder holds one change:
 
@@ -60,20 +60,9 @@ The pages in `examples/general/` are re-rendered from [WUICC](https://huggingfac
 
 ## PrairieLearn screenshot capture
 
-[`prairielearn_capture/capture_screenshots.sh`](prairielearn_capture/capture_screenshots.sh) accepts a PrairieLearn checkout and one of
-three commands. `before` asks GitHub Copilot CLI to generate a focused
-Playwright E2E spec from the component path and capture instructions. It always
-creates a new spec, even if related tests exist; it may inspect them for
-conventions but will not modify or reuse them. It runs the new spec and asks
-Copilot to repair it when a run fails, retrying up to five test runs. `after`
-reruns the selected spec without automatic repair.
-`pr` publishes the before/after screenshots and DOM snapshots and creates a
-draft PR.
+[`prairielearn_capture/capture_screenshots.sh`](prairielearn_capture/capture_screenshots.sh) takes a PrairieLearn checkout and one of three commands. `before` asks GitHub Copilot CLI to write a new Playwright E2E spec from the component path and capture instructions, runs it, and asks Copilot to fix it when a run fails, up to five runs. `after` reruns that spec without fixing it, and `pr` publishes the screenshots and DOM snapshots in a draft PR.
 
-Generated specs use the PrairieLearn fork's shared E2E snapshot helper so screenshots
-and DOM snapshots use the same viewport, wait for fonts and MathJax, freeze
-animations, and serialize computed styles in the normalized format consumed by
-`image_diff`.
+The specs use the fork's shared snapshot helper, so screenshots and DOM snapshots share the same viewport, wait for fonts and MathJax, freeze animations, and save computed styles in the format `image_diff` reads.
 
 ```sh
 ./prairielearn_capture/capture_screenshots.sh /path/to/PrairieLearn before \
@@ -83,9 +72,9 @@ animations, and serialize computed styles in the normalized format consumed by
 ./prairielearn_capture/capture_screenshots.sh /path/to/PrairieLearn pr
 ```
 
-Screenshot and snapshot artifacts are saved under `.artifacts/` next to the script. New specs are kept in `apps/prairielearn/src/tests/e2e/generated-captures/` in the PrairieLearn checkout. `before` creates a new spec each time it is run; use the same `--name` on `after` and `pr` that was used for `before`. Use distinct names when capturing multiple components with the same filename.
+Screenshots and snapshots are saved under `.artifacts/` next to the script, and new specs go in `apps/prairielearn/src/tests/e2e/generated-captures/` in the PrairieLearn checkout. Use the same `--name` on `after` and `pr` that you used for `before`, and different names when capturing components that share a filename.
 
-The `pr` command requires a pushed non-`master` branch and `gh` authentication. Capturing requires GitHub Copilot CLI with authentication configured, Node.js 24+, pnpm (or Corepack), and the normal local PrairieLearn E2E prerequisites.
+`pr` needs `gh` authentication and a pushed branch other than `master`. Capturing needs an authenticated GitHub Copilot CLI, Node.js 24+, pnpm (or Corepack) and the usual PrairieLearn E2E setup.
 
 ## Image diff
 
@@ -111,14 +100,14 @@ A simple pixel diff boxes everything a change moves, so if an element grows, eve
 
 ## LLM-based regression detection
 
-[`regression_detection/gemini_processor.py`](regression_detection/gemini_processor.py) asks Gemini whether a change is a regression and which boxes regressed. It reads a case's image diff folder, `<case_folder>/out/dom`, or `<case_folder>/out/pixel` for `no_snapshots`, which holds `before_color.png`, `after_color.png`, `before_shape.png`, `after_shape.png` and `boxes.json`:
+[`regression_detection/gemini_processor.py`](regression_detection/gemini_processor.py) asks Gemini whether a change is a regression and which boxes regressed. It reads the case's image diff folder (`out/dom`, or `out/pixel` for `no_snapshots`), which holds `before_color.png`, `after_color.png`, `before_shape.png`, `after_shape.png` and `boxes.json`:
 ```bash
 python -m regression_detection.gemini_processor run <diff_folder> \
   [--mode context|baseline|both] [--variant all|images|boxes|no_snapshots] \
   [--model MODEL] [--out DIR] [--dry-run]
 ```
 
-`--mode` picks the prompt, `context` by default. Baseline gets the 4 images and `boxes.json`, and context also gets the design intent and design language. The pipeline passes those from the case's `design/` folder, but run on its own the script reads them from the diff folder. `--variant` works like `--detection-variant` above. The script prints each report, and `--out` also saves it as `report_<mode>.json`. `--dry-run` prints the prompts without calling Gemini.
+`--mode` picks the prompt, `context` by default. Baseline gets the 4 images and `boxes.json`, and context also gets the design intent and design language. The pipeline passes those from the case's `design/` folder. When run on its own, the script reads them from the diff folder instead. `--variant` works like `--detection-variant` above. The script prints each report, and `--out` also saves it as `report_<mode>.json`. `--dry-run` prints the prompts without calling Gemini.
 
 Each report ends with a `usage` block containing the text, image, output, thinking and total token counts from the API response.
 
@@ -126,7 +115,7 @@ Each report ends with a `usage` block containing the text, image, output, thinki
 
 ### LLM
 
-[`test_generation/llm/generate.py`](test_generation/llm/generate.py) requires Claude Code to write the test. It writes a `unittest` that passes on the before snapshot and fails on the after snapshot. If the report found no regression, the script skips writing a test:
+[`test_generation/llm/generate.py`](test_generation/llm/generate.py) uses Claude Code to write the test. It writes a `unittest` that passes on the before snapshot and fails on the after snapshot. If the report found no regression, the script skips writing a test:
 ```bash
 python -m test_generation.llm.generate <case_folder> \
   [--detection-model MODEL] [--detection-variant all|images|boxes|no_snapshots] \
@@ -143,7 +132,7 @@ Output goes in `out/test_generation/llm/<cli model>/detection-<model>/<variant>/
 
 ### Scripted
 
-[`test_generation/scripted/generate.py`](test_generation/scripted/generate.py) writes a `unittest` from a case's regression report and `out/dom/boxes.json`. If the report found a regression, the test expects the before snapshot on the regressed boxes, checking only the CSS properties that changed on those elements. If it found none, the script skips writing a test:
+[`test_generation/scripted/generate.py`](test_generation/scripted/generate.py) writes a `unittest` from a case's regression report and `out/dom/boxes.json`. If the report found a regression, the test checks that the flagged elements still match the before snapshot, on only the CSS properties that changed. If it found none, the script skips writing a test:
 ```bash
 python -m test_generation.scripted.generate <case_folder> \
   [--detection-model MODEL] [--detection-variant all|images|boxes] \
@@ -177,4 +166,4 @@ The script writes `<model>.csv` to [`evaluation/results/regression_detection/`](
 python -m evaluation.score_test_generation
 ```
 
-It writes `<generator>.csv` to [`evaluation/results/test_generation/`](evaluation/results/test_generation/), with a row for each detection model, variant and mode. `valid_test_rate` is the share of regressions that got a test passing on the before snapshot and failing on the after snapshot. `relevant_test_rate` only counts valid tests whose failure names a regressed element from `dom_boxes`, so tests built on false positives don't count. The LLM generators also get `avg_cost_usd`, Claude Code's estimate at API list prices, and `avg_attempts`.
+It writes `<generator>.csv` to [`evaluation/results/test_generation/`](evaluation/results/test_generation/), with a row for each detection model, variant and mode. `valid_test_rate` is the share of regressions that got a test passing on the before snapshot and failing on the after snapshot. `relevant_test_rate` only counts valid tests whose failure names a regressed element from `dom_boxes`, so tests built on false positives don't count. The LLM generators also have `avg_cost_usd`, Claude Code's estimate at API list prices, and `avg_attempts`.

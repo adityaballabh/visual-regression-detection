@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The section headings were updated to blue text, which appears to be an intended design update. However, the contact text in the footer was changed to dark blue against a blue background, rendering it almost unreadable.",
+  "regressions": [
+    {
+      "box_id": 4,
+      "category": "color",
+      "severity": "high",
+      "explanation": "The text color of 'Contact us at: info@educationalinstitute.com' changed to dark blue on a blue background, causing severe contrast issues and making the text difficult to read.",
+      "violated_rule": "Text color on colored backgrounds must maintain sufficient contrast for readability."
+    }
+  ],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 678,
+    "image_tokens": 4400,
+    "output_tokens": 196,
+    "thinking_tokens": 862,
+    "total_tokens": 6136
+  }
+}

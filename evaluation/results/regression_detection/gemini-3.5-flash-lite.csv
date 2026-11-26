@@ -1,9 +1,9 @@
 variant,mode,case_precision,case_recall,box_precision,box_recall,avg_input_tokens,avg_output_tokens,avg_cost_usd
-all,context,1.000,0.333,1.000,0.143,5723,84,0.00193
-all,baseline,NaN,0.000,NaN,0.000,5100,71,0.00171
-boxes,context,1.000,0.333,1.000,0.143,1253,88,0.00060
-boxes,baseline,0.000,0.000,0.000,0.000,629,94,0.00042
-images,context,1.000,0.333,1.000,0.143,5207,85,0.00178
-images,baseline,NaN,0.000,NaN,0.000,4608,79,0.00158
-no_snapshots,context,1.000,0.333,1.000,0.167,6364,114,0.00219
-no_snapshots,baseline,0.000,0.000,0.000,0.000,5740,125,0.00204
+all,context,1.000,0.400,1.000,0.200,5621,90,0.00191
+all,baseline,NaN,0.000,NaN,0.000,5138,72,0.00172
+boxes,context,1.000,0.400,1.000,0.200,1150,94,0.00058
+boxes,baseline,0.500,0.200,0.500,0.200,668,111,0.00048
+images,context,1.000,0.400,0.750,0.300,5066,106,0.00178
+images,baseline,NaN,0.000,NaN,0.000,4608,78,0.00158
+no_snapshots,context,1.000,0.200,1.000,0.091,6016,102,0.00206
+no_snapshots,baseline,0.500,0.200,0.000,0.000,5533,130,0.00198

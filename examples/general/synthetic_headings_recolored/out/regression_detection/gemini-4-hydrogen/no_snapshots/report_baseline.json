@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.96,
+  "summary": "While changing the main section headings to dark blue appears intentional, the footer contact text also changed from white to dark blue against a bright blue background, causing a severe contrast and readability defect.",
+  "regressions": [
+    {
+      "box_id": 4,
+      "category": "color",
+      "severity": "high",
+      "explanation": "The text 'Contact us at: info@educationalinstitute.com' changed from white to dark blue against the medium-blue footer background, resulting in very low contrast and poor legibility compared to the white social media text above it.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 1268,
+    "image_tokens": 4400,
+    "output_tokens": 204,
+    "thinking_tokens": 575,
+    "total_tokens": 6447
+  }
+}

@@ -1,0 +1,8 @@
+[
+  {"id": 1, "type": "shape", "before": {"x": 56, "y": 401, "width": 68, "height": 11}, "after": null, "element": null, "selector": null, "frames": null, "detail": null},
+  {"id": 2, "type": "shape", "before": null, "after": {"x": 263, "y": 400, "width": 67, "height": 12}, "element": null, "selector": null, "frames": null, "detail": null},
+  {"id": 3, "type": "shape", "before": {"x": 56, "y": 474, "width": 66, "height": 12}, "after": null, "element": null, "selector": null, "frames": null, "detail": null},
+  {"id": 4, "type": "shape", "before": null, "after": {"x": 263, "y": 474, "width": 66, "height": 12}, "element": null, "selector": null, "frames": null, "detail": null},
+  {"id": 5, "type": "shape", "before": {"x": 55, "y": 553, "width": 101, "height": 39}, "after": null, "element": null, "selector": null, "frames": null, "detail": null},
+  {"id": 6, "type": "shape", "before": null, "after": {"x": 245, "y": 553, "width": 101, "height": 39}, "element": null, "selector": null, "frames": null, "detail": null}
+]

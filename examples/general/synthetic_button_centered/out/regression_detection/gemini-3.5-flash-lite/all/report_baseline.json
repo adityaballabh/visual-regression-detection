@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The alignment of the form labels and the button within the container has been intentionally centered for a cleaner, more balanced design.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 661,
+    "image_tokens": 4368,
+    "output_tokens": 77,
+    "thinking_tokens": 0,
+    "total_tokens": 5106
+  }
+}

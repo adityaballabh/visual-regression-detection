@@ -1,0 +1,6 @@
+[
+  {"id": 1, "type": "shape", "before": {"x": 976, "y": 22, "width": 41, "height": 13}, "after": {"x": 961, "y": 22, "width": 43, "height": 13}, "element": null, "selector": null, "frames": null, "detail": null},
+  {"id": 2, "type": "shape", "before": {"x": 1042, "y": 22, "width": 41, "height": 13}, "after": {"x": 1029, "y": 22, "width": 45, "height": 13}, "element": null, "selector": null, "frames": null, "detail": null},
+  {"id": 3, "type": "shape", "before": {"x": 1108, "y": 21, "width": 61, "height": 14}, "after": {"x": 1099, "y": 21, "width": 65, "height": 14}, "element": null, "selector": null, "frames": null, "detail": null},
+  {"id": 4, "type": "shape", "before": {"x": 1193, "y": 21, "width": 55, "height": 14}, "after": {"x": 1189, "y": 21, "width": 59, "height": 14}, "element": null, "selector": null, "frames": null, "detail": null}
+]

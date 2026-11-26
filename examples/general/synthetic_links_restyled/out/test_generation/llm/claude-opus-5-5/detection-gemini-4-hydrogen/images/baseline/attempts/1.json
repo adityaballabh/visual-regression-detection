@@ -1,0 +1,115 @@
+{
+  "duration_api_ms": 29975,
+  "stop_reason": "end_turn",
+  "session_id": "cffe79ab-27fb-4987-bf4c-c62290ac9693",
+  "total_cost_usd": 0.445156,
+  "usage": {
+    "input_tokens": 10,
+    "cache_creation_input_tokens": 41084,
+    "cache_read_input_tokens": 253420,
+    "output_tokens": 3288,
+    "output_tokens_details": {"thinking_tokens": 753},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 41084, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 327,
+        "cache_read_input_tokens": 60049,
+        "cache_creation_input_tokens": 2289,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 2289},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 10,
+      "outputTokens": 3288,
+      "cacheReadInputTokens": 253420,
+      "cacheCreationInputTokens": 41084,
+      "webSearchRequests": 0,
+      "costUSD": 0.445156,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 753,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_01HQBG581oNSNUFbZU6QKB24",
+      "tool_input": {
+        "command": "PYTHONPATH=. .venv/bin/python -c \"\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\nfor name in ['before','after']:\n    s = load_snapshot(Path('examples/general/synthetic_links_restyled/captures/%s_snapshot.json' % name))\n    for e in s.elements:\n        if e.selector.startswith('html:nth-child(1) > body:nth-child(2) > header:nth-child(1) > nav:nth-child(2) > a'):\n            print(name, e.frames, e.own_text, e.box, e.styles.get('text-decoration-line'), e.styles.get('color'))\n\"",
+        "description": "Inspect nav link boxes and decoration in both snapshots"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 7,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I wrote `test_generated_regression.py`. It checks that the left edge (`box.x1`) of each header nav link (Home, About, Services, Contact) stays within 1 px of the before snapshot: 967, 1034, 1100 and 1185. It passes on the before snapshot and fails on the after one with `a:nth-child(1): box x1 expected 967, got 952`.\n\nThis detection looks like a false positive. The diff changes only the links' inline `color` (#1f2937 to #4f46e5) and adds `font-weight:bold`, which is exactly the intended design change. The underline the detector described isn't there: the only `text-decoration-line` value in the after snapshot is `none`. The task rules say not to assert on colour or weight, so the only thing left to pin is the leftward shift. That shift happens because bold text is wider and the nav is right-aligned, so it's a side effect of the intended change. In practice, this test would fail on the correct new design.",
+  "ttft_ms": 4172,
+  "type": "result",
+  "duration_ms": 32735,
+  "uuid": "f65e05db-8982-4fe5-9cd9-f3bb8e438df2",
+  "ttft_stream_ms": 2783,
+  "time_to_request_ms": 1764,
+  "time_to_request_phases_ms": {
+    "other": 14,
+    "system_prompt": 7,
+    "resume_other": 0,
+    "process_user_input": 1,
+    "input_attachments": 21,
+    "input_hooks": 65,
+    "tool_pool_refresh": 4,
+    "init_message": 6,
+    "engine_pickup": 1,
+    "message_prep": 0,
+    "model_config_wait": 1,
+    "autocompact": 1,
+    "query_setup": 0,
+    "model_gates": 1634,
+    "tool_schema_build": 3,
+    "message_normalization": 1,
+    "client_creation": 1,
+    "request_build": 4
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 21,
+  "time_to_request_cpu_ms": 217,
+  "time_to_request_major_faults": 144,
+  "input_attachments_detail": {
+    "slowest_producer": "at_mentioned_files",
+    "slowest_producer_ms": 10,
+    "cpu_ms": 28,
+    "major_faults": 19
+  },
+  "first_content_frame_ms": 2784,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

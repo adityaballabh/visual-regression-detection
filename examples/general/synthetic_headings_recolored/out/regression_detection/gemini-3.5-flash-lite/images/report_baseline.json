@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The heading text colors were updated to blue to match the theme consistently, and the contact email link color was adjusted for better contrast.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4],
+  "usage": {
+    "text_tokens": 219,
+    "image_tokens": 4400,
+    "output_tokens": 82,
+    "thinking_tokens": 0,
+    "total_tokens": 4701
+  }
+}

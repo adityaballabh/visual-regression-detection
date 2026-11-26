@@ -1,0 +1,55 @@
+{
+  "status": "generated",
+  "reason": null,
+  "case": "examples/general/synthetic_button_centered",
+  "detection_model": "gemini-4-hydrogen",
+  "detection_variant": "boxes",
+  "detection_mode": "baseline",
+  "flagged_box_ids": [1, 2, 3],
+  "cli": {
+    "name": "claude-code",
+    "version": "2.1.288 (Claude Code)",
+    "model": "claude-sonnet-5-5"
+  },
+  "code": {
+    "kind": "html",
+    "pr_url": null,
+    "head_sha": null,
+    "code_dir": "examples/general/synthetic_button_centered/html",
+    "diff_file": "examples/general/synthetic_button_centered/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-4-hydrogen/boxes/baseline/code_changes.diff"
+  },
+  "test_file": "examples/general/synthetic_button_centered/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-4-hydrogen/boxes/baseline/test_generated_regression.py",
+  "attempts": [
+    {
+      "usage": {
+        "input_tokens": 6,
+        "cache_creation_input_tokens": 33070,
+        "cache_read_input_tokens": 129573,
+        "output_tokens": 1649,
+        "total_cost_usd": 0.1746966,
+        "num_turns": 5,
+        "duration_ms": 13335
+      },
+      "session_id": "223623c4-5b62-4149-b88e-38c83a65317b",
+      "error": null,
+      "validation": {
+        "passes_on_before": true,
+        "fails_on_after": true,
+        "fails_by_assertion": true,
+        "names_flagged_element": true,
+        "before_output": ".\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nOK\n",
+        "after_output": "F\n======================================================================\nFAIL: test_form_labels_keep_start_alignment (test_generated_regression.GeneratedRegressionTest.test_form_labels_keep_start_alignment)\nGuards the form labels staying start aligned in the free trial form.\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"examples/general/synthetic_button_centered/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-4-hydrogen/boxes/baseline/test_generated_regression.py\", line 40, in test_form_labels_keep_start_alignment\n    self.assertEqual(\n    ~~~~~~~~~~~~~~~~^\n        actual,\n        ^^^^^^^\n        EXPECTED_TEXT_ALIGN,\n        ^^^^^^^^^^^^^^^^^^^^\n        f\"{selector} ({text} label): property text-align expected {EXPECTED_TEXT_ALIGN!r} but got {actual!r}\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: 'center' != 'start'\n- center\n+ start\n : html:nth-child(1) > body:nth-child(2) > section:nth-child(3) > form:nth-child(2) > div:nth-child(1) > label:nth-child(1) (Username label): property text-align expected 'start' but got 'center'\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (failures=1)\n"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 6,
+    "cache_creation_input_tokens": 33070,
+    "cache_read_input_tokens": 129573,
+    "output_tokens": 1649,
+    "total_cost_usd": 0.1746966,
+    "num_turns": 5,
+    "duration_ms": 13335
+  },
+  "created_at": "2026-11-26T20:26:06+00:00"
+}

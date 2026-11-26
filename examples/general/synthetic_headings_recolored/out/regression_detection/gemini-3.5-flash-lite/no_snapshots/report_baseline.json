@@ -1,0 +1,36 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The section headings have changed color from black to blue, which matches the link color style and creates an unintended visual hierarchy issue since they are not links.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "Section heading 'Academic Programs' color changed to blue, making it look like a hyperlink.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 2,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "Section heading 'Faculty' color changed to blue, making it look like a hyperlink.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 3,
+      "category": "color",
+      "severity": "medium",
+      "explanation": "Section heading 'Faculty Research' color changed to blue, making it look like a hyperlink.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [4],
+  "usage": {
+    "text_tokens": 678,
+    "image_tokens": 4400,
+    "output_tokens": 252,
+    "thinking_tokens": 0,
+    "total_tokens": 5330
+  }
+}

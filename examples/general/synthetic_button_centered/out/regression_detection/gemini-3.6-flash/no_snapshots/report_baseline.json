@@ -1,0 +1,57 @@
+{
+  "is_regression": true,
+  "confidence": 0.85,
+  "summary": "Form labels and the Sign Up button have been center-aligned while the input boxes remain left-aligned, causing visual misalignment.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "layout",
+      "severity": "medium",
+      "explanation": "The 'Username' label was previously aligned with the left edge of the input field. Moving it to the center creates visual misalignment with the input box.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 2,
+      "category": "layout",
+      "severity": "medium",
+      "explanation": "The 'Username' label is centered above the input box rather than aligned with its left edge, breaking standard form layout alignment.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 3,
+      "category": "layout",
+      "severity": "medium",
+      "explanation": "The 'Password' label was previously aligned with the left edge of the input field. Moving it to the center creates visual misalignment.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 4,
+      "category": "layout",
+      "severity": "medium",
+      "explanation": "The 'Password' label is centered above the input box rather than aligned with its left edge.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 5,
+      "category": "layout",
+      "severity": "medium",
+      "explanation": "The 'Sign Up' button moved from left alignment to center alignment, inconsistent with left-aligned input field content.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 6,
+      "category": "layout",
+      "severity": "medium",
+      "explanation": "The 'Sign Up' button is centered within the card container while input box content remains left-aligned.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 627,
+    "image_tokens": 4368,
+    "output_tokens": 500,
+    "thinking_tokens": 1352,
+    "total_tokens": 6847
+  }
+}

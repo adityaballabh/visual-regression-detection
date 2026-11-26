@@ -1,0 +1,36 @@
+{
+  "is_regression": true,
+  "confidence": 0.85,
+  "summary": "The form labels and submit button inside the Sign Up card became centered while the section heading, card, and input contents remain left-aligned, indicating an unintended alignment change.",
+  "regressions": [
+    {
+      "box_id": 1,
+      "category": "layout",
+      "severity": "medium",
+      "explanation": "The Username label is now centered instead of left-aligned, misaligning it from the left-aligned input field below it and the section heading above.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 2,
+      "category": "layout",
+      "severity": "medium",
+      "explanation": "The Password label is now centered instead of left-aligned, breaking vertical alignment with its input field and the rest of the left-aligned form.",
+      "violated_rule": null
+    },
+    {
+      "box_id": 3,
+      "category": "layout",
+      "severity": "low",
+      "explanation": "The Sign Up button shifted from left-aligned to centered within the card, breaking consistency with the left-aligned form structure and section heading.",
+      "violated_rule": null
+    }
+  ],
+  "intended_box_ids": [],
+  "usage": {
+    "text_tokens": 1251,
+    "image_tokens": 4368,
+    "output_tokens": 266,
+    "thinking_tokens": 2300,
+    "total_tokens": 8185
+  }
+}

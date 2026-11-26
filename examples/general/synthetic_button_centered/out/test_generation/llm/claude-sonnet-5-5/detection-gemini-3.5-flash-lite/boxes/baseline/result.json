@@ -1,0 +1,55 @@
+{
+  "status": "generated",
+  "reason": null,
+  "case": "examples/general/synthetic_button_centered",
+  "detection_model": "gemini-3.5-flash-lite",
+  "detection_variant": "boxes",
+  "detection_mode": "baseline",
+  "flagged_box_ids": [1, 2, 3],
+  "cli": {
+    "name": "claude-code",
+    "version": "2.1.288 (Claude Code)",
+    "model": "claude-sonnet-5-5"
+  },
+  "code": {
+    "kind": "html",
+    "pr_url": null,
+    "head_sha": null,
+    "code_dir": "examples/general/synthetic_button_centered/html",
+    "diff_file": "examples/general/synthetic_button_centered/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-3.5-flash-lite/boxes/baseline/code_changes.diff"
+  },
+  "test_file": "examples/general/synthetic_button_centered/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-3.5-flash-lite/boxes/baseline/test_generated_regression.py",
+  "attempts": [
+    {
+      "usage": {
+        "input_tokens": 6,
+        "cache_creation_input_tokens": 32147,
+        "cache_read_input_tokens": 127981,
+        "output_tokens": 1567,
+        "total_cost_usd": 0.1698662,
+        "num_turns": 5,
+        "duration_ms": 11334
+      },
+      "session_id": "c6a77a6d-0957-4288-8216-b2c2b1b6ef31",
+      "error": null,
+      "validation": {
+        "passes_on_before": true,
+        "fails_on_after": true,
+        "fails_by_assertion": true,
+        "names_flagged_element": true,
+        "before_output": ".\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nOK\n",
+        "after_output": "F\n======================================================================\nFAIL: test_form_labels_are_left_aligned (test_generated_regression.GeneratedRegressionTest.test_form_labels_are_left_aligned)\nGuards the free trial form labels staying left-aligned.\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"examples/general/synthetic_button_centered/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-3.5-flash-lite/boxes/baseline/test_generated_regression.py\", line 41, in test_form_labels_are_left_aligned\n    self.assertIn(\n    ~~~~~~~~~~~~~^\n        actual,\n        ^^^^^^^\n        LEFT_ALIGNED,\n        ^^^^^^^^^^^^^\n        f\"{selector}: property text-align expected 'start', got {actual!r}\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: 'center' not found in ('start', 'left') : html:nth-child(1) > body:nth-child(2) > section:nth-child(3) > form:nth-child(2) > div:nth-child(1) > label:nth-child(1): property text-align expected 'start', got 'center'\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (failures=1)\n"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 6,
+    "cache_creation_input_tokens": 32147,
+    "cache_read_input_tokens": 127981,
+    "output_tokens": 1567,
+    "total_cost_usd": 0.1698662,
+    "num_turns": 5,
+    "duration_ms": 11334
+  },
+  "created_at": "2026-11-26T19:55:39+00:00"
+}

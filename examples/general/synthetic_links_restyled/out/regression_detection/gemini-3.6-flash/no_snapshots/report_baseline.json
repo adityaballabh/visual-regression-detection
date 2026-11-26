@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The navigation links in the header were updated to use a bold font weight and blue accent color as an intended styling change.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4],
+  "usage": {
+    "text_tokens": 678,
+    "image_tokens": 4400,
+    "output_tokens": 81,
+    "thinking_tokens": 442,
+    "total_tokens": 5601
+  }
+}

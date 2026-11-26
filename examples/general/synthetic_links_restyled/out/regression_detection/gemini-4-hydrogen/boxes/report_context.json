@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.98,
+  "summary": "All four detected changes correspond to the navigation links changing from dark gray to indigo and becoming bold, with natural minor width and position adjustments and no layout defects.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4],
+  "usage": {
+    "text_tokens": 1634,
+    "image_tokens": 0,
+    "output_tokens": 91,
+    "thinking_tokens": 626,
+    "total_tokens": 2351
+  }
+}

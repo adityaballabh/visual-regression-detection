@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "The changes successfully update heading text colors and footer contact text color to a cohesive blue tone.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4],
+  "usage": {
+    "text_tokens": 872,
+    "image_tokens": 4400,
+    "output_tokens": 74,
+    "thinking_tokens": 0,
+    "total_tokens": 5346
+  }
+}

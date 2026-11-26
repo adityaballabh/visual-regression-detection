@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The form labels and the Sign Up button have been center-aligned, representing an intended layout update.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 661,
+    "image_tokens": 4368,
+    "output_tokens": 74,
+    "thinking_tokens": 1182,
+    "total_tokens": 6285
+  }
+}

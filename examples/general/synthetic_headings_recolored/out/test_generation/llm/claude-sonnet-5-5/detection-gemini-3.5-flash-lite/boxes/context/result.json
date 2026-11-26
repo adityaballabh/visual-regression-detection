@@ -1,0 +1,55 @@
+{
+  "status": "generated",
+  "reason": null,
+  "case": "examples/general/synthetic_headings_recolored",
+  "detection_model": "gemini-3.5-flash-lite",
+  "detection_variant": "boxes",
+  "detection_mode": "context",
+  "flagged_box_ids": [4],
+  "cli": {
+    "name": "claude-code",
+    "version": "2.1.288 (Claude Code)",
+    "model": "claude-sonnet-5-5"
+  },
+  "code": {
+    "kind": "html",
+    "pr_url": null,
+    "head_sha": null,
+    "code_dir": "examples/general/synthetic_headings_recolored/html",
+    "diff_file": "examples/general/synthetic_headings_recolored/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-3.5-flash-lite/boxes/context/code_changes.diff"
+  },
+  "test_file": "examples/general/synthetic_headings_recolored/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-3.5-flash-lite/boxes/context/test_generated_regression.py",
+  "attempts": [
+    {
+      "usage": {
+        "input_tokens": 6,
+        "cache_creation_input_tokens": 30417,
+        "cache_read_input_tokens": 125455,
+        "output_tokens": 1515,
+        "total_cost_usd": 0.16192099999999998,
+        "num_turns": 5,
+        "duration_ms": 12008
+      },
+      "session_id": "d62cf47f-357b-4e3d-9867-768461a967f3",
+      "error": null,
+      "validation": {
+        "passes_on_before": true,
+        "fails_on_after": true,
+        "fails_by_assertion": true,
+        "names_flagged_element": true,
+        "before_output": ".\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n",
+        "after_output": "F\n======================================================================\nFAIL: test_footer_contact_text_stays_white (test_generated_regression.GeneratedRegressionTest.test_footer_contact_text_stays_white)\nGuards the footer contact paragraph color against the heading recolor change.\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"examples/general/synthetic_headings_recolored/out/test_generation/llm/claude-sonnet-5-5/detection-gemini-3.5-flash-lite/boxes/context/test_generated_regression.py\", line 37, in test_footer_contact_text_stays_white\n    self.assertEqual(actual, EXPECTED_COLOR, f\"{SELECTOR}: property color expected {EXPECTED_COLOR}, got {actual}\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'rgb(30, 64, 175)' != 'rgb(255, 255, 255)'\n- rgb(30, 64, 175)\n+ rgb(255, 255, 255)\n : html:nth-child(1) > body:nth-child(2) > footer:nth-child(3) > p:nth-child(3): property color expected rgb(255, 255, 255), got rgb(30, 64, 175)\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (failures=1)\n"
+      }
+    }
+  ],
+  "usage": {
+    "input_tokens": 6,
+    "cache_creation_input_tokens": 30417,
+    "cache_read_input_tokens": 125455,
+    "output_tokens": 1515,
+    "total_cost_usd": 0.16192099999999998,
+    "num_turns": 5,
+    "duration_ms": 12008
+  },
+  "created_at": "2026-11-26T19:55:37+00:00"
+}

@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.95,
+  "summary": "The section headings were successfully changed to dark blue as intended, but the contact email in the footer was also incorrectly changed to dark blue, making it unreadable against the blue footer background.",
+  "regressions": [
+    {
+      "box_id": 4,
+      "category": "color",
+      "severity": "high",
+      "explanation": "The footer text color changed from white to dark blue, rendering it almost invisible against the bright blue background.",
+      "violated_rule": "Text must have sufficient contrast with its background."
+    }
+  ],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 1025,
+    "image_tokens": 4400,
+    "output_tokens": 171,
+    "thinking_tokens": 0,
+    "total_tokens": 5596
+  }
+}

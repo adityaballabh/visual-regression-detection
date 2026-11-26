@@ -1,0 +1,22 @@
+{
+  "is_regression": true,
+  "confidence": 0.99,
+  "summary": "While the three section headings were intentionally updated to dark blue, the contact text in the footer was also unintentionally changed from white to dark blue, resulting in poor contrast against the bright blue background.",
+  "regressions": [
+    {
+      "box_id": 4,
+      "category": "color",
+      "severity": "high",
+      "explanation": "The footer contact text 'Contact us at: info@educationalinstitute.com' changed from white to dark blue against the bright blue footer background, causing low contrast and poor readability while contradicting the design intent which only targeted section headings.",
+      "violated_rule": "The section headings \"Academic Programs\", \"Faculty\" and \"Faculty Research\" were changed from black to dark blue."
+    }
+  ],
+  "intended_box_ids": [1, 2, 3],
+  "usage": {
+    "text_tokens": 1614,
+    "image_tokens": 4400,
+    "output_tokens": 195,
+    "thinking_tokens": 386,
+    "total_tokens": 6595
+  }
+}

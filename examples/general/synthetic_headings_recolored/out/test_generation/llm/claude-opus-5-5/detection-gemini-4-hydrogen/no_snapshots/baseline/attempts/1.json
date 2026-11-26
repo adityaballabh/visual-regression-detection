@@ -1,0 +1,115 @@
+{
+  "duration_api_ms": 25953,
+  "stop_reason": "end_turn",
+  "session_id": "4882987c-8df5-41b0-8dcf-174e4c06c947",
+  "total_cost_usd": 0.3842140000000001,
+  "usage": {
+    "input_tokens": 14,
+    "cache_creation_input_tokens": 32528,
+    "cache_read_input_tokens": 339070,
+    "output_tokens": 2806,
+    "output_tokens_details": {"thinking_tokens": 337},
+    "server_tool_use": {"web_search_requests": 0, "web_fetch_requests": 0},
+    "service_tier": "standard",
+    "cache_creation": {"ephemeral_1h_input_tokens": 32528, "ephemeral_5m_input_tokens": 0},
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 343,
+        "cache_read_input_tokens": 54339,
+        "cache_creation_input_tokens": 1238,
+        "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 1238},
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 14,
+      "outputTokens": 2806,
+      "cacheReadInputTokens": 339070,
+      "cacheCreationInputTokens": 32528,
+      "webSearchRequests": 0,
+      "costUSD": 0.3842140000000001,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 337,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [
+    {
+      "tool_name": "Bash",
+      "tool_use_id": "toolu_0118RnziLPi1CCQZytuKexCp",
+      "tool_input": {
+        "command": "cd . && .venv/bin/python -c \"\nfrom pathlib import Path\nfrom image_diff.dom.parse import load_snapshot\nfor n in ['before','after']:\n    s=load_snapshot(Path('examples/general/synthetic_headings_recolored/captures/%s_snapshot.json'%n))\n    for e in s.elements:\n        if 'Contact us' in (e.own_text or ''):\n            print(n, e.frames, e.selector, e.tag, e.styles.get('color'), e.box)\n\"",
+        "description": "Find the contact paragraph in both snapshots"
+      }
+    }
+  ],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {"background": 0, "foreground": 0, "unset": 0},
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {"parent": 0, "user": 0, "system": 0},
+    "refused": {"depth_limit": 0, "concurrency_limit": 0, "budget": 0},
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 8,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I wrote the test, and it passes on the before snapshot and fails on the after snapshot. The failure is an assertion about the flagged element: `html:nth-child(1) > body:nth-child(2) > footer:nth-child(3) > p:nth-child(3)` color, expected `rgb(255, 255, 255)`, got `rgb(30, 64, 175)`.\n\nThe flagged box came with no selector, so the test finds the footer `<p>` by its text \"Contact us at: info@educationalinstitute.com\". It then checks that its computed `color` is still white. It doesn't check the three section headings, since turning those dark blue was intended.\n\nI couldn't read the white value straight from the snapshot: Bash was denied for my lookup script and the file is one JSON line too long for Grep to show. The before run passing confirms that `rgb(255, 255, 255)` is the value in that snapshot.",
+  "ttft_ms": 2657,
+  "type": "result",
+  "duration_ms": 28445,
+  "uuid": "1f92bf49-4736-4a89-8d4a-6f109096f620",
+  "ttft_stream_ms": 894,
+  "time_to_request_ms": 63,
+  "time_to_request_phases_ms": {
+    "other": 8,
+    "system_prompt": 6,
+    "resume_other": 0,
+    "process_user_input": 1,
+    "input_attachments": 12,
+    "input_hooks": 27,
+    "tool_pool_refresh": 1,
+    "init_message": 1,
+    "engine_pickup": 0,
+    "message_prep": 0,
+    "model_config_wait": 1,
+    "autocompact": 0,
+    "query_setup": 0,
+    "model_gates": 0,
+    "tool_schema_build": 2,
+    "message_normalization": 1,
+    "client_creation": 1,
+    "request_build": 2
+  },
+  "turn_start_resume_kind": "none",
+  "process_turn_index": 0,
+  "time_to_request_loop_lag_ms": 12,
+  "time_to_request_cpu_ms": 61,
+  "time_to_request_major_faults": 0,
+  "input_attachments_detail": {
+    "slowest_producer": "nested_memory",
+    "slowest_producer_ms": 5,
+    "cpu_ms": 17,
+    "major_faults": 0
+  },
+  "first_content_frame_ms": 895,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

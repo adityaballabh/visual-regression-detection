@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.95,
+  "summary": "The navigation links were updated with a bold font weight and purple accent color consistently across the header menu.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4],
+  "usage": {
+    "text_tokens": 983,
+    "image_tokens": 4400,
+    "output_tokens": 77,
+    "thinking_tokens": 276,
+    "total_tokens": 5736
+  }
+}

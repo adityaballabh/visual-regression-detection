@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 0.9,
+  "summary": "The detected changes show navigation links being updated to a bold, active state with a new color, which appears to be an intentional navigation styling update.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4],
+  "usage": {
+    "text_tokens": 901,
+    "image_tokens": 0,
+    "output_tokens": 85,
+    "thinking_tokens": 0,
+    "total_tokens": 986
+  }
+}

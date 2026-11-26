@@ -1,0 +1,14 @@
+{
+  "is_regression": false,
+  "confidence": 1.0,
+  "summary": "All changes correctly reflect the design intent to update the section headings color.",
+  "regressions": [],
+  "intended_box_ids": [1, 2, 3, 4],
+  "usage": {
+    "text_tokens": 831,
+    "image_tokens": 4400,
+    "output_tokens": 70,
+    "thinking_tokens": 0,
+    "total_tokens": 5301
+  }
+}
